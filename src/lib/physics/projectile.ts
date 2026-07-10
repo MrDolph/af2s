@@ -1,8 +1,5 @@
 import { degreesToRadians } from '@/lib/utils/format';
 import type { ProjectileParams, GraphDataPoint } from "@/types/simulation";
-export type { ProjectileParams };
-
-export type { ProjectileParams };
 
 export interface ProjectileState {
   x: number;
