@@ -1,3 +1,10 @@
+#!/bin/bash
+# Run inside af2s/ folder: bash fix-build.sh
+set -e
+echo "Fixing build errors..."
+
+# Rewrite projectile.ts — inline ProjectileParams instead of re-exporting it
+cat > src/lib/physics/projectile.ts << 'PHYSICS'
 import { degreesToRadians } from '@/lib/utils/format';
 import type { GraphDataPoint } from '@/types/simulation';
 
@@ -62,3 +69,16 @@ export function generateTrajectoryPath(params: ProjectileParams): GraphDataPoint
   }
   return points;
 }
+PHYSICS
+
+# Also remove ProjectileParams from types/simulation.ts to avoid duplication
+# (it now lives only in projectile.ts)
+sed -i '/export interface ProjectileParams/,/^}/d' src/types/simulation.ts
+
+echo ""
+echo "✅ Build fix applied!"
+echo "   ProjectileParams is now defined directly in projectile.ts"
+echo "   No more cross-boundary re-export"
+echo ""
+echo "Test locally: npm run build"
+echo "Then: git add . && git commit -m 'fix: resolve Vercel build error' && git push"

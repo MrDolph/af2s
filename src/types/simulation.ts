@@ -19,12 +19,6 @@ export interface SimulationScene {
   createdAt: string;
 }
 
-export interface ProjectileParams extends SimulationParams {
-  initialVelocity: number;
-  angle: number;
-  gravity: number;
-  mass: number;
-}
 
 export interface GraphDataPoint {
   x: number;
