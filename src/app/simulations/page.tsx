@@ -26,13 +26,13 @@ const SIMULATIONS = [
   },
   {
     slug: 'newtons-second-law',
-    href: '/simulations/newtons-second-law',
+    href: '/simulations/newtons-laws',
     title: "Newton's 2nd law",
     description: 'Apply forces to a block and observe acceleration in real time.',
     icon: '⚡',
     tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
     topic: 'Mechanics',
-    status: 'coming',
+    status: 'live',
   },
   {
     slug: 'simple-harmonic-motion',
