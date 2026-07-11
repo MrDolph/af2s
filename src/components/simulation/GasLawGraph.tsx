@@ -48,7 +48,7 @@ export function GasLawGraph({ law, currentV, currentP, currentT, moles }: GasLaw
           </YAxis>
           <Tooltip formatter={(v) => [`${Number(v).toFixed(2)} L`, 'Volume']} labelFormatter={(t) => `Temp: ${t} K`} />
           <Line type="monotone" dataKey="v" stroke="#10b981" strokeWidth={2} dot={false} />
-          <ReferenceDot x={currentT} y={+charlesCurve(moles, currentP, currentT, currentT, 1)[0]?.v?.toFixed(2) ?? 0} r={6} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
+          <ReferenceDot x={currentT} y={+(charlesCurve(moles, currentP, currentT, currentT, 1)[0]?.v ?? 0)} r={6} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     );
