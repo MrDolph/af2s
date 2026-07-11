@@ -26,7 +26,7 @@ export function GasLawGraph({ law, currentV, currentP, currentT, moles }: GasLaw
           <YAxis tick={{ fontSize: 11 }}>
             <Label value="Pressure (kPa)" angle={-90} position="insideLeft" offset={10} style={{ fontSize: 11, fill: '#64748b' }} />
           </YAxis>
-          <Tooltip formatter={(v: number) => [`${v} kPa`, 'Pressure']} labelFormatter={v => `Volume: ${v} L`} />
+          <Tooltip formatter={(v) => [`${Number(v).toFixed(2)} kPa`, 'Pressure']} labelFormatter={(v) => `Volume: ${v} L`} />
           <Line type="monotone" dataKey="p" stroke="#6366f1" strokeWidth={2} dot={false} />
           <ReferenceDot x={+currentV.toFixed(2)} y={+currentP.toFixed(2)} r={6} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
         </LineChart>
@@ -45,7 +45,7 @@ export function GasLawGraph({ law, currentV, currentP, currentT, moles }: GasLaw
         <YAxis tick={{ fontSize: 11 }}>
           <Label value="Volume (L)" angle={-90} position="insideLeft" offset={10} style={{ fontSize: 11, fill: '#64748b' }} />
         </YAxis>
-        <Tooltip formatter={(v: number) => [`${v} L`, 'Volume']} labelFormatter={t => `Temp: ${t} K`} />
+        <Tooltip formatter={(v) => [`${Number(v).toFixed(2)} L`, 'Volume']} labelFormatter={(t) => `Temp: ${t} K`} />
         <Line type="monotone" dataKey="v" stroke="#10b981" strokeWidth={2} dot={false} />
         <ReferenceDot x={currentT} y={+(charlesCurve(moles, currentP, currentT, currentT, 1)[0]?.v ?? 0).toFixed(2)} r={6} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
       </LineChart>
