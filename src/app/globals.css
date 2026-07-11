@@ -24,3 +24,13 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Hide scrollbar for topic filter row on mobile */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Smooth tap targets on mobile */
+button, a { -webkit-tap-highlight-color: transparent; }
+
+/* Prevent canvas overflow on small screens */
+canvas { max-width: 100%; }
