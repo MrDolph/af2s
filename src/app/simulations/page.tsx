@@ -6,7 +6,7 @@ const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'] as const;
 const SIMULATIONS = [
   {
     slug: 'projectile-motion',
-    href: '/',
+    href: '/simulations/projectile-motion',
     title: 'Projectile motion',
     description: 'Launch a projectile and explore range, height, and trajectory in real time.',
     icon: '🎯',
