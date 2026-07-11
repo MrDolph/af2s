@@ -1,3 +1,373 @@
+#!/bin/bash
+# A-Factor STEM Studio — Ideal Gas Equation + Real Gases patch
+# Run inside af2s/ folder: bash ideal-real-gas-patch.sh
+set -e
+echo "Adding Ideal Gas Equation and Real Gases tabs..."
+
+# ── 1. Update gas-laws physics engine ─────────────────────────────────────────
+cat > src/lib/physics/gas-laws.ts << 'EOF'
+export interface GasState {
+  pressure: number;    // kPa
+  volume: number;      // L
+  temperature: number; // K
+  moles: number;
+}
+
+export const R = 8.314; // J/(mol·K)
+
+// ── Simple gas laws ───────────────────────────────────────────────────────────
+export function boyleNewVolume(p1: number, v1: number, p2: number): number { return (p1 * v1) / p2; }
+export function charlesNewVolume(v1: number, t1: number, t2: number): number { return (v1 * t2) / t1; }
+export function pressureLawNewPressure(p1: number, t1: number, t2: number): number { return (p1 * t2) / t1; }
+
+// ── Ideal gas law: PV = nRT ───────────────────────────────────────────────────
+export function idealGasPressure(n: number, t: number, vLitres: number): number {
+  return (n * R * t) / (vLitres * 0.001); // Pa
+}
+export function idealGasVolume(n: number, t: number, pKpa: number): number {
+  return (n * R * t) / (pKpa * 1000) * 1000; // L
+}
+export function idealGasMoles(pKpa: number, vLitres: number, t: number): number {
+  return (pKpa * 1000 * vLitres * 0.001) / (R * t);
+}
+export function idealGasTemperature(pKpa: number, vLitres: number, n: number): number {
+  return (pKpa * 1000 * vLitres * 0.001) / (n * R);
+}
+
+// ── Van der Waals constants for real gases ────────────────────────────────────
+export interface GasConstants { a: number; b: number; name: string; formula: string; }
+export const VAN_DER_WAALS: Record<string, GasConstants> = {
+  ideal: { a: 0,     b: 0,       name: 'Ideal gas',       formula: '—' },
+  He:    { a: 0.034, b: 0.02370, name: 'Helium',          formula: 'He' },
+  H2:    { a: 0.244, b: 0.02661, name: 'Hydrogen',        formula: 'H₂' },
+  N2:    { a: 1.370, b: 0.03870, name: 'Nitrogen',        formula: 'N₂' },
+  O2:    { a: 1.382, b: 0.03186, name: 'Oxygen',          formula: 'O₂' },
+  CO2:   { a: 3.640, b: 0.04267, name: 'Carbon dioxide',  formula: 'CO₂' },
+  NH3:   { a: 4.170, b: 0.03707, name: 'Ammonia',         formula: 'NH₃' },
+  H2O:   { a: 5.536, b: 0.03049, name: 'Water vapour',    formula: 'H₂O' },
+};
+
+// Van der Waals pressure: (P + an²/V²)(V - nb) = nRT
+export function vdwPressure(n: number, t: number, vLitres: number, gas: string): number {
+  const { a, b } = VAN_DER_WAALS[gas];
+  const V = vLitres * 0.001; // m³
+  const p = (n * R * t) / (V - n * b) - a * (n * n) / (V * V);
+  return Math.max(0, p); // Pa
+}
+
+// ── Curve generators ──────────────────────────────────────────────────────────
+export function boyleCurve(n: number, t: number, vMin = 0.5, vMax = 10, steps = 60) {
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const v = vMin + (i / steps) * (vMax - vMin);
+    return { v: +v.toFixed(3), p: +(idealGasPressure(n, t, v) / 1000).toFixed(2) };
+  });
+}
+export function charlesCurve(n: number, p: number, tMin = 100, tMax = 600, steps = 60) {
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const t = tMin + (i / steps) * (tMax - tMin);
+    return { t: +t.toFixed(0), v: +((n * R * t) / (p * 1000) * 1000).toFixed(3) };
+  });
+}
+export function pressureLawCurve(n: number, vLitres: number, tMin = 100, tMax = 600, steps = 60) {
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const t = tMin + (i / steps) * (tMax - tMin);
+    return { t: +t.toFixed(0), p: +(idealGasPressure(n, t, vLitres) / 1000).toFixed(2) };
+  });
+}
+
+// Ideal vs real comparison: PV/nRT (compressibility factor Z) vs P
+export function compressibilityCurve(
+  n: number, t: number, gas: string, pMinKpa = 100, pMaxKpa = 20000, steps = 80
+) {
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const pKpa = pMinKpa + (i / steps) * (pMaxKpa - pMinKpa);
+    const vIdeal = idealGasVolume(n, t, pKpa);
+    // For real gas Z: solve vdw numerically — use ideal V as starting point
+    let vReal = vIdeal;
+    for (let iter = 0; iter < 20; iter++) {
+      const pCalc = vdwPressure(n, t, vReal, gas) / 1000;
+      const dv = (pCalc - pKpa) * 0.00001;
+      vReal -= dv;
+      if (vReal <= 0.001) { vReal = 0.001; break; }
+    }
+    const Z = (pKpa * 1000 * vReal * 0.001) / (n * R * t);
+    return { p: +pKpa.toFixed(0), z: +Z.toFixed(4), zIdeal: 1 };
+  });
+}
+
+// P-V isotherms for ideal vs real
+export function pvIsotherm(n: number, t: number, gas: string, vMin = 0.5, vMax = 15, steps = 80) {
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const v = vMin + (i / steps) * (vMax - vMin);
+    const pIdeal = +(idealGasPressure(n, t, v) / 1000).toFixed(2);
+    const pReal  = +(vdwPressure(n, t, v, gas) / 1000).toFixed(2);
+    return { v: +v.toFixed(3), pIdeal: Math.min(pIdeal, 5000), pReal: Math.max(0, Math.min(pReal, 5000)) };
+  });
+}
+EOF
+
+# ── 2. IdealGasCanvas — animated particle box ─────────────────────────────────
+cat > src/components/simulation/IdealGasCanvas.tsx << 'EOF'
+'use client';
+import { useRef, useEffect, useCallback } from 'react';
+import { idealGasPressure } from '@/lib/physics/gas-laws';
+
+interface IdealGasCanvasProps {
+  pressure: number;    // kPa
+  volume: number;      // L
+  temperature: number; // K
+  moles: number;
+  solveFor: 'P' | 'V' | 'T' | 'n';
+  width?: number;
+  height?: number;
+}
+
+interface Particle { x: number; y: number; vx: number; vy: number; }
+
+const CLEFT = 60, CTOP = 30, CWIDTH = 160, CHEIGHT = 200;
+const CRIGHT = CLEFT + CWIDTH;
+const CBOTTOM = CTOP + CHEIGHT;
+
+export function IdealGasCanvas({ pressure, volume, temperature, moles, width = 320, height = 300 }: IdealGasCanvasProps) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rafRef = useRef<number>(0);
+  const particles = useRef<Particle[]>([]);
+  const sim = useRef({ pressure, volume, temperature, moles, width, height });
+  sim.current = { pressure, volume, temperature, moles, width, height };
+
+  useEffect(() => {
+    const count = Math.max(8, Math.min(Math.round(moles * 60), 60));
+    particles.current = Array.from({ length: count }, () => ({
+      x: CLEFT + 8 + Math.random() * (CWIDTH - 16),
+      y: CTOP + 8 + Math.random() * (CHEIGHT - 16),
+      vx: (Math.random() - 0.5) * 2,
+      vy: (Math.random() - 0.5) * 2,
+    }));
+  }, [moles]);
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const { temperature: T, moles: n, volume: V } = sim.current;
+
+    const pKpa = idealGasPressure(n, T, V) / 1000;
+    const heat = Math.min((T - 100) / 500, 1);
+    const speedFactor = Math.sqrt(T / 300);
+    const count = Math.max(8, Math.min(Math.round(n * 60), 60));
+
+    // Adjust particle count smoothly
+    while (particles.current.length < count) {
+      particles.current.push({
+        x: CLEFT + 8 + Math.random() * (CWIDTH - 16),
+        y: CTOP + 8 + Math.random() * (CHEIGHT - 16),
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+      });
+    }
+    if (particles.current.length > count) particles.current.length = count;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Container
+    const fillR = Math.round(219 + heat * 36);
+    const fillG = Math.round(234 - heat * 114);
+    const fillB = Math.round(254 - heat * 154);
+    ctx.fillStyle = `rgba(${fillR},${fillG},${fillB},0.25)`;
+    ctx.fillRect(CLEFT, CTOP, CWIDTH, CHEIGHT);
+    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
+    ctx.strokeRect(CLEFT, CTOP, CWIDTH, CHEIGHT);
+
+    // Volume label
+    ctx.fillStyle = '#94a3b8'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText(`V = ${V.toFixed(1)} L`, CLEFT + CWIDTH / 2, CTOP - 8);
+
+    // Particles
+    for (const p of particles.current) {
+      p.x += p.vx * speedFactor;
+      p.y += p.vy * speedFactor;
+      if (p.x < CLEFT + 5)    { p.x = CLEFT + 5;    p.vx = Math.abs(p.vx); }
+      if (p.x > CRIGHT - 5)   { p.x = CRIGHT - 5;   p.vx = -Math.abs(p.vx); }
+      if (p.y < CTOP + 5)     { p.y = CTOP + 5;     p.vy = Math.abs(p.vy); }
+      if (p.y > CBOTTOM - 5)  { p.y = CBOTTOM - 5;  p.vy = -Math.abs(p.vy); }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${Math.round(99 + heat * 120)},102,${Math.round(241 - heat * 141)},0.85)`;
+      ctx.fill();
+    }
+
+    // PV = nRT readout
+    const labels = [
+      { label: 'P', value: `${pKpa.toFixed(1)} kPa`, color: '#6366f1' },
+      { label: 'V', value: `${V.toFixed(1)} L`,       color: '#10b981' },
+      { label: 'n', value: `${n.toFixed(2)} mol`,     color: '#f59e0b' },
+      { label: 'T', value: `${T} K`,                  color: '#ef4444' },
+    ];
+    labels.forEach((l, i) => {
+      const lx = CRIGHT + 20;
+      const ly = CTOP + 30 + i * 42;
+      ctx.fillStyle = l.color; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left';
+      ctx.fillText(l.label, lx, ly);
+      ctx.fillStyle = '#1e293b'; ctx.font = '11px system-ui';
+      ctx.fillText(l.value, lx + 14, ly);
+    });
+
+    // PV = nRT verification
+    const pv = pKpa * 1000 * V * 0.001;
+    const nrt = n * 8.314 * T;
+    ctx.fillStyle = '#94a3b8'; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+    ctx.fillText('PV = nRT', CLEFT + CWIDTH / 2, CBOTTOM + 20);
+    ctx.fillStyle = '#6366f1'; ctx.font = 'bold 10px monospace';
+    ctx.fillText(`${pv.toFixed(1)} ≈ ${nrt.toFixed(1)} J`, CLEFT + CWIDTH / 2, CBOTTOM + 34);
+
+    rafRef.current = requestAnimationFrame(draw);
+  }, []);
+
+  useEffect(() => {
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [draw]);
+
+  return (
+    <canvas ref={canvasRef} width={width} height={height}
+      className="w-full rounded-xl border border-gray-200 bg-white" style={{ display: 'block' }} />
+  );
+}
+EOF
+
+# ── 3. Updated GasLawGraph with ideal + real curves ───────────────────────────
+cat > src/components/simulation/GasLawGraph.tsx << 'EOF'
+'use client';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ReferenceDot, ResponsiveContainer, Label, Legend,
+} from 'recharts';
+import {
+  boyleCurve, charlesCurve, pressureLawCurve,
+  compressibilityCurve, pvIsotherm,
+} from '@/lib/physics/gas-laws';
+
+interface GasLawGraphProps {
+  law: 'boyle' | 'charles' | 'pressure' | 'ideal' | 'real';
+  currentV: number;
+  currentP: number;
+  currentT: number;
+  moles: number;
+  selectedGas?: string;
+}
+
+export function GasLawGraph({ law, currentV, currentP, currentT, moles, selectedGas = 'CO2' }: GasLawGraphProps) {
+  if (law === 'boyle') {
+    const data = boyleCurve(moles, currentT);
+    return (
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis dataKey="v" type="number" domain={[0.5, 10]} tick={{ fontSize: 11 }}>
+            <Label value="Volume (L)" position="insideBottom" offset={-18} style={{ fontSize: 11, fill: '#64748b' }} />
+          </XAxis>
+          <YAxis tick={{ fontSize: 11 }}>
+            <Label value="Pressure (kPa)" angle={-90} position="insideLeft" offset={10} style={{ fontSize: 11, fill: '#64748b' }} />
+          </YAxis>
+          <Tooltip formatter={(v) => [`${Number(v).toFixed(2)} kPa`, 'Pressure']} labelFormatter={(v) => `Volume: ${v} L`} />
+          <Line type="monotone" dataKey="p" stroke="#6366f1" strokeWidth={2} dot={false} />
+          <ReferenceDot x={+currentV.toFixed(2)} y={+currentP.toFixed(2)} r={6} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
+        </LineChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  if (law === 'charles') {
+    const data = charlesCurve(moles, currentP);
+    return (
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis dataKey="t" type="number" domain={[100, 600]} tick={{ fontSize: 11 }}>
+            <Label value="Temperature (K)" position="insideBottom" offset={-18} style={{ fontSize: 11, fill: '#64748b' }} />
+          </XAxis>
+          <YAxis tick={{ fontSize: 11 }}>
+            <Label value="Volume (L)" angle={-90} position="insideLeft" offset={10} style={{ fontSize: 11, fill: '#64748b' }} />
+          </YAxis>
+          <Tooltip formatter={(v) => [`${Number(v).toFixed(2)} L`, 'Volume']} labelFormatter={(t) => `Temp: ${t} K`} />
+          <Line type="monotone" dataKey="v" stroke="#10b981" strokeWidth={2} dot={false} />
+          <ReferenceDot x={currentT} y={+(charlesCurve(moles, currentP, currentT, currentT, 1)[0]?.v ?? 0)} r={6} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
+        </LineChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  if (law === 'pressure') {
+    const data = pressureLawCurve(moles, currentV);
+    return (
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis dataKey="t" type="number" domain={[100, 600]} tick={{ fontSize: 11 }}>
+            <Label value="Temperature (K)" position="insideBottom" offset={-18} style={{ fontSize: 11, fill: '#64748b' }} />
+          </XAxis>
+          <YAxis tick={{ fontSize: 11 }}>
+            <Label value="Pressure (kPa)" angle={-90} position="insideLeft" offset={10} style={{ fontSize: 11, fill: '#64748b' }} />
+          </YAxis>
+          <Tooltip formatter={(v) => [`${Number(v).toFixed(2)} kPa`, 'Pressure']} labelFormatter={(t) => `Temp: ${t} K`} />
+          <Line type="monotone" dataKey="p" stroke="#ef4444" strokeWidth={2} dot={false} />
+          <ReferenceDot x={currentT} y={+(pressureLawCurve(moles, currentV, currentT, currentT, 1)[0]?.p ?? 0)} r={6} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
+        </LineChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  if (law === 'ideal') {
+    // Show multiple isotherms for different mole counts
+    const t1 = boyleCurve(0.05, currentT).map(d => ({ v: d.v, p1: d.p }));
+    const t2 = boyleCurve(0.1,  currentT).map(d => ({ v: d.v, p2: d.p }));
+    const t3 = boyleCurve(0.2,  currentT).map(d => ({ v: d.v, p3: d.p }));
+    const data = t1.map((d, i) => ({ ...d, ...t2[i], ...t3[i] }));
+    return (
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis dataKey="v" type="number" domain={[0.5, 10]} tick={{ fontSize: 10 }}>
+            <Label value="Volume (L)" position="insideBottom" offset={-18} style={{ fontSize: 11, fill: '#64748b' }} />
+          </XAxis>
+          <YAxis tick={{ fontSize: 10 }}>
+            <Label value="Pressure (kPa)" angle={-90} position="insideLeft" offset={10} style={{ fontSize: 11, fill: '#64748b' }} />
+          </YAxis>
+          <Tooltip formatter={(v) => [`${Number(v).toFixed(1)} kPa`]} labelFormatter={(v) => `V = ${v} L`} />
+          <Legend wrapperStyle={{ fontSize: 10 }} />
+          <Line type="monotone" dataKey="p1" stroke="#c7d2fe" strokeWidth={1.5} dot={false} name="n = 0.05 mol" />
+          <Line type="monotone" dataKey="p2" stroke="#6366f1" strokeWidth={2} dot={false} name="n = 0.1 mol" />
+          <Line type="monotone" dataKey="p3" stroke="#3730a3" strokeWidth={2.5} dot={false} name="n = 0.2 mol" />
+        </LineChart>
+      </ResponsiveContainer>
+    );
+  }
+
+  // Real gas — compressibility factor Z vs P
+  const data = compressibilityCurve(moles, currentT, selectedGas);
+  return (
+    <ResponsiveContainer width="100%" height={220}>
+      <LineChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 30 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+        <XAxis dataKey="p" type="number" tick={{ fontSize: 10 }}>
+          <Label value="Pressure (kPa)" position="insideBottom" offset={-18} style={{ fontSize: 11, fill: '#64748b' }} />
+        </XAxis>
+        <YAxis domain={[0.5, 1.5]} tick={{ fontSize: 10 }}>
+          <Label value="Z = PV/nRT" angle={-90} position="insideLeft" offset={10} style={{ fontSize: 11, fill: '#64748b' }} />
+        </YAxis>
+        <Tooltip formatter={(v) => [Number(v).toFixed(3)]} labelFormatter={(p) => `P = ${p} kPa`} />
+        <Legend wrapperStyle={{ fontSize: 10 }} />
+        <Line type="monotone" dataKey="zIdeal" stroke="#94a3b8" strokeWidth={1.5} dot={false} strokeDasharray="5 4" name="Ideal (Z=1)" />
+        <Line type="monotone" dataKey="z" stroke="#ef4444" strokeWidth={2} dot={false} name={`${selectedGas} (real)`} />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+EOF
+
+# ── 4. Full updated Gas Laws page — all 5 tabs ────────────────────────────────
+cat > src/app/simulations/gas-laws/page.tsx << 'EOF'
 'use client';
 import { useState } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -404,3 +774,15 @@ export default function GasLawsPage() {
     </>
   );
 }
+EOF
+
+echo ""
+echo "✅ Ideal Gas + Real Gases added!"
+echo ""
+echo "Files written:"
+echo "  src/lib/physics/gas-laws.ts              — VdW constants, ideal solvers, Z curve"
+echo "  src/components/simulation/IdealGasCanvas.tsx  — animated particle box with PV=nRT readout"
+echo "  src/components/simulation/GasLawGraph.tsx     — isotherms + compressibility Z graph"
+echo "  src/app/simulations/gas-laws/page.tsx         — 5-tab layout"
+echo ""
+echo "Visit: http://localhost:3000/simulations/gas-laws"
