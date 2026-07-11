@@ -106,34 +106,78 @@ export interface InclinedParams {
   alpha: number;    // angle of projection above inclined surface (degrees)
   beta: number;     // angle of incline to horizontal (degrees)
   g: number;        // m/s²
+  // 'base': launched from the foot of the incline, up along the slope —
+  //         terminates back on the incline surface (n = 0 in the local frame).
+  // 'top':  launched from the top of a raised incline/platform, out into
+  //         open air beyond it — terminates at ground level, like a
+  //         standard projectile launched from height `height`.
+  launchFrom: 'base' | 'top';
+  height?: number;  // platform height (m) — only used when launchFrom === 'top'
 }
+
 export function inclinedAnalytics(p: InclinedParams) {
-  const { v0, alpha, beta, g } = p;
+  const { v0, alpha, beta, g, launchFrom } = p;
   const a = alpha * DEG;
   const b = beta * DEG;
-  // g along incline (down) = g sinβ, g perpendicular (into surface) = g cosβ
+
+  if (launchFrom === 'top') {
+    // Free flight from height h at (alpha+beta)° above horizontal — same
+    // shape as standardAnalytics(), just re-expressed via alpha/beta.
+    const h = p.height ?? 0;
+    const vx0 = v0 * Math.cos(a + b);
+    const vy0 = v0 * Math.sin(a + b);
+    const disc = vy0 * vy0 + 2 * g * h;
+    const tFlight = (vy0 + Math.sqrt(Math.max(0, disc))) / g;
+    const maxHeight = h + Math.max(0, (vy0 * vy0) / (2 * g));
+    const range = vx0 * tFlight;
+    return {
+      tFlight: +tFlight.toFixed(3),
+      range: +range.toFixed(3),
+      rangeHorizontal: +range.toFixed(3),
+      maxHeight: +maxHeight.toFixed(3),
+      rangeAlongIncline: undefined as number | undefined,
+      maxHeightAboveIncline: undefined as number | undefined,
+    };
+  }
+
+  // Launched from the base, up the slope — lands back on the incline.
+  // g along incline (down-slope) = g sinβ, g perpendicular (into surface) = g cosβ
   const gAlong = g * Math.sin(b);
   const gPerp  = g * Math.cos(b);
-  // Launch: v along incline = v0 cosα, v perpendicular = v0 sinα
   const tFlight = (2 * v0 * Math.sin(a)) / gPerp;
   const rangeAlongIncline = v0 * Math.cos(a) * tFlight - 0.5 * gAlong * tFlight * tFlight;
   const maxHeightPerp = (v0 * v0 * Math.sin(a) * Math.sin(a)) / (2 * gPerp);
   return {
     tFlight: +tFlight.toFixed(3),
+    range: +(rangeAlongIncline * Math.cos(b)).toFixed(3),
     rangeAlongIncline: +rangeAlongIncline.toFixed(3),
     rangeHorizontal: +(rangeAlongIncline * Math.cos(b)).toFixed(3),
+    maxHeight: +maxHeightPerp.toFixed(3),
     maxHeightAboveIncline: +maxHeightPerp.toFixed(3),
   };
 }
+
 export function inclinedPath(p: InclinedParams, steps = 100) {
-  const { v0, alpha, beta, g } = p;
+  const { v0, alpha, beta, g, launchFrom } = p;
   const a = alpha * DEG;
   const b = beta * DEG;
-  const gPerp = g * Math.cos(b);
-  const gAlong = g * Math.sin(b);
+
+  if (launchFrom === 'top') {
+    const h = p.height ?? 0;
+    const vx0 = v0 * Math.cos(a + b);
+    const vy0 = v0 * Math.sin(a + b);
+    const disc = vy0 * vy0 + 2 * g * h;
+    const tFlight = (vy0 + Math.sqrt(Math.max(0, disc))) / g;
+    return Array.from({ length: steps + 1 }, (_, i) => {
+      const t = (i / steps) * tFlight;
+      return { t: +t.toFixed(3), x: +(vx0 * t).toFixed(3), y: +(h + vy0 * t - 0.5 * g * t * t).toFixed(3) };
+    }).filter(pt => pt.y >= 0);
+  }
+
+  const gPerp = g * Math.cos(b), gAlong = g * Math.sin(b);
   const tFlight = (2 * v0 * Math.sin(a)) / gPerp;
-  // In inclined frame: s (along), n (perp)
-  // Convert to world x,y coordinates
+  // In inclined frame: s (along), n (perp) — this trajectory is only valid
+  // for t in [0, tFlight], i.e. up until it returns to the incline surface.
   const cosB = Math.cos(b), sinB = Math.sin(b);
   return Array.from({ length: steps + 1 }, (_, i) => {
     const t = (i / steps) * tFlight;

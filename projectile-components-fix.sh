@@ -1,3 +1,13 @@
+#!/bin/bash
+# ============================================================
+# Fix: ball auto-resetting at end of run + add vx/vy component arrows
+# Run inside af2s/ folder: bash projectile-components-fix.sh
+# ============================================================
+set -e
+echo "🔧 Patching projectile-motion: end-of-run reset + velocity components..."
+
+# --- src/components/simulation/ProjectileModeCanvas.tsx ---
+cat > src/components/simulation/ProjectileModeCanvas.tsx << 'PATCHEOF'
 'use client';
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
@@ -36,13 +46,7 @@ const PAD = 44, GH = 44, BR = 8;
 const DT_BASE = 0.016;
 
 // ── Physics helpers ───────────────────────────────────────────────────────────
-interface Setup {
-  x0: number; y0: number; vx0: number; vy0: number; g: number; h0: number;
-  beta?: number;                    // incline angle (radians) — inclined mode only
-  launchFrom?: 'base' | 'top';      // inclined mode only
-}
-
-function getSetup(mode: ProjectileMode, p: Props): Setup {
+function getSetup(mode: ProjectileMode, p: Props) {
   if (mode === 'standard' && p.standard) {
     const a = p.standard.angle * Math.PI / 180;
     return {
@@ -62,20 +66,11 @@ function getSetup(mode: ProjectileMode, p: Props): Setup {
   if (mode === 'inclined' && p.inclined) {
     const a = p.inclined.alpha * Math.PI / 180;
     const b = p.inclined.beta  * Math.PI / 180;
-    const launchFrom = p.inclined.launchFrom ?? 'base';
-    const top = launchFrom === 'top';
-    const h0 = top ? (p.inclined.height ?? 0) : 0;
-    // Whether launched from the base or the top, the object is in free
-    // flight under gravity g the whole time — the launch angle above
-    // horizontal is simply (alpha + beta). What differs between the two
-    // scenarios is only the starting height and where it's allowed to land
-    // (handled below via `beta`/`launchFrom` in the termination check).
     return {
-      x0: 0, y0: h0,
-      vx0: p.inclined.v0 * Math.cos(a + b),
-      vy0: p.inclined.v0 * Math.sin(a + b),
-      g: p.inclined.g, h0,
-      beta: b, launchFrom,
+      x0: 0, y0: 0,
+      vx0: p.inclined.v0 * (Math.cos(a) * Math.cos(b) - Math.sin(a) * Math.sin(b)),
+      vy0: p.inclined.v0 * (Math.cos(a) * Math.sin(b) + Math.sin(a) * Math.cos(b)),
+      g: p.inclined.g, h0: 0,
     };
   }
   return { x0: 0, y0: 0, vx0: 10, vy0: 10, g: 9.81, h0: 0 };
@@ -110,17 +105,10 @@ function drawAll(
   trail: [number, number][],
   mode: ProjectileMode, h0: number,
   showHUD: boolean, showGrid: boolean, showTrail: boolean, showVec: boolean, showComp: boolean,
-  beta?: number, launchFrom?: 'base' | 'top',
 ) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const W = canvas.width, H = canvas.height;
-
-  // For an inclined launch from the base, the "ground" the object lands on
-  // is the sloped incline surface (y = x·tanβ), not world y = 0. Every other
-  // mode — and the inclined-from-top mode — lands on flat ground (y = 0).
-  const onIncline = mode === 'inclined' && launchFrom === 'base';
-  const floorAt = (xv: number) => (onIncline ? xv * Math.tan(beta ?? 0) : 0);
 
   ctx.clearRect(0, 0, W, H);
 
@@ -143,14 +131,17 @@ function drawAll(
     ctx.fillText(`${h0}m`, (PAD + 4) / 2, py - 6);
   }
 
-  // Inclined surface — only for a base launch (the ball lands back on this).
-  // A top launch instead shows the "Platform" block above (h0 = height).
-  if (onIncline && beta !== undefined) {
+  // Inclined surface
+  if (mode === 'inclined') {
     const maxXPt = maxX * 1.25;
-    const [x0c, y0c] = toCanvas(0, 0, scale, H);
-    const [x1c, y1c] = toCanvas(maxXPt, maxXPt * Math.tan(beta), scale, H);
-    ctx.beginPath(); ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
-    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 3; ctx.stroke();
+    const betaPts = path.filter(p => p.x > 0 && p.y > 0);
+    if (betaPts.length > 1) {
+      const beta = Math.atan2(path[path.length-1].y - path[0].y, path[path.length-1].x - path[0].x);
+      const [x0c, y0c] = toCanvas(0, 0, scale, H);
+      const [x1c, y1c] = toCanvas(maxXPt, maxXPt * Math.tan(beta < 0 ? 0 : beta), scale, H);
+      ctx.beginPath(); ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
+      ctx.strokeStyle = '#64748b'; ctx.lineWidth = 3; ctx.stroke();
+    }
   }
 
   // Grid
@@ -189,20 +180,19 @@ function drawAll(
 
   // Peak + landing markers
   const [pCx, pCy] = toCanvas(maxX / 2, maxY, scale, H);
-  const [, pFloorY] = toCanvas(maxX / 2, floorAt(maxX / 2), scale, H);
   ctx.save();
   ctx.beginPath(); ctx.setLineDash([4, 3]);
-  ctx.moveTo(pCx, pCy); ctx.lineTo(pCx, pFloorY);
+  ctx.moveTo(pCx, pCy); ctx.lineTo(pCx, H - GH);
   ctx.strokeStyle = 'rgba(99,102,241,0.4)'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.setLineDash([]);
   ctx.fillStyle = '#6366f1'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(`${maxY.toFixed(1)}m`, pCx, pCy - 8); ctx.restore();
 
-  const [lCx, lCy] = toCanvas(maxX, floorAt(maxX), scale, H);
+  const [lCx] = toCanvas(maxX, 0, scale, H);
   ctx.save();
-  ctx.beginPath(); ctx.arc(lCx, lCy, 5, 0, Math.PI * 2);
+  ctx.beginPath(); ctx.arc(lCx, H - GH, 5, 0, Math.PI * 2);
   ctx.fillStyle = '#10b981'; ctx.fill();
   ctx.fillStyle = '#10b981'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-  ctx.fillText(`${maxX.toFixed(1)}m`, lCx, lCy + (onIncline ? -10 : 32)); ctx.restore();
+  ctx.fillText(`${maxX.toFixed(1)}m`, lCx, H - GH + 32); ctx.restore();
 
   // Trail
   if (showTrail && trail.length > 1) {
@@ -216,8 +206,8 @@ function drawAll(
   }
 
   // Ball
-  const [bx, by] = toCanvas(x, Math.max(floorAt(x), y), scale, H);
-  const [, groundY] = toCanvas(x, floorAt(x), scale, H);
+  const [bx, by] = toCanvas(x, Math.max(0, y), scale, H);
+  const [, groundY] = toCanvas(0, 0, scale, H);
   ctx.beginPath(); ctx.ellipse(bx, groundY + 5, 10, 4, 0, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fill();
   const glow = ctx.createRadialGradient(bx, by, 0, bx, by, BR * 2.5);
@@ -286,7 +276,7 @@ function drawAll(
     const lines = [
       `t  = ${t.toFixed(2)}s`,
       ...(mode !== 'vertical' ? [`x  = ${x.toFixed(1)}m`] : []),
-      `y  = ${Math.max(floorAt(x), y).toFixed(1)}m`,
+      `y  = ${Math.max(0, y).toFixed(1)}m`,
       `v  = ${speed.toFixed(1)} m/s`,
     ];
     const bw = 118, bh = lines.length * 18 + 14, bhx = W - bw - 8;
@@ -346,9 +336,8 @@ export function ProjectileModeCanvas({
       trailRef.current, mode, setup.h0,
       isRunning || st.t > 0,
       showGrid, showTrail, showVec, showComp,
-      setup.beta, setup.launchFrom,
     );
-  }, [path, scale, maxX, maxY, mode, setup.h0, setup.beta, setup.launchFrom, isRunning, showGrid, showTrail, showVec, showComp]);
+  }, [path, scale, maxX, maxY, mode, setup.h0, isRunning, showGrid, showTrail, showVec, showComp]);
 
   // Keep a ref to the latest `draw` so the reset effect below doesn't need
   // `draw` itself in its dependency array. `draw`'s identity changes with
@@ -389,16 +378,11 @@ export function ProjectileModeCanvas({
           g:  s.g,
         };
         const ns = stateRef.current;
-        // A base-launched inclined trajectory lands back on the sloped
-        // surface (y = x·tanβ), not on flat ground (y = 0) — everything
-        // else (including an inclined launch from the top) lands at y = 0.
-        const onIncline = mode === 'inclined' && setup.launchFrom === 'base';
-        const floor = onIncline ? ns.x * Math.tan(setup.beta ?? 0) : 0;
-        const [tbx, tby] = toCanvas(ns.x, Math.max(floor, ns.y), scale, height);
+        const [tbx, tby] = toCanvas(ns.x, Math.max(0, ns.y), scale, height);
         trailRef.current.push([tbx, tby]);
         if (trailRef.current.length > 140) trailRef.current.shift();
-        onTick?.(ns.t, ns.x, Math.max(floor, ns.y));
-        if (ns.y <= floor || ns.t > 120) {
+        onTick?.(ns.t, ns.x, Math.max(0, ns.y));
+        if (ns.y < 0 || ns.t > 120) {
           completedRef.current = true;
           onComplete?.();
           draw(stateRef.current);
@@ -410,7 +394,7 @@ export function ProjectileModeCanvas({
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isRunning, isPaused, speedIdx, scale, height, mode, setup.beta, setup.launchFrom, draw, onTick, onComplete]);
+  }, [isRunning, isPaused, speedIdx, scale, height, draw, onTick, onComplete]);
 
   return (
     <div className="space-y-2">
@@ -449,3 +433,10 @@ export function ProjectileModeCanvas({
     </div>
   );
 }
+PATCHEOF
+
+echo ""
+echo "✅ Patch applied!"
+echo ""
+echo "Restart your dev server (Ctrl+C then npm run dev) and hard-refresh the page."
+echo "New: an 'Overlays' > 'Components' toggle now shows the vx/vy vectors."
