@@ -1,3 +1,10 @@
+#!/bin/bash
+# Final projectile canvas fix — clean single-loop approach
+# Run inside af2s/: bash projectile-canvas-final.sh
+set -e
+echo "Writing final ProjectileModeCanvas..."
+
+cat > src/components/simulation/ProjectileModeCanvas.tsx << 'EOF'
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -390,3 +397,8 @@ export function ProjectileModeCanvas({
     </div>
   );
 }
+EOF
+
+echo "✅ ProjectileModeCanvas rewritten!"
+echo "Run: npm run dev -- --webpack"
+echo "Visit: http://localhost:3000/simulations/projectile-motion"
