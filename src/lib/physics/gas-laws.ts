@@ -20,46 +20,52 @@ export function charlesNewVolume(v1: number, t1: number, t2: number): number {
   return (v1 * t2) / t1;
 }
 
+// Pressure Law (Gay-Lussac): P1/T1 = P2/T2 (constant V, n)
+export function pressureLawNewPressure(p1: number, t1: number, t2: number): number {
+  return (p1 * t2) / t1;
+}
+export function pressureLawNewTemperature(p1: number, t1: number, p2: number): number {
+  return (p2 * t1) / p1;
+}
+
 // Ideal gas: PV = nRT
 export function idealGasPressure(n: number, t: number, v: number): number {
   return (n * R * t) / (v * 0.001); // v in L → m³
 }
 
-// Generate Boyle's curve: P vs V at constant T
+// Boyle's curve: P vs V at constant T
 export function boyleCurve(
-  n: number,
-  temperature: number,
-  vMin = 0.5,
-  vMax = 10,
-  steps = 60
+  n: number, temperature: number, vMin = 0.5, vMax = 10, steps = 60
 ): { v: number; p: number }[] {
-  const points = [];
-  for (let i = 0; i <= steps; i++) {
+  return Array.from({ length: steps + 1 }, (_, i) => {
     const v = vMin + (i / steps) * (vMax - vMin);
-    const p = idealGasPressure(n, temperature, v) / 1000; // Pa → kPa
-    points.push({ v, p });
-  }
-  return points;
+    return { v: +v.toFixed(3), p: +(idealGasPressure(n, temperature, v) / 1000).toFixed(2) };
+  });
 }
 
-// Generate Charles' curve: V vs T at constant P
+// Charles' curve: V vs T at constant P
 export function charlesCurve(
-  n: number,
-  pressure: number, // kPa
-  tMin = 100,
-  tMax = 600,
-  steps = 60
+  n: number, pressure: number, tMin = 100, tMax = 600, steps = 60
 ): { t: number; v: number }[] {
-  const points = [];
-  for (let i = 0; i <= steps; i++) {
+  return Array.from({ length: steps + 1 }, (_, i) => {
     const t = tMin + (i / steps) * (tMax - tMin);
-    const v = (n * R * t) / (pressure * 1000) * 1000; // m³ → L
-    points.push({ t, v });
-  }
-  return points;
+    const v = (n * R * t) / (pressure * 1000) * 1000;
+    return { t: +t.toFixed(0), v: +v.toFixed(3) };
+  });
 }
 
-// Particle speed from temperature (Maxwell-Boltzmann proxy)
+// Pressure Law curve: P vs T at constant V
+export function pressureLawCurve(
+  n: number, volume: number, tMin = 100, tMax = 600, steps = 60
+): { t: number; p: number }[] {
+  return Array.from({ length: steps + 1 }, (_, i) => {
+    const t = tMin + (i / steps) * (tMax - tMin);
+    const p = idealGasPressure(n, t, volume) / 1000;
+    return { t: +t.toFixed(0), p: +p.toFixed(2) };
+  });
+}
+
+// Particle speed proxy from temperature
 export function particleSpeed(temperature: number, molarMass = 0.029): number {
   return Math.sqrt((3 * R * temperature) / molarMass);
 }
