@@ -40,7 +40,7 @@ export function ProjectileGraph({
           <Tooltip formatter={(v: unknown) => [`${Number(v).toFixed(2)} m`, 'Height']} labelFormatter={v => `Distance: ${Number(v).toFixed(2)} m`} />
           <Line type="monotone" dataKey="y" stroke="#6366f1" strokeWidth={2} dot={false} name="Height" />
           {elapsedTime > 0 && (
-            <ReferenceDot x={+path.find(p => p.y >= 0 && p.x <= (elapsedTime * params.initialVelocity * Math.cos(params.angle * Math.PI / 180)))?.x?.toFixed(2) ?? 0}
+            <ReferenceDot x={+(path.find(p => p.y >= 0 && p.x <= (elapsedTime * params.initialVelocity * Math.cos(params.angle * Math.PI / 180)))?.x ?? 0)}
               y={+Math.max(0, currentHeight).toFixed(2)} r={5} fill="#f59e0b" stroke="#fff" strokeWidth={2} />
           )}
         </LineChart>
