@@ -1,3 +1,34 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v13: topic filter tabs on the simulations hub
+# actually filter now
+#
+#   Every simulation's `topic` field was already correctly assigned (Optics
+#   sims tagged Optics, Mechanics sims tagged Mechanics, etc.) — that part
+#   was fine. The real bug: the topic filter buttons ("Mechanics",
+#   "Electricity", "Waves", "Optics", "Thermal physics", "Modern physics")
+#   had no onClick handler and no state behind them at all — the page
+#   wasn't even a client component. Clicking any tab did nothing; every tab
+#   showed every simulation.
+#
+#   Fixed: made the page a client component, added selected-topic state,
+#   wired each tab to filter the grid by sim.topic, added active-tab
+#   styling (filled indigo when selected) and a small item-count badge per
+#   tab, plus an empty-state message for any topic with zero simulations.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v13-hub-topic-filter-fix.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "✗ Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+mkdir -p "src/app/simulations"
+
+echo "  → src/app/simulations/page.tsx"
+cat > "src/app/simulations/page.tsx" << 'AFEOF'
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -296,3 +327,15 @@ export default function SimulationsPage() {
     </>
   );
 }
+AFEOF
+
+echo ""
+echo "✓ Patch v13 applied."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /simulations -> click each topic tab (Mechanics, Electricity,"
+echo "Waves, Optics, Thermal physics, Modern physics) and confirm only the"
+echo "matching cards remain, with the active tab highlighted."
