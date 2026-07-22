@@ -1,6 +1,6 @@
 'use client';
 import { useRef, useEffect, useCallback } from 'react';
-import { stepSecondLaw, SecondLawState, SecondLawParams } from '@/lib/physics/newtons-laws';
+import { stepSecondLaw, SecondLawState, SecondLawParams, SECOND_LAW_TRACK_LEN } from '@/lib/physics/newtons-laws';
 
 interface Props {
   params: SecondLawParams;
@@ -10,33 +10,43 @@ interface Props {
   width?: number; height?: number;
 }
 
-const TRACK_LEN = 12; // metres shown
+const TRACK_LEN = SECOND_LAW_TRACK_LEN;
 
 export function NewtonsSecondCanvas({ params, isRunning, isPaused, onTick, onComplete, width = 680, height = 240 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const stateRef = useRef<SecondLawState>({ x: 0, v: 0, a: 0, time: 0, frictionForce: 0, netForce: 0 });
   const doneRef = useRef(false);
+  const lastFrameRef = useRef<number | null>(null);
   const simRef = useRef({ params, isRunning, isPaused, onTick, onComplete });
   simRef.current = { params, isRunning, isPaused, onTick, onComplete };
 
   useEffect(() => {
     stateRef.current = { x: 0, v: 0, a: 0, time: 0, frictionForce: 0, netForce: 0 };
     doneRef.current = false;
+    lastFrameRef.current = null;
   }, [params]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { isRunning: r, isPaused: p, params: pm, onTick: ot, onComplete: oc } = simRef.current;
     const W = canvas.width, H = canvas.height;
     const state = stateRef.current;
 
-    if (r && !p && !doneRef.current) {
-      const next = stepSecondLaw(state, pm, 0.016);
-      stateRef.current = next;
-      ot?.(next);
-      if (next.x >= TRACK_LEN) { doneRef.current = true; oc?.(); }
+    // Real wall-clock dt — keeps the block's on-screen motion and the live
+    // graph's time axis (which plots this same state.time) in lockstep.
+    if (r && !p && !doneRef.current && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        const dt = Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+        const next = stepSecondLaw(state, pm, dt);
+        stateRef.current = next;
+        ot?.(next);
+        if (next.x >= TRACK_LEN) { doneRef.current = true; oc?.(); }
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
     }
 
     ctx.clearRect(0, 0, W, H);

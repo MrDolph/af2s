@@ -1,3 +1,34 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v7: fix Newton's 2nd law "vibrating" bug
+#
+#   Root cause: params={ mass: mass2, appliedForce: applied, friction:
+#   friction2 } was an inline object literal passed to NewtonsSecondCanvas.
+#   Every graph tick called setGraphData, re-rendering the page and
+#   recreating that object as a brand-new reference (same values, different
+#   identity). NewtonsSecondCanvas's reset effect depends on [params], so it
+#   fired on every single tick — snapping position/velocity back to zero
+#   right after each tiny step forward (the "vibrating on the spot") and
+#   collapsing state.time back near 0 repeatedly, which corrupted the live
+#   graph's x-axis domain (the "blinks and disappears").
+#
+#   Fix: memoize the params object with useMemo, keyed on the primitive
+#   values, so its identity only changes when mass/force/friction actually
+#   change — not on every render.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v7-2nd-law-vibrating-fix.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "✗ Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+mkdir -p "src/app/simulations/newtons-laws"
+
+echo "  → src/app/simulations/newtons-laws/page.tsx"
+cat > "src/app/simulations/newtons-laws/page.tsx" << 'AFEOF'
 'use client';
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -5,12 +36,8 @@ import { NewtonsFirstCanvas } from '@/components/simulation/NewtonsFirstCanvas';
 import { NewtonsSecondCanvas } from '@/components/simulation/NewtonsSecondCanvas';
 import { NewtonsThirdCanvas } from '@/components/simulation/NewtonsThirdCanvas';
 import { NewtonsGraph } from '@/components/simulation/NewtonsGraph';
-import { ThirdLawGraph } from '@/components/simulation/ThirdLawGraph';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
-import {
-  secondLawAnalytics, thirdLawAnalytics, firstLawTrajectory, secondLawTrajectory, thirdLawTrajectory,
-  firstLawAcceleration, ROCKET_GRAPH_DURATION, FirstLawState, SecondLawState,
-} from '@/lib/physics/newtons-laws';
+import { secondLawAnalytics, thirdLawAnalytics, FirstLawState, SecondLawState } from '@/lib/physics/newtons-laws';
 
 type Law = '1st' | '2nd' | '3rd';
 type GraphType = 'v' | 'a' | 'x';
@@ -96,13 +123,8 @@ export default function NewtonsLawsPage() {
   const [resetKey, setResetKey] = useState(0);
   const [openEx, setOpenEx] = useState<number | null>(null);
   const [activeCurricula, setActiveCurricula] = useState(['WAEC', 'IGCSE', 'SAT']);
+  const [graphData, setGraphData] = useState<{ t: number; v: number; a: number; x: number }[]>([]);
   const [graphType, setGraphType] = useState<GraphType>('v');
-  // Live marker position only — the curve itself is precomputed up front
-  // (see the ghost-trajectory useMemos below) and shown in full immediately,
-  // so this just tracks "where on that curve are we right now".
-  const [live1st, setLive1st] = useState({ t: 0, v: 0, a: 0, x: 0 });
-  const [live2nd, setLive2nd] = useState({ t: 0, v: 0, a: 0, x: 0 });
-  const [live3rd, setLive3rd] = useState({ t: 0, v1: 0, v2: 0 });
 
   // 1st law params
   const [mass1, setMass1] = useState(5);
@@ -135,26 +157,12 @@ export default function NewtonsLawsPage() {
     [mass2, applied, friction2]
   );
 
-  // Precomputed "ghost" curves — the whole predicted picture, available the
-  // instant a slider changes, before Run is ever pressed.
-  const firstLawGhost = useMemo(
-    () => firstLawTrajectory(mass1, friction1, initV, forceOn, force1),
-    [mass1, friction1, initV, forceOn, force1]
-  );
-  const secondLawGhost = useMemo(() => secondLawTrajectory(secondLawParams), [secondLawParams]);
-  const thirdLawGhost = useMemo(
-    () => thirdLawTrajectory(scenario3, mass3a, mass3b, force3),
-    [scenario3, mass3a, mass3b, force3]
-  );
-
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTickRef = useRef(0);
   const reset = useCallback(() => {
     setIsRunning(false); setIsPaused(false);
     setIsComplete(false); setResetKey(k => k + 1);
-    setLive1st({ t: 0, v: 0, a: 0, x: 0 });
-    setLive2nd({ t: 0, v: 0, a: 0, x: 0 });
-    setLive3rd({ t: 0, v1: 0, v2: 0 });
+    setGraphData([]);
     lastTickRef.current = 0;
   }, []);
 
@@ -167,22 +175,14 @@ export default function NewtonsLawsPage() {
     const now = performance.now();
     if (now - lastTickRef.current < 40) return;
     lastTickRef.current = now;
-    const a = firstLawAcceleration(s.v, mass1, friction1, forceOn ? force1 : 0);
-    setLive1st({ t: s.time, v: s.v, a, x: s.x });
-  }, [mass1, friction1, forceOn, force1]);
+    setGraphData(d => [...d.slice(-120), { t: +s.time.toFixed(2), v: +s.v.toFixed(3), a: 0, x: +s.x.toFixed(3) }]);
+  }, []);
 
   const handle2ndTick = useCallback((s: SecondLawState) => {
     const now = performance.now();
     if (now - lastTickRef.current < 40) return;
     lastTickRef.current = now;
-    setLive2nd({ t: s.time, v: s.v, a: s.a, x: s.x });
-  }, []);
-
-  const handle3rdTick = useCallback((t: number, v1: number, v2: number) => {
-    const now = performance.now();
-    if (now - lastTickRef.current < 40) return;
-    lastTickRef.current = now;
-    setLive3rd({ t, v1, v2 });
+    setGraphData(d => [...d.slice(-120), { t: +s.time.toFixed(2), v: +s.v.toFixed(3), a: +s.a.toFixed(3), x: +s.x.toFixed(3) }]);
   }, []);
 
   return (
@@ -255,7 +255,6 @@ export default function NewtonsLawsPage() {
                   <NewtonsThirdCanvas
                     key={resetKey} mass1={mass3a} mass2={mass3b} force={force3}
                     scenario={scenario3} isRunning={isRunning} isPaused={isPaused}
-                    onTick={handle3rdTick}
                     width={660} height={220}
                   />
                 )}
@@ -271,14 +270,11 @@ export default function NewtonsLawsPage() {
                 {isComplete && <span className="text-xs font-medium text-emerald-600">✓ Complete — Reset to go again</span>}
               </div>
 
-              {/* Live graph — full predicted curve shown immediately, with a
-                  live marker riding along it as the animation plays. */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-                    {law === '3rd' ? 'Velocity graph' : 'Live graph'}
-                  </p>
-                  {law !== '3rd' && (
+              {/* Graph (1st and 2nd law only) */}
+              {law !== '3rd' && (
+                <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Live graph</p>
                     <div className="flex gap-1 bg-gray-100 p-0.5 rounded-lg">
                       {(['v', 'a', 'x'] as GraphType[]).map(g => (
                         <button key={g} onClick={() => setGraphType(g)}
@@ -287,31 +283,9 @@ export default function NewtonsLawsPage() {
                           }`}>{g === 'v' ? 'Velocity' : g === 'a' ? 'Acceleration' : 'Displacement'}</button>
                       ))}
                     </div>
-                  )}
+                  </div>
+                  <NewtonsGraph data={graphData} show={graphType} />
                 </div>
-                {law === '1st' && (
-                  <NewtonsGraph data={firstLawGhost} show={graphType} liveT={live1st.t} liveValue={live1st[graphType]} />
-                )}
-                {law === '2nd' && (
-                  <NewtonsGraph data={secondLawGhost} show={graphType} liveT={live2nd.t} liveValue={live2nd[graphType]} />
-                )}
-                {law === '3rd' && (() => {
-                  const rocketA = force3 / mass3a;
-                  const wrappedT = scenario3 === 'rocket' ? live3rd.t % ROCKET_GRAPH_DURATION : live3rd.t;
-                  const wrappedV1 = scenario3 === 'rocket' ? rocketA * wrappedT : live3rd.v1;
-                  return (
-                    <ThirdLawGraph data={thirdLawGhost} scenario={scenario3}
-                      liveT={wrappedT} liveV1={wrappedV1} liveV2={live3rd.v2} />
-                  );
-                })()}
-              </div>
-
-              {law === '3rd' && (
-                <p className="text-[10px] text-gray-400 -mt-2 px-1">
-                  {scenario3 === 'rocket'
-                    ? 'Rocket velocity keeps climbing as fuel burns — this graph loops to show the same constant-acceleration shape each cycle.'
-                    : 'Same force, different acceleration: the lighter object always reaches a larger speed by the time contact ends.'}
-                </p>
               )}
 
               {/* Sliders */}
@@ -464,3 +438,11 @@ export default function NewtonsLawsPage() {
     </>
   );
 }
+AFEOF
+
+echo ""
+echo "✓ Patch v7 applied."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"

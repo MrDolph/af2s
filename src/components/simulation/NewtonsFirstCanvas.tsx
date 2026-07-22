@@ -17,22 +17,33 @@ export function NewtonsFirstCanvas({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const stateRef = useRef<FirstLawState>({ x: 0, v: initialVelocity, time: 0 });
+  const lastFrameRef = useRef<number | null>(null);
   const simRef = useRef({ mass, friction, initialVelocity, forceOn, appliedForce, isRunning, isPaused, onTick, width, height });
   simRef.current = { mass, friction, initialVelocity, forceOn, appliedForce, isRunning, isPaused, onTick, width, height };
 
   useEffect(() => {
     stateRef.current = { x: 0, v: initialVelocity, time: 0 };
+    lastFrameRef.current = null;
   }, [initialVelocity, mass, friction, appliedForce]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { isRunning: r, isPaused: p, forceOn, appliedForce: F, mass: m, friction: mu, onTick: ot } = simRef.current;
     const W = canvas.width, H = canvas.height;
 
-    if (r && !p) {
-      stateRef.current = stepFirstLaw(stateRef.current, forceOn ? F : 0, m, mu, 0.016);
-      ot?.(stateRef.current);
+    // Real wall-clock dt — one simulated second always equals one real
+    // second, at any display refresh rate, keeping the canvas and the live
+    // graph (which plots this same state.time) in sync.
+    if (r && !p && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        const dt = Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+        stateRef.current = stepFirstLaw(stateRef.current, forceOn ? F : 0, m, mu, dt);
+        ot?.(stateRef.current);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
     }
 
     const state = stateRef.current;
