@@ -5,6 +5,7 @@ import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { DecayCanvas, DecayGraph } from '@/components/simulation/DecayCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
 import { decayConstant, activity, remaining } from '@/lib/physics/decay';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'];
 const CC: Record<string, string> = {
@@ -87,12 +88,15 @@ export default function RadioactiveDecayPage() {
 
   const lam = decayConstant(halfLife);
 
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
+
   return (
     <>
       <AppHeader />
       <main className="min-h-screen bg-gray-50">
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">Modern physics</p>
@@ -111,7 +115,7 @@ export default function RadioactiveDecayPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
           <div className="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-2.5">
             <span className="text-xs text-gray-400">Random decay, predictable statistics</span>
             <span className="text-sm font-semibold font-mono text-gray-900">N = N₀ · 2^(−t/T½)</span>
@@ -120,10 +124,10 @@ export default function RadioactiveDecayPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
             <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <DecayCanvas n0={n0} halfLife={halfLife} resetKey={resetKey}
                   isRunning={isRunning} isPaused={isPaused}
-                  onTick={handleTick} width={640} height={300} />
+                  onTick={handleTick} width={canvasSize.width} height={canvasSize.height} />
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-2">

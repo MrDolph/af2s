@@ -1,3 +1,295 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v12: mobile-friendly AI prompt bar + a more
+# compact projectile-motion layout
+#
+#   1. PROMPT BAR MOBILE FIX. The input + "Generate" button were forced into
+#      one fixed row with no mobile breakpoint, so on narrow screens the
+#      button got squeezed and text could overflow/wrap awkwardly. Now
+#      stacks vertically (full-width input, full-width button below it) on
+#      narrow screens and sits in one row from the `sm` breakpoint up. Input
+#      text is 16px on mobile (prevents iOS Safari's automatic zoom-on-
+#      focus, a common mobile-web gotcha) while staying compact on desktop.
+#      This fixes the prompt bar everywhere it's used: the homepage and the
+#      projectile-motion page.
+#
+#   2. PROJECTILE-MOTION LAYOUT. Moved the "Parameters" (sliders) card out
+#      of the main column — where it sat stacked full-width below the
+#      canvas — into the sidebar column, right next to "Calculated". This
+#      shortens the main column to just canvas + controls, so on wider
+#      screens the whole page reads more like a single compact view instead
+#      of a long stack, and puts the sliders directly beside the numbers
+#      they affect. Mobile stacking order is unchanged (Parameters still
+#      appears immediately after the controls).
+#
+#   3. HOMEPAGE: wired the same responsive-canvas hook used across the rest
+#      of the app (previously fixed at 720×320) and widened the page
+#      container to match every other page (max-w-7xl -> max-w-[100rem]).
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v12-mobile-prompt-and-layout.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "✗ Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "── A-Factor patch v12: mobile prompt bar + compact projectile-motion layout ──"
+mkdir -p "src/app" "src/app/simulations/projectile-motion" "src/components/ai"
+
+echo "  → src/components/ai/PromptBar.tsx"
+cat > "src/components/ai/PromptBar.tsx" << 'AFEOF'
+'use client';
+import { useState } from 'react';
+import type { AIPromptResponse } from '@/types/ai';
+
+interface PromptBarProps { onResult: (r: AIPromptResponse) => void; className?: string; }
+
+const EXAMPLE_PROMPTS = [
+  'Show projectile motion at 45° and 30 m/s',
+  "Demonstrate Newton's second law with 10 kg and 50 N",
+  'Ṣe afihan projectile ti o bẹrẹ ni 20 m/s',
+];
+
+export function PromptBar({ onResult, className }: PromptBarProps) {
+  const [prompt, setPrompt] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (text: string) => {
+    if (!text.trim() || isLoading) return;
+    setIsLoading(true); setError(null);
+    try {
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text }),
+      });
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Error'); }
+      onResult(await res.json());
+      setPrompt('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate simulation');
+    } finally { setIsLoading(false); }
+  };
+
+  return (
+    <div className={className}>
+      {/* Stacks on narrow screens (full-width input, full-width button below
+          it) and sits in one row from `sm` upward. text-base (16px) on the
+          input prevents iOS Safari's automatic zoom-on-focus. */}
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          type="text" value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSubmit(prompt)}
+          placeholder="Describe what you want to simulate…"
+          disabled={isLoading}
+          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-4 py-3 text-base outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 disabled:opacity-50 sm:text-sm"
+        />
+        <button
+          onClick={() => handleSubmit(prompt)}
+          disabled={!prompt.trim() || isLoading}
+          className="w-full shrink-0 rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-40 sm:w-auto"
+        >
+          {isLoading ? 'Generating…' : 'Generate'}
+        </button>
+      </div>
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      <div className="mt-3 flex flex-wrap gap-2">
+        {EXAMPLE_PROMPTS.map(p => (
+          <button key={p} onClick={() => handleSubmit(p)} disabled={isLoading}
+            className="max-w-full truncate rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-600 transition hover:border-indigo-300 hover:text-indigo-700 disabled:opacity-40">
+            {p}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+AFEOF
+
+echo "  → src/app/page.tsx"
+cat > "src/app/page.tsx" << 'AFEOF'
+'use client';
+import { useState, useCallback, useRef } from 'react';
+import Link from 'next/link';
+import { AppHeader } from '@/components/layout/AppHeader';
+import { PromptBar } from '@/components/ai/PromptBar';
+import { ProjectileCanvas } from '@/components/simulation/ProjectileCanvas';
+import { SimulationStats } from '@/components/simulation/SimulationStats';
+import { SimulationControls } from '@/components/simulation/SimulationControls';
+import { ParamControls } from '@/components/simulation/ParamControls';
+import type { AIPromptResponse } from '@/types/ai';
+import type { ProjectileParams, ProjectileState } from '@/lib/physics/projectile';
+import type { GraphDataPoint } from '@/types/simulation';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
+
+const DEFAULT_PARAMS: ProjectileParams = { initialVelocity: 20, angle: 45, gravity: 9.81, mass: 1 };
+
+export default function HomePage() {
+  const [params, setParams] = useState<ProjectileParams>(DEFAULT_PARAMS);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [liveState, setLiveState] = useState<ProjectileState | null>(null);
+  const [isComplete, setIsComplete] = useState(false);
+  const [lastResponse, setLastResponse] = useState<AIPromptResponse | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+
+  const handleAIResult = useCallback((response: AIPromptResponse) => {
+    setLastResponse(response);
+    if (response.simulationType === 'projectile_motion') {
+      const p = response.params as ProjectileParams;
+      setParams({
+        initialVelocity: Number(p.initialVelocity) || 20,
+        angle: Number(p.angle) || 45,
+        gravity: Number(p.gravity) || 9.81,
+        mass: Number(p.mass) || 1,
+      });
+    }
+    setIsRunning(false); setIsPaused(false);
+    setLiveState(null); setIsComplete(false);
+    setResetKey(k => k + 1);
+  }, []);
+
+  const handleRun = () => { setIsRunning(true); setIsPaused(false); setIsComplete(false); };
+  const handlePause = () => setIsPaused(p => !p);
+  const handleReset = () => {
+    setIsRunning(false); setIsPaused(false);
+    setLiveState(null); setIsComplete(false);
+    setResetKey(k => k + 1);
+  };
+  const handleParamChange = (next: ProjectileParams) => {
+    setParams(next); setIsRunning(false); setIsPaused(false);
+    setLiveState(null); setIsComplete(false);
+    setResetKey(k => k + 1);
+  };
+  const handleTick = useCallback((s: ProjectileState) => setLiveState(s), []);
+  const handleComplete = useCallback((_: GraphDataPoint[]) => { setIsComplete(true); }, []);
+  const currentSpeed = liveState ? Math.sqrt(liveState.vx ** 2 + liveState.vy ** 2) : undefined;
+
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 720, 320, 900);
+
+  return (
+    <>
+      <AppHeader />
+      <main className="min-h-screen bg-gray-50">
+
+        {/* Hero prompt section */}
+        <section className="border-b border-gray-200 bg-white">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-6 sm:py-8">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="rounded-full bg-indigo-50 px-3 py-0.5 text-xs font-medium text-indigo-600">
+                Phase 1 · Projectile motion
+              </span>
+              <Link href="/simulations" className="text-xs text-gray-400 hover:text-indigo-600 transition">
+                All simulations →
+              </Link>
+            </div>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
+              Describe your simulation
+            </h2>
+            <p className="text-xs text-gray-400 mb-4">
+              Type in English, Yoruba, Hausa, or Igbo — AI generates parameters instantly.
+            </p>
+            <PromptBar onResult={handleAIResult} />
+          </div>
+        </section>
+
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-6 space-y-4">
+
+          {/* AI explanation */}
+          {lastResponse && (
+            <div className="rounded-2xl border border-indigo-100 bg-indigo-50 px-4 sm:px-6 py-4">
+              <p className="text-xs font-medium text-indigo-400 mb-1 uppercase tracking-wide">
+                {lastResponse.title}
+              </p>
+              <p className="text-xs sm:text-sm text-indigo-800 leading-relaxed">
+                {lastResponse.explanation}
+              </p>
+              {lastResponse.suggestedFollowUps?.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {lastResponse.suggestedFollowUps.map(q => (
+                    <span key={q} className="rounded-full border border-indigo-200 bg-white px-2.5 py-1 text-xs text-indigo-600">
+                      {q}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Main simulation area — stack on mobile, side by side on desktop */}
+          <div className="flex flex-col lg:grid lg:grid-cols-[1fr_260px] gap-4">
+
+            {/* Canvas + controls */}
+            <div className="space-y-3 min-w-0">
+              <div ref={canvasBoxRef}>
+                <ProjectileCanvas
+                  key={resetKey}
+                  params={params}
+                  isRunning={isRunning}
+                  isPaused={isPaused}
+                  onTick={handleTick}
+                  onComplete={handleComplete}
+                  width={canvasSize.width}
+                  height={canvasSize.height}
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-3 justify-between">
+                <SimulationControls
+                  isRunning={isRunning && !isComplete}
+                  isPaused={isPaused}
+                  onRun={handleRun}
+                  onPause={handlePause}
+                  onReset={handleReset}
+                />
+                {isComplete && (
+                  <span className="text-xs font-medium text-emerald-600">
+                    ✓ Complete — press Reset to go again
+                  </span>
+                )}
+              </div>
+              <SimulationStats
+                params={params}
+                elapsedTime={liveState?.time}
+                currentHeight={liveState ? Math.max(0, liveState.y) : undefined}
+                currentSpeed={currentSpeed}
+              />
+            </div>
+
+            {/* Param controls — below canvas on mobile */}
+            <div>
+              <ParamControls
+                params={params}
+                onChange={handleParamChange}
+                disabled={isRunning && !isComplete}
+              />
+            </div>
+          </div>
+
+          {/* Link to all simulations */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-gray-900 mb-0.5">More simulations</p>
+              <p className="text-xs text-gray-400">Gas laws, Newton&apos;s laws, waves, circuits, and more.</p>
+            </div>
+            <Link href="/simulations"
+              className="shrink-0 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition">
+              Browse all →
+            </Link>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
+AFEOF
+
+echo "  → src/app/simulations/projectile-motion/page.tsx"
+cat > "src/app/simulations/projectile-motion/page.tsx" << 'AFEOF'
 'use client';
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -421,3 +713,16 @@ export default function ProjectileMotionPage() {
     </>
   );
 }
+AFEOF
+
+echo ""
+echo "✓ Patch v12 applied — 3 files written."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check on a narrow (mobile-width) browser window: the AI prompt bar"
+echo "should stack input above a full-width Generate button, and the"
+echo "projectile-motion page's Parameters panel should now sit beside"
+echo "Calculated in the sidebar on wider screens."

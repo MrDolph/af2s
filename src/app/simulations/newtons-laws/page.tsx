@@ -4,6 +4,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { NewtonsFirstCanvas } from '@/components/simulation/NewtonsFirstCanvas';
 import { NewtonsSecondCanvas } from '@/components/simulation/NewtonsSecondCanvas';
 import { NewtonsThirdCanvas } from '@/components/simulation/NewtonsThirdCanvas';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 import { NewtonsGraph } from '@/components/simulation/NewtonsGraph';
 import { ThirdLawGraph } from '@/components/simulation/ThirdLawGraph';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -185,12 +186,15 @@ export default function NewtonsLawsPage() {
     setLive3rd({ t, v1, v2 });
   }, []);
 
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 210, 980);
+
   return (
     <>
       <AppHeader />
       <main className="min-h-screen bg-gray-50">
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">Mechanics</p>
@@ -209,7 +213,7 @@ export default function NewtonsLawsPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
 
           {/* Law tabs */}
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
@@ -234,13 +238,13 @@ export default function NewtonsLawsPage() {
 
             {/* Col 1: Canvas + controls + sliders */}
             <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {law === '1st' && (
                   <NewtonsFirstCanvas
                     key={resetKey} mass={mass1} friction={friction1}
                     initialVelocity={initV} forceOn={forceOn} appliedForce={force1}
                     isRunning={isRunning} isPaused={isPaused} onTick={handle1stTick}
-                    width={660} height={200}
+                    width={canvasSize.width} height={canvasSize.height}
                   />
                 )}
                 {law === '2nd' && (
@@ -248,7 +252,7 @@ export default function NewtonsLawsPage() {
                     key={resetKey} params={secondLawParams}
                     isRunning={isRunning} isPaused={isPaused} onTick={handle2ndTick}
                     onComplete={() => { setIsComplete(true); setIsRunning(false); }}
-                    width={660} height={220}
+                    width={canvasSize.width} height={canvasSize.height}
                   />
                 )}
                 {law === '3rd' && (
@@ -256,7 +260,7 @@ export default function NewtonsLawsPage() {
                     key={resetKey} mass1={mass3a} mass2={mass3b} force={force3}
                     scenario={scenario3} isRunning={isRunning} isPaused={isPaused}
                     onTick={handle3rdTick}
-                    width={660} height={220}
+                    width={canvasSize.width} height={canvasSize.height}
                   />
                 )}
               </div>

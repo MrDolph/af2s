@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { PromptBar } from '@/components/ai/PromptBar';
@@ -10,6 +10,7 @@ import { ParamControls } from '@/components/simulation/ParamControls';
 import type { AIPromptResponse } from '@/types/ai';
 import type { ProjectileParams, ProjectileState } from '@/lib/physics/projectile';
 import type { GraphDataPoint } from '@/types/simulation';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 
 const DEFAULT_PARAMS: ProjectileParams = { initialVelocity: 20, angle: 45, gravity: 9.81, mass: 1 };
 
@@ -54,6 +55,9 @@ export default function HomePage() {
   const handleComplete = useCallback((_: GraphDataPoint[]) => { setIsComplete(true); }, []);
   const currentSpeed = liveState ? Math.sqrt(liveState.vx ** 2 + liveState.vy ** 2) : undefined;
 
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 720, 320, 900);
+
   return (
     <>
       <AppHeader />
@@ -61,7 +65,7 @@ export default function HomePage() {
 
         {/* Hero prompt section */}
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-6 sm:py-8">
             <div className="mb-1 flex items-center gap-2">
               <span className="rounded-full bg-indigo-50 px-3 py-0.5 text-xs font-medium text-indigo-600">
                 Phase 1 · Projectile motion
@@ -80,7 +84,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-6 space-y-4">
 
           {/* AI explanation */}
           {lastResponse && (
@@ -108,16 +112,18 @@ export default function HomePage() {
 
             {/* Canvas + controls */}
             <div className="space-y-3 min-w-0">
-              <ProjectileCanvas
-                key={resetKey}
-                params={params}
-                isRunning={isRunning}
-                isPaused={isPaused}
-                onTick={handleTick}
-                onComplete={handleComplete}
-                width={720}
-                height={320}
-              />
+              <div ref={canvasBoxRef}>
+                <ProjectileCanvas
+                  key={resetKey}
+                  params={params}
+                  isRunning={isRunning}
+                  isPaused={isPaused}
+                  onTick={handleTick}
+                  onComplete={handleComplete}
+                  width={canvasSize.width}
+                  height={canvasSize.height}
+                />
+              </div>
               <div className="flex flex-wrap items-center gap-3 justify-between">
                 <SimulationControls
                   isRunning={isRunning && !isComplete}
@@ -154,7 +160,7 @@ export default function HomePage() {
           <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-gray-900 mb-0.5">More simulations</p>
-              <p className="text-xs text-gray-400">Gas laws, Newton's 2nd law, waves, circuits and more coming.</p>
+              <p className="text-xs text-gray-400">Gas laws, Newton&apos;s laws, waves, circuits, and more.</p>
             </div>
             <Link href="/simulations"
               className="shrink-0 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition">

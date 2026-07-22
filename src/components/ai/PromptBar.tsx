@@ -34,28 +34,31 @@ export function PromptBar({ onResult, className }: PromptBarProps) {
 
   return (
     <div className={className}>
-      <div className="flex gap-2">
+      {/* Stacks on narrow screens (full-width input, full-width button below
+          it) and sits in one row from `sm` upward. text-base (16px) on the
+          input prevents iOS Safari's automatic zoom-on-focus. */}
+      <div className="flex flex-col gap-2 sm:flex-row">
         <input
           type="text" value={prompt}
           onChange={e => setPrompt(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSubmit(prompt)}
           placeholder="Describe what you want to simulate…"
           disabled={isLoading}
-          className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 disabled:opacity-50"
+          className="min-w-0 flex-1 rounded-lg border border-gray-200 bg-white px-4 py-3 text-base outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 disabled:opacity-50 sm:text-sm"
         />
         <button
           onClick={() => handleSubmit(prompt)}
           disabled={!prompt.trim() || isLoading}
-          className="rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-40"
+          className="w-full shrink-0 rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-40 sm:w-auto"
         >
           {isLoading ? 'Generating…' : 'Generate'}
         </button>
       </div>
-      {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
-      <div className="flex flex-wrap gap-2 mt-3">
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      <div className="mt-3 flex flex-wrap gap-2">
         {EXAMPLE_PROMPTS.map(p => (
           <button key={p} onClick={() => handleSubmit(p)} disabled={isLoading}
-            className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-gray-600 transition hover:border-indigo-300 hover:text-indigo-700 disabled:opacity-40">
+            className="max-w-full truncate rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs text-gray-600 transition hover:border-indigo-300 hover:text-indigo-700 disabled:opacity-40">
             {p}
           </button>
         ))}

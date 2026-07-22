@@ -5,6 +5,7 @@ import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { ElevatorCanvas } from '@/components/simulation/ElevatorCanvas';
 import { WalkingCanvas } from '@/components/simulation/WalkingCanvas';
 import { CollisionCanvas } from '@/components/simulation/CollisionCanvas';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 import {
   apparentWeight, solveCollision, rocketAnalytics,
   ElevatorState, CollisionParams, g,
@@ -164,15 +165,21 @@ export default function ConsequencesPage() {
     resetTimer.current = setTimeout(reset, 100);
   }, [topic, elevMass, elevState, elevAccel, frictionEnabled, rocketMass, exhaustSpeed, massFlowRate, collM1, collM2, collU1, collU2, collType, collE, reset]);
 
+  // Elevator is a tall, portrait-ish shaft; walking/collision are wide
+  // and short — pick the matching base aspect before scaling up.
+  const consBase = topic === 'elevator' ? { w: 500, h: 320 } : { w: 660, h: 200 };
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, consBase.w, consBase.h, 900);
+
   return (
     <>
       <AppHeader />
       <main className="min-h-screen bg-gray-50">
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <p className="text-xs text-gray-400 mb-0.5">Applications of Newton's Laws</p>
+                <p className="text-xs text-gray-400 mb-0.5">Applications of Newton&apos;s Laws</p>
                 <h1 className="text-lg font-semibold text-gray-900">Consequences of motion</h1>
               </div>
               <div className="flex gap-1.5 flex-wrap">
@@ -188,7 +195,7 @@ export default function ConsequencesPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
 
           {/* Topic tabs — scrollable on mobile */}
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
@@ -215,12 +222,12 @@ export default function ConsequencesPage() {
 
             {/* Canvas + controls + params */}
             <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
 
                 {topic === 'elevator' && (
                   <ElevatorCanvas key={resetKey} mass={elevMass} elevState={elevState}
                     manualAccel={elevAccel} isRunning={isRunning} isPaused={isPaused}
-                    width={500} height={320} />
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
 
                 {topic === 'weightlessness' && (
@@ -269,7 +276,7 @@ export default function ConsequencesPage() {
                 {topic === 'walking' && (
                   <WalkingCanvas key={resetKey} isRunning={isRunning} isPaused={isPaused}
                     frictionEnabled={frictionEnabled} surfaceMass={70}
-                    width={660} height={200} />
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
 
                 {topic === 'propulsion' && (
@@ -328,7 +335,7 @@ export default function ConsequencesPage() {
                   <CollisionCanvas key={resetKey} params={collParams}
                     isRunning={isRunning} isPaused={isPaused}
                     onComplete={r => { setCollResult(r); setIsComplete(true); setIsRunning(false); }}
-                    width={660} height={200} />
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
               </div>
 

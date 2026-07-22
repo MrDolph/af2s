@@ -8,6 +8,7 @@ import { SpringCanvas } from '@/components/simulation/SpringCanvas';
 import { ConicalPendulumCanvas } from '@/components/simulation/ConicalPendulumCanvas';
 import { PhysicalPendulumCanvas } from '@/components/simulation/PhysicalPendulumCanvas';
 import { BifilarCanvas } from '@/components/simulation/BifilarCanvas';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 import { SHMGraph } from '@/components/simulation/SHMGraph';
 import {
   pendulumOmega, pendulumPeriod,
@@ -224,12 +225,21 @@ export default function OscillationsPage() {
     }
   }, []);
 
+  // Each topic was tuned with its own aspect ratio (spring is a tall,
+  // portrait-ish demo; the others are wider) — pick the matching base
+  // before scaling it up to fill the available width.
+  const oscBase = topic === 'spring' ? { w: 280, h: 320 }
+    : topic === 'bifilar' ? { w: 380, h: 280 }
+    : { w: 380, h: 300 };
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, oscBase.w, oscBase.h, 650);
+
   return (
     <>
       <AppHeader />
       <main className="min-h-screen bg-gray-50">
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">Mechanics — Oscillations</p>
@@ -248,7 +258,7 @@ export default function OscillationsPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
 
           {/* Topic tabs */}
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
@@ -280,30 +290,30 @@ export default function OscillationsPage() {
             <div className="space-y-3 min-w-0">
 
               {/* Canvas */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {topic === 'pendulum' && (
                   <PendulumCanvas key={resetKey} length={pendL} amplitude={pendA}
                     gravity={pendG} mass={pendM}
                     isRunning={isRunning} isPaused={isPaused}
                     onTick={(t) => handleTick(t)}
-                    width={380} height={300} />
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
                 {topic === 'spring' && (
                   <SpringCanvas key={resetKey} k={spK} mass={spM} amplitude={spA}
                     isRunning={isRunning} isPaused={isPaused}
                     onTick={(t) => handleTick(t)}
-                    width={280} height={320} />
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
                 {topic === 'conical' && (
                   <ConicalPendulumCanvas key={resetKey} length={conL} theta_deg={conTheta}
                     mass={conM} isRunning={isRunning} isPaused={isPaused}
-                    width={380} height={300} />
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
                 {topic === 'physical' && (
                   <PhysicalPendulumCanvas key={resetKey} length={physL} mass={physM}
                     pivotFraction={physPF} isRunning={isRunning} isPaused={isPaused}
                     onTick={(t) => handleTick(t)}
-                    width={380} height={300} />
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
                 {topic === 'bifilar' && (
                   <div className="space-y-2">
@@ -322,7 +332,7 @@ export default function OscillationsPage() {
                       youngModulus={200} load={cantLoad}
                       isRunning={isRunning} isPaused={isPaused}
                       onTick={(t) => handleTick(t)}
-                      width={380} height={280} />
+                      width={canvasSize.width} height={canvasSize.height} />
                   </div>
                 )}
               </div>

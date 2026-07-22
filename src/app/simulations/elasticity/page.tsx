@@ -1,10 +1,11 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceDot, ReferenceLine } from 'recharts';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { ElasticityCanvas, ElasticityMode } from '@/components/simulation/ElasticityCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
 import { extension, springEnergy, forceExtensionCurve, wireExtension, stress, strain, youngModulus, WIRE_MATERIALS } from '@/lib/physics/elasticity';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'];
 const CC: Record<string, string> = {
@@ -117,12 +118,15 @@ export default function ElasticityPage() {
   const A = Math.PI * Math.pow((wireDiamMm / 1000) / 2, 2);
   const e = wireExtension(wireLoad, wireLength, A, material.E);
 
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 320, 980);
+
   return (
     <>
       <AppHeader />
       <main className="min-h-screen bg-gray-50">
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">Mechanics</p>
@@ -141,7 +145,7 @@ export default function ElasticityPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
             {(Object.keys(MODE_META) as ElasticityMode[]).map(m => (
               <button key={m} onClick={() => { setMode(m); setOpenEx(null); }}
@@ -160,11 +164,11 @@ export default function ElasticityPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
             <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <ElasticityCanvas mode={mode}
                   load={mode === 'hooke' ? load : wireLoad} k={k} elasticLimitF={elasticLimitF}
                   wireLength={wireLength} wireDiamMm={wireDiamMm} youngE={material.E} materialName={material.name}
-                  width={640} height={320} />
+                  width={canvasSize.width} height={canvasSize.height} />
               </div>
 
               <div className="flex justify-end">

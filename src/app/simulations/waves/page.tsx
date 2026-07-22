@@ -5,6 +5,7 @@ import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { WaveCanvas, WaveMode } from '@/components/simulation/WaveCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
 import { waveSpeed, angularFreq, waveNumber, period } from '@/lib/physics/waves';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'];
 const CC: Record<string, string> = {
@@ -126,12 +127,15 @@ export default function WavesPage() {
 
   const v = waveSpeed(f, lambda);
 
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 300, 980);
+
   return (
     <>
       <AppHeader />
       <main className="min-h-screen bg-gray-50">
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">Waves</p>
@@ -150,7 +154,7 @@ export default function WavesPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
             {(Object.keys(MODE_META) as WaveMode[]).map(m => (
               <button key={m} onClick={() => { setMode(m); setOpenEx(null); }}
@@ -170,12 +174,12 @@ export default function WavesPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
             <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <WaveCanvas key={resetKey} mode={mode}
                   amplitude={A} frequency={f} wavelength={lambda}
                   amplitude2={A2} frequency2={f2} phase2={phase2}
                   isRunning={isRunning} isPaused={isPaused}
-                  width={660} height={300} />
+                  width={canvasSize.width} height={canvasSize.height} />
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-2">

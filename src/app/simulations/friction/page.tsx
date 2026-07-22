@@ -6,6 +6,7 @@ import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { FrictionCanvas, FrictionMode } from '@/components/simulation/FrictionCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
 import { flatFriction, inclineDynamics, frictionCurve } from '@/lib/physics/friction';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'];
 const CC: Record<string, string> = {
@@ -148,12 +149,15 @@ export default function FrictionPage() {
   const flat = flatFriction(mass, applied, muS, muK);
   const inc = inclineDynamics(mass, angle, muS, muK, appliedIncline, 0);
 
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
+
   return (
     <>
       <AppHeader />
       <main className="min-h-screen bg-gray-50">
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-gray-400 mb-0.5">Mechanics</p>
@@ -172,7 +176,7 @@ export default function FrictionPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
             {(Object.keys(MODE_META) as FrictionMode[]).map(m => (
               <button key={m} onClick={() => { setMode(m); setOpenEx(null); }}
@@ -191,12 +195,12 @@ export default function FrictionPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
             <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <FrictionCanvas key={resetKey} mode={mode} mass={mass} applied={applied} angle={angle}
                   appliedIncline={appliedIncline} muS={muS} muK={muK} isRunning={isRunning} isPaused={isPaused} resetKey={resetKey}
                   showWeight={showWeight} showComponents={showComponents} showNormal={showNormal}
                   showFriction={showFriction} showApplied={showApplied}
-                  width={640} height={300} />
+                  width={canvasSize.width} height={canvasSize.height} />
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-2">

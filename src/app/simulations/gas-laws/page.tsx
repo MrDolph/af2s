@@ -1,10 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { BoylesCanvas } from '@/components/simulation/BoylesCanvas';
 import { CharlesCanvas } from '@/components/simulation/CharlesCanvas';
 import { PressureLawCanvas } from '@/components/simulation/PressureLawCanvas';
 import { IdealGasCanvas } from '@/components/simulation/IdealGasCanvas';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 import { GasLawGraph } from '@/components/simulation/GasLawGraph';
 import {
   idealGasPressure, idealGasVolume, idealGasMoles, idealGasTemperature,
@@ -133,12 +134,18 @@ export default function GasLawsPage() {
 
   const meta = LAW_META[law];
 
+  // This card sits in a narrower grid column (alongside a graph/stats
+  // column), so it gets a smaller cap than the full-width single-canvas
+  // sims elsewhere in the app.
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 280, 240, 460);
+
   return (
     <>
       <AppHeader />
       <main className="min-h-screen bg-gray-50">
         <section className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-5">
+          <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <p className="text-xs text-gray-400 mb-1">Thermal physics</p>
@@ -156,7 +163,7 @@ export default function GasLawsPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-5 space-y-4">
+        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-5 space-y-4">
 
           {/* Tabs */}
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
@@ -180,7 +187,7 @@ export default function GasLawsPage() {
 
             {/* Left: canvas / calculator */}
             <div className="space-y-3">
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
                   {law === 'boyle' ? 'Compression (constant T)' :
                    law === 'charles' ? 'Expansion (constant P)' :
@@ -189,10 +196,10 @@ export default function GasLawsPage() {
                    'Real vs ideal gas'}
                 </p>
 
-                {law === 'boyle'    && <BoylesCanvas volume={volume} temperature={temperature} moles={moles} width={280} height={240} />}
-                {law === 'charles'  && <CharlesCanvas temperature={temperature} pressure={pressure} moles={moles} width={280} height={240} />}
-                {law === 'pressure' && <PressureLawCanvas temperature={temperature} volume={volume} moles={moles} width={280} height={240} />}
-                {law === 'ideal'    && <IdealGasCanvas pressure={pressure} volume={volume} temperature={temperature} moles={moles} solveFor={solveFor} width={280} height={240} />}
+                {law === 'boyle'    && <BoylesCanvas volume={volume} temperature={temperature} moles={moles} width={canvasSize.width} height={canvasSize.height} />}
+                {law === 'charles'  && <CharlesCanvas temperature={temperature} pressure={pressure} moles={moles} width={canvasSize.width} height={canvasSize.height} />}
+                {law === 'pressure' && <PressureLawCanvas temperature={temperature} volume={volume} moles={moles} width={canvasSize.width} height={canvasSize.height} />}
+                {law === 'ideal'    && <IdealGasCanvas pressure={pressure} volume={volume} temperature={temperature} moles={moles} solveFor={solveFor} width={canvasSize.width} height={canvasSize.height} />}
                 {law === 'real'     && (
                   <div className="space-y-3">
                     <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
