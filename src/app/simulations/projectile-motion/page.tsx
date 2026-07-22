@@ -4,6 +4,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { PromptBar } from '@/components/ai/PromptBar';
 import { ProjectileModeCanvas, ProjectileMode } from '@/components/simulation/ProjectileModeCanvas';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
+import { EmbedButton } from '@/components/ui/EmbedButton';
 import type { AIPromptResponse } from '@/types/ai';
 import {
   standardAnalytics, horizontalAnalytics, verticalAnalytics, inclinedAnalytics,
@@ -52,6 +53,7 @@ const TEACHER_NOTES: Record<ProjectileMode, string[]> = {
     'Optimal launch angle for max range along slope = 45° − β/2, not 45°.',
     'Range along slope ≠ horizontal range — understand which the exam question is asking for.',
     'This is one of the hardest WAEC/IGCSE topics: always set up axes along and perpendicular to the slope.',
+    'Down-the-slope launch: same flight time t = 2v₀sinα/(g cosβ), but g sinβ now ACCELERATES the motion, so the range along the slope is longer than the same launch going up.',
   ],
 };
 
@@ -125,7 +127,6 @@ export default function ProjectileMotionPage() {
   const [vV0, setVV0] = useState(15); const [vH0, setVH0] = useState(0);
   const [iV0, setIV0] = useState(20); const [iAlpha, setIAlpha] = useState(30); const [iBeta, setIBeta] = useState(30);
   const [iLaunchFrom, setILaunchFrom] = useState<'base' | 'top'>('base');
-  const [iHeight, setIHeight] = useState(20);
 
   // Memoized so these keep a stable object identity across renders that don't
   // actually change their values (e.g. the per-frame re-render from handleTick
@@ -135,8 +136,8 @@ export default function ProjectileMotionPage() {
   const hrz: HorizontalParams = useMemo(() => ({ v0: hV0, h: hH, g }), [hV0, hH, g]);
   const vtc: VerticalParams   = useMemo(() => ({ v0: vV0, h0: vH0, g }), [vV0, vH0, g]);
   const inc: InclinedParams   = useMemo(
-    () => ({ v0: iV0, alpha: iAlpha, beta: iBeta, g, launchFrom: iLaunchFrom, height: iHeight }),
-    [iV0, iAlpha, iBeta, g, iLaunchFrom, iHeight]
+    () => ({ v0: iV0, alpha: iAlpha, beta: iBeta, g, launchFrom: iLaunchFrom }),
+    [iV0, iAlpha, iBeta, g, iLaunchFrom]
   );
 
   const stdA = standardAnalytics(std);
@@ -155,7 +156,7 @@ export default function ProjectileMotionPage() {
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 80);
-  }, [mode, v0, angle, g, h0, hV0, hH, vV0, vH0, iV0, iAlpha, iBeta, iLaunchFrom, iHeight, reset]);
+  }, [mode, v0, angle, g, h0, hV0, hH, vV0, vH0, iV0, iAlpha, iBeta, iLaunchFrom, reset]);
 
   const handleTick = useCallback((t: number, x: number, y: number) => setLivePos({ t, x, y }), []);
   const handleComplete = useCallback(() => { setIsComplete(true); setIsRunning(false); }, []);
@@ -249,7 +250,19 @@ export default function ProjectileMotionPage() {
                   onPause={() => setIsPaused(p => !p)}
                   onReset={reset}
                 />
-                {isComplete && <span className="text-xs font-medium text-emerald-600">✓ Complete — Reset to go again</span>}
+                <div className="flex items-center gap-2">
+                  {isComplete && <span className="text-xs font-medium text-emerald-600">✓ Complete — Reset to go again</span>}
+                  <EmbedButton
+                    path="/embed/projectile"
+                    title={`Projectile motion (${mode}) — A-Factor STEM Studio`}
+                    params={
+                      mode === 'standard'   ? { mode, v0, angle, g, h0 } :
+                      mode === 'horizontal' ? { mode, v0: hV0, h: hH, g } :
+                      mode === 'vertical'   ? { mode, v0: vV0, h0: vH0, g } :
+                      { mode, v0: iV0, alpha: iAlpha, beta: iBeta, g, launch: iLaunchFrom }
+                    }
+                  />
+                </div>
               </div>
 
               {/* Sliders */}
@@ -282,22 +295,19 @@ export default function ProjectileMotionPage() {
                           className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition ${
                             iLaunchFrom === v ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
                           }`}>
-                          {v === 'base' ? 'Base — up the slope' : 'Top — out over the edge'}
+                          {v === 'base' ? 'Base — up the slope' : 'Top — down the slope'}
                         </button>
                       ))}
                     </div>
                     <p className="text-[10px] text-gray-400">
                       {iLaunchFrom === 'base'
-                        ? 'Lands back on the incline surface.'
-                        : 'Launched off a raised platform — lands on the ground below.'}
+                        ? 'Launched up the slope at α above the surface — lands back on the incline. Gravity component g sinβ decelerates it along the slope.'
+                        : 'Launched down the slope at α above the surface — lands at the base of the incline. Gravity component g sinβ accelerates it along the slope, so it travels farther than the same launch going up.'}
                     </p>
                   </div>
                   <Slider label="Initial velocity" unit="m/s" value={iV0} min={1} max={60} step={1} set={setIV0} color="#6366f1" />
                   <Slider label="α — angle above slope" unit="°" value={iAlpha} min={1} max={89} step={1} set={setIAlpha} color="#f59e0b" />
                   <Slider label="β — slope angle" unit="°" value={iBeta} min={5} max={60} step={1} set={setIBeta} color="#ef4444" />
-                  {iLaunchFrom === 'top' && (
-                    <Slider label="Platform height" unit="m" value={iHeight} min={1} max={100} step={1} set={setIHeight} color="#8b5cf6" />
-                  )}
                 </>}
               </div>
             </div>
@@ -326,16 +336,15 @@ export default function ProjectileMotionPage() {
                     <StatRow label="Flight time" value={vtcA.tFlight} unit="s" color="text-emerald-600" />
                     <StatRow label="Landing speed" value={vtcA.vLand} unit="m/s" color="text-rose-500" />
                   </>}
-                  {mode === 'inclined' && (iLaunchFrom === 'base' ? <>
+                  {mode === 'inclined' && <>
                     <StatRow label="Flight time" value={incA.tFlight} unit="s" color="text-indigo-600" />
-                    <StatRow label="Range along slope" value={incA.rangeAlongIncline ?? 0} unit="m" color="text-emerald-600" />
+                    <StatRow label="Range along slope" value={incA.rangeAlongIncline} unit="m" color="text-emerald-600" />
                     <StatRow label="Horizontal range" value={incA.rangeHorizontal} unit="m" color="text-amber-600" />
-                    <StatRow label="Height above slope" value={incA.maxHeightAboveIncline ?? 0} unit="m" color="text-rose-500" />
-                  </> : <>
-                    <StatRow label="Flight time" value={incA.tFlight} unit="s" color="text-indigo-600" />
-                    <StatRow label="Range" value={incA.range} unit="m" color="text-emerald-600" />
-                    <StatRow label="Max height" value={incA.maxHeight} unit="m" color="text-amber-600" />
-                  </>)}
+                    <StatRow label="Max height ⊥ slope" value={incA.maxHeightAboveIncline} unit="m" color="text-rose-500" />
+                    <StatRow
+                      label={iLaunchFrom === 'top' ? 'Vertical drop' : 'Vertical rise'}
+                      value={incA.verticalDrop} unit="m" color="text-purple-600" />
+                  </>}
                 </div>
               </div>
 

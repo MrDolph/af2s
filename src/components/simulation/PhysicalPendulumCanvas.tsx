@@ -5,22 +5,24 @@ import { physicalPendulumPeriod, pendulumPeriod } from '@/lib/physics/shm';
 interface Props {
   length: number; mass: number; pivotFraction: number;
   isRunning: boolean; isPaused: boolean;
+  onTick?: (t: number) => void;
   width?: number; height?: number;
 }
 
-export function PhysicalPendulumCanvas({ length, mass, pivotFraction, isRunning, isPaused, width = 380, height = 320 }: Props) {
+export function PhysicalPendulumCanvas({ length, mass, pivotFraction, isRunning, isPaused, onTick, width = 380, height = 320 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const tRef = useRef(0);
-  const sim = useRef({ length, mass, pivotFraction, isRunning, isPaused });
-  sim.current = { length, mass, pivotFraction, isRunning, isPaused };
+  const lastFrameRef = useRef<number | null>(null);
+  const sim = useRef({ length, mass, pivotFraction, isRunning, isPaused, onTick });
+  sim.current = { length, mass, pivotFraction, isRunning, isPaused, onTick };
 
-  useEffect(() => { tRef.current = 0; }, [length, mass, pivotFraction]);
+  useEffect(() => { tRef.current = 0; lastFrameRef.current = null; }, [length, mass, pivotFraction]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
-    const { length: L, mass: m, pivotFraction: pf, isRunning: r, isPaused: p } = sim.current;
+    const { length: L, mass: m, pivotFraction: pf, isRunning: r, isPaused: p, onTick: ot } = sim.current;
     const W = canvas.width, H = canvas.height;
 
     // Pivot at fraction pf along rod from top
@@ -35,7 +37,18 @@ export function PhysicalPendulumCanvas({ length, mass, pivotFraction, isRunning,
     const T_simple = pendulumPeriod(L);
     const omega_phys = 2 * Math.PI / T_phys;
 
-    if (r && !p) tRef.current += 0.016;
+    // Real wall-clock dt — keeps the rod's motion equal to true seconds so
+    // the period shown on screen matches T_phys exactly at any refresh rate,
+    // and the graph's time marker stays perfectly in sync.
+    if (r && !p && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        tRef.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
+    ot?.(tRef.current);
 
     const A_rad = 0.25; // fixed amplitude
     const theta = A_rad * Math.cos(omega_phys * tRef.current);

@@ -2,6 +2,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
+import { EmbedButton } from '@/components/ui/EmbedButton';
 import { PendulumCanvas } from '@/components/simulation/PendulumCanvas';
 import { SpringCanvas } from '@/components/simulation/SpringCanvas';
 import { ConicalPendulumCanvas } from '@/components/simulation/ConicalPendulumCanvas';
@@ -14,7 +15,6 @@ import {
   conicalPendulumOmega, conicalPendulumPeriod, conicalPendulumTension, conicalPendulumSpeed,
   physicalPendulumPeriod, rodPendulumPeriod,
   bifilarPeriodSimple, cantileverStiffness, cantileverDeflection, cantileverPeriod,
-  generateSHMData,
 } from '@/lib/physics/shm';
 
 type Topic = 'pendulum' | 'spring' | 'conical' | 'physical' | 'bifilar';
@@ -169,8 +169,11 @@ export default function OscillationsPage() {
   const conT = conicalPendulumPeriod(conL, conTheta * Math.PI / 180);
   const conTens = conicalPendulumTension(conM, conTheta * Math.PI / 180);
   const conSpeed = conicalPendulumSpeed(conL, conTheta * Math.PI / 180);
-  const physI = physM * physL * physL / 3; // rod pivoted at end approx
-  const physD = physL / 2;
+  // Pivot-dependent — must mirror PhysicalPendulumCanvas exactly, otherwise
+  // the graph's ω differs from the canvas's ω whenever the pivot slider moves
+  // and the live dot drifts off the rod's motion.
+  const physD = Math.max(Math.abs(physL / 2 - physPF * physL), 0.001);
+  const physI = physM * physL * physL / 12 + physM * physD * physD;
   const physT_actual = physicalPendulumPeriod(physI, physM, physD);
   const physT_simple = rodPendulumPeriod(physL);
   const bifT = bifilarPeriodSimple(bifM, bifL, bifWire, bifSep / 2);
@@ -178,14 +181,23 @@ export default function OscillationsPage() {
   const cantDef = cantileverDeflection(cantLoad, 200e9, 0.03, cantH / 1000, cantL);
   const cantT = cantileverPeriod(1, 200e9, 0.03, cantH / 1000, cantL);
 
-  // Graph data
+  // Graph data — omega/A must match what the canvas actually animates so the
+  // live dot on the curve tracks the mass/bob/rod exactly.
+  const bifOmega = bifMode === 'bifilar' ? 2 * Math.PI / bifT : 2 * Math.PI / cantT;
   const graphA = topic === 'pendulum' ? pendA * Math.PI / 180 * pendL :
-                 topic === 'spring' ? spA : 0.2;
+                 topic === 'spring' ? spA :
+                 topic === 'physical' ? 0.25 :          // rad — canvas uses A_rad = 0.25
+                 bifMode === 'bifilar' ? 0.3 :           // rad — bifilar canvas uses 0.3
+                 0.3 * cantDef;                          // m — cantilever tip oscillates ±0.3·δ
   const graphOmega = topic === 'pendulum' ? pendOmega :
-                     topic === 'spring' ? spOmega : 2;
-  const graphM = topic === 'pendulum' ? pendM : topic === 'spring' ? spM : 1;
+                     topic === 'spring' ? spOmega :
+                     topic === 'physical' ? 2 * Math.PI / physT_actual :
+                     bifOmega;
+  const graphM = topic === 'pendulum' ? pendM : topic === 'spring' ? spM :
+                 topic === 'physical' ? physM : bifM;
   const graphK = topic === 'pendulum' ? pendM * pendOmega * pendOmega :
-                 topic === 'spring' ? spK : 4;
+                 topic === 'spring' ? spK :
+                 graphM * graphOmega * graphOmega;
 
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reset = useCallback(() => {
@@ -198,7 +210,19 @@ export default function OscillationsPage() {
     resetTimer.current = setTimeout(reset, 100);
   }, [topic, pendL, pendA, pendG, pendM, spK, spM, spA, conL, conTheta, conM, physL, physM, physPF, bifM, bifL, bifWire, bifSep, cantL, cantH, cantLoad, bifMode, reset]);
 
-  const handleTick = useCallback((t: number) => setCurrentT(t), []);
+  // Throttle marker updates to ~12fps. Updating React state on every
+  // animation frame re-rendered the whole page (and the Recharts graph)
+  // 60+ times a second — the graph would visibly stutter and lag behind
+  // the canvas. The canvas itself animates via its own rAF loop and is
+  // unaffected by this throttle.
+  const lastTickRef = useRef(0);
+  const handleTick = useCallback((t: number) => {
+    const now = performance.now();
+    if (now - lastTickRef.current > 40) {
+      lastTickRef.current = now;
+      setCurrentT(t);
+    }
+  }, []);
 
   return (
     <>
@@ -278,6 +302,7 @@ export default function OscillationsPage() {
                 {topic === 'physical' && (
                   <PhysicalPendulumCanvas key={resetKey} length={physL} mass={physM}
                     pivotFraction={physPF} isRunning={isRunning} isPaused={isPaused}
+                    onTick={(t) => handleTick(t)}
                     width={380} height={300} />
                 )}
                 {topic === 'bifilar' && (
@@ -296,6 +321,7 @@ export default function OscillationsPage() {
                       beamLength={cantL} beamWidth={30} beamHeight={cantH}
                       youngModulus={200} load={cantLoad}
                       isRunning={isRunning} isPaused={isPaused}
+                      onTick={(t) => handleTick(t)}
                       width={380} height={280} />
                   </div>
                 )}
@@ -309,6 +335,18 @@ export default function OscillationsPage() {
                   onPause={() => setIsPaused(p => !p)}
                   onReset={reset}
                 />
+                {topic !== 'bifilar' && (
+                  <EmbedButton
+                    path="/embed/oscillations"
+                    title={`${TOPIC_META[topic].title} — A-Factor STEM Studio`}
+                    params={
+                      topic === 'pendulum' ? { topic, L: pendL, A: pendA, g: pendG, m: pendM } :
+                      topic === 'spring'   ? { topic, k: spK, m: spM, A: spA } :
+                      topic === 'conical'  ? { topic, L: conL, theta: conTheta, m: conM } :
+                      { topic, L: physL, m: physM, pf: physPF }
+                    }
+                  />
+                )}
               </div>
 
               {/* Graph */}

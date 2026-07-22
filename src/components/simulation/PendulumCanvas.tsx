@@ -13,13 +13,14 @@ export function PendulumCanvas({ length, amplitude, gravity, mass, isRunning, is
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const tRef = useRef(0);
+  const lastFrameRef = useRef<number | null>(null);
   const trailRef = useRef<[number, number][]>([]);
   const sim = useRef({ length, amplitude, gravity, mass, isRunning, isPaused, onTick });
   sim.current = { length, amplitude, gravity, mass, isRunning, isPaused, onTick };
 
-  useEffect(() => { tRef.current = 0; trailRef.current = []; }, [length, amplitude, gravity, mass]);
+  useEffect(() => { tRef.current = 0; lastFrameRef.current = null; trailRef.current = []; }, [length, amplitude, gravity, mass]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { length: L, amplitude: A_deg, gravity: grav, mass: m, isRunning: r, isPaused: p, onTick: ot } = sim.current;
@@ -27,7 +28,18 @@ export function PendulumCanvas({ length, amplitude, gravity, mass, isRunning, is
     const A_rad = A_deg * Math.PI / 180;
     const omega = pendulumOmega(L, grav);
 
-    if (r && !p) { tRef.current += 0.016; }
+    // Advance simulation time by REAL elapsed wall-clock time, not a fixed
+    // per-frame step. A fixed += 0.016 assumes 60fps: on 120Hz screens the
+    // animation ran 2× fast, which is why the canvas drifted out of sync
+    // with the graph (whose time axis is in true seconds).
+    if (r && !p && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        tRef.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
 
     const theta = pendulumAngle(A_rad, omega, tRef.current);
     const pivotX = W / 2, pivotY = 40;

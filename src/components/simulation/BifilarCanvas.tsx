@@ -10,29 +10,41 @@ interface Props {
   beamLength: number; beamWidth: number; beamHeight: number;
   youngModulus: number; load: number;
   isRunning: boolean; isPaused: boolean;
+  onTick?: (t: number) => void;
   width?: number; height?: number;
 }
 
 export function BifilarCanvas({
   mode, mass, rodLength, wireLength, separation,
   beamLength, beamWidth, beamHeight, youngModulus, load,
-  isRunning, isPaused, width = 380, height = 300
+  isRunning, isPaused, onTick, width = 380, height = 300
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const tRef = useRef(0);
-  const sim = useRef({ mode, mass, rodLength, wireLength, separation, beamLength, beamWidth, beamHeight, youngModulus, load, isRunning, isPaused });
-  sim.current = { mode, mass, rodLength, wireLength, separation, beamLength, beamWidth, beamHeight, youngModulus, load, isRunning, isPaused };
+  const lastFrameRef = useRef<number | null>(null);
+  const sim = useRef({ mode, mass, rodLength, wireLength, separation, beamLength, beamWidth, beamHeight, youngModulus, load, isRunning, isPaused, onTick });
+  sim.current = { mode, mass, rodLength, wireLength, separation, beamLength, beamWidth, beamHeight, youngModulus, load, isRunning, isPaused, onTick };
 
-  useEffect(() => { tRef.current = 0; }, [mode, mass, rodLength, wireLength, separation, beamLength, beamHeight, youngModulus, load]);
+  useEffect(() => { tRef.current = 0; lastFrameRef.current = null; }, [mode, mass, rodLength, wireLength, separation, beamLength, beamHeight, youngModulus, load]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const s = sim.current;
     const W = canvas.width, H = canvas.height;
 
-    if (s.isRunning && !s.isPaused) tRef.current += 0.016;
+    // Real wall-clock dt (see PendulumCanvas) — animation time == true
+    // seconds at any refresh rate, so the graph marker stays in sync.
+    if (s.isRunning && !s.isPaused && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        tRef.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
+    s.onTick?.(tRef.current);
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, H);
@@ -40,7 +52,9 @@ export function BifilarCanvas({
     if (s.mode === 'bifilar') {
       const T = bifilarPeriodSimple(s.mass, s.rodLength, s.wireLength, s.separation / 2);
       const omega = 2 * Math.PI / T;
-      const phi = 0.3 * Math.sin(omega * tRef.current); // torsion angle
+      // cos, not sin — matches the graph's x = A·cos(ωt) convention, so the
+      // rod starts at maximum twist exactly where the plotted curve starts at +A.
+      const phi = 0.3 * Math.cos(omega * tRef.current); // torsion angle
 
       const cx = W / 2, ceilY = 20;
       const rodY = ceilY + s.wireLength * 80;
@@ -94,7 +108,7 @@ export function BifilarCanvas({
       const omega_c = Math.sqrt(k / s.mass);
 
       // Static + dynamic deflection
-      const dynamicPx = s.isRunning ? dispPx + 0.3 * dispPx * Math.sin(omega_c * tRef.current) : dispPx;
+      const dynamicPx = s.isRunning ? dispPx + 0.3 * dispPx * Math.cos(omega_c * tRef.current) : dispPx;
 
       const wallX = 40, beamY = H / 2 - 10;
       const beamLenPx = W - 100;

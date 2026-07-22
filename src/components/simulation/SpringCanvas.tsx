@@ -28,13 +28,14 @@ export function SpringCanvas({ k, mass, amplitude, isRunning, isPaused, onTick, 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const tRef = useRef(0);
+  const lastFrameRef = useRef<number | null>(null);
   const trailRef = useRef<number[]>([]);
   const sim = useRef({ k, mass, amplitude, isRunning, isPaused, onTick });
   sim.current = { k, mass, amplitude, isRunning, isPaused, onTick };
 
-  useEffect(() => { tRef.current = 0; trailRef.current = []; }, [k, mass, amplitude]);
+  useEffect(() => { tRef.current = 0; lastFrameRef.current = null; trailRef.current = []; }, [k, mass, amplitude]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { k: K, mass: m, amplitude: A, isRunning: r, isPaused: p, onTick: ot } = sim.current;
@@ -42,7 +43,16 @@ export function SpringCanvas({ k, mass, amplitude, isRunning, isPaused, onTick, 
     const omega = springOmega(K, m);
     const staticExt = springStaticExtension(m, K);
 
-    if (r && !p) tRef.current += 0.016;
+    // Real wall-clock dt (see PendulumCanvas) — keeps canvas time equal to
+    // the true seconds shown on the graph's time axis at any refresh rate.
+    if (r && !p && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        tRef.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
 
     const x = shmDisplacement(A, omega, tRef.current); // displacement from equilibrium
     const v = shmVelocity(A, omega, tRef.current);

@@ -12,10 +12,11 @@ export function ConicalPendulumCanvas({ length, theta_deg, mass, isRunning, isPa
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const phiRef = useRef(0);
+  const lastFrameRef = useRef<number | null>(null);
   const sim = useRef({ length, theta_deg, mass, isRunning, isPaused });
   sim.current = { length, theta_deg, mass, isRunning, isPaused };
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { length: L, theta_deg: th, mass: m, isRunning: r, isPaused: p } = sim.current;
@@ -25,7 +26,16 @@ export function ConicalPendulumCanvas({ length, theta_deg, mass, isRunning, isPa
     const r_circ = conicalPendulumRadius(L, theta);
     const T = conicalPendulumTension(m, theta);
 
-    if (r && !p) phiRef.current += omega * 0.016;
+    // Real wall-clock dt — the orbital period on screen now equals the
+    // calculated T exactly, at any display refresh rate.
+    if (r && !p && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        phiRef.current += omega * Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
 
     const cx = W / 2, cy = 50;
     const scale = Math.min((H - 100) / L, 200);

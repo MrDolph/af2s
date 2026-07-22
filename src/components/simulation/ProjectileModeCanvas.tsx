@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
-  standardPath, horizontalPath, verticalPath, inclinedPath,
+  standardPath, horizontalPath, verticalPath, inclinedPath, inclinedSetup,
   StandardParams, HorizontalParams, VerticalParams, InclinedParams,
 } from '@/lib/physics/projectile-modes';
 
@@ -40,6 +40,7 @@ interface Setup {
   x0: number; y0: number; vx0: number; vy0: number; g: number; h0: number;
   beta?: number;                    // incline angle (radians) — inclined mode only
   launchFrom?: 'base' | 'top';      // inclined mode only
+  topHeight?: number;               // height of incline top above base (top mode)
 }
 
 function getSetup(mode: ProjectileMode, p: Props): Setup {
@@ -60,22 +61,17 @@ function getSetup(mode: ProjectileMode, p: Props): Setup {
     return { x0: 0, y0: p.vertical.h0 ?? 0, vx0: 0, vy0: p.vertical.v0, g: p.vertical.g, h0: p.vertical.h0 ?? 0 };
   }
   if (mode === 'inclined' && p.inclined) {
-    const a = p.inclined.alpha * Math.PI / 180;
-    const b = p.inclined.beta  * Math.PI / 180;
+    const b = p.inclined.beta * Math.PI / 180;
     const launchFrom = p.inclined.launchFrom ?? 'base';
-    const top = launchFrom === 'top';
-    const h0 = top ? (p.inclined.height ?? 0) : 0;
-    // Whether launched from the base or the top, the object is in free
-    // flight under gravity g the whole time — the launch angle above
-    // horizontal is simply (alpha + beta). What differs between the two
-    // scenarios is only the starting height and where it's allowed to land
-    // (handled below via `beta`/`launchFrom` in the termination check).
+    // Both cases are free flight that terminates back ON the incline
+    // surface. inclinedSetup() gives the world-frame launch point and
+    // velocity: base → angle (α+β) above horizontal from the foot;
+    // top → angle (α−β) above horizontal from the summit, height H = R·sinβ.
+    const s = inclinedSetup({ ...p.inclined, launchFrom });
     return {
-      x0: 0, y0: h0,
-      vx0: p.inclined.v0 * Math.cos(a + b),
-      vy0: p.inclined.v0 * Math.sin(a + b),
-      g: p.inclined.g, h0,
-      beta: b, launchFrom,
+      x0: s.x0, y0: s.y0, vx0: s.vx0, vy0: s.vy0,
+      g: p.inclined.g, h0: 0,
+      beta: b, launchFrom, topHeight: s.topHeight,
     };
   }
   return { x0: 0, y0: 0, vx0: 10, vy0: 10, g: 9.81, h0: 0 };
@@ -110,17 +106,24 @@ function drawAll(
   trail: [number, number][],
   mode: ProjectileMode, h0: number,
   showHUD: boolean, showGrid: boolean, showTrail: boolean, showVec: boolean, showComp: boolean,
-  beta?: number, launchFrom?: 'base' | 'top',
+  beta?: number, launchFrom?: 'base' | 'top', topHeight?: number,
 ) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const W = canvas.width, H = canvas.height;
 
-  // For an inclined launch from the base, the "ground" the object lands on
-  // is the sloped incline surface (y = x·tanβ), not world y = 0. Every other
-  // mode — and the inclined-from-top mode — lands on flat ground (y = 0).
-  const onIncline = mode === 'inclined' && launchFrom === 'base';
-  const floorAt = (xv: number) => (onIncline ? xv * Math.tan(beta ?? 0) : 0);
+  // For inclined mode, the "ground" the object lands on is the sloped
+  // incline surface — base: y = x·tanβ (rising to the right); top:
+  // y = H − x·tanβ (falling to the right, clamped at ground level beyond
+  // the base). Every other mode lands on flat ground (y = 0).
+  const onIncline = mode === 'inclined';
+  const floorAt = (xv: number) => {
+    if (!onIncline) return 0;
+    const tb = Math.tan(beta ?? 0);
+    return launchFrom === 'top'
+      ? Math.max(0, (topHeight ?? 0) - xv * tb)
+      : xv * tb;
+  };
 
   ctx.clearRect(0, 0, W, H);
 
@@ -143,14 +146,32 @@ function drawAll(
     ctx.fillText(`${h0}m`, (PAD + 4) / 2, py - 6);
   }
 
-  // Inclined surface — only for a base launch (the ball lands back on this).
-  // A top launch instead shows the "Platform" block above (h0 = height).
+  // Inclined surface — the ball lands back on this in both launch modes.
   if (onIncline && beta !== undefined) {
     const maxXPt = maxX * 1.25;
-    const [x0c, y0c] = toCanvas(0, 0, scale, H);
-    const [x1c, y1c] = toCanvas(maxXPt, maxXPt * Math.tan(beta), scale, H);
-    ctx.beginPath(); ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
-    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.save();
+    ctx.beginPath();
+    if (launchFrom === 'top') {
+      // Slope descends from (0, H) to the base at x = H/tanβ, flat after.
+      const th = topHeight ?? 0;
+      const baseX = Math.tan(beta) > 1e-6 ? th / Math.tan(beta) : maxXPt;
+      const [x0c, y0c] = toCanvas(0, th, scale, H);
+      const [x1c, y1c] = toCanvas(Math.min(baseX, maxXPt), floorAt(Math.min(baseX, maxXPt)), scale, H);
+      ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
+      // Fill the hill body
+      ctx.strokeStyle = '#64748b'; ctx.lineWidth = 3; ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
+      const [xg, yg] = toCanvas(0, 0, scale, H);
+      ctx.lineTo(xg, yg); ctx.closePath();
+      ctx.fillStyle = 'rgba(148,163,184,0.25)'; ctx.fill();
+    } else {
+      const [x0c, y0c] = toCanvas(0, 0, scale, H);
+      const [x1c, y1c] = toCanvas(maxXPt, maxXPt * Math.tan(beta), scale, H);
+      ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
+      ctx.strokeStyle = '#64748b'; ctx.lineWidth = 3; ctx.stroke();
+    }
+    ctx.restore();
   }
 
   // Grid
@@ -346,9 +367,9 @@ export function ProjectileModeCanvas({
       trailRef.current, mode, setup.h0,
       isRunning || st.t > 0,
       showGrid, showTrail, showVec, showComp,
-      setup.beta, setup.launchFrom,
+      setup.beta, setup.launchFrom, setup.topHeight,
     );
-  }, [path, scale, maxX, maxY, mode, setup.h0, setup.beta, setup.launchFrom, isRunning, showGrid, showTrail, showVec, showComp]);
+  }, [path, scale, maxX, maxY, mode, setup.h0, setup.beta, setup.launchFrom, setup.topHeight, isRunning, showGrid, showTrail, showVec, showComp]);
 
   // Keep a ref to the latest `draw` so the reset effect below doesn't need
   // `draw` itself in its dependency array. `draw`'s identity changes with
@@ -389,11 +410,16 @@ export function ProjectileModeCanvas({
           g:  s.g,
         };
         const ns = stateRef.current;
-        // A base-launched inclined trajectory lands back on the sloped
-        // surface (y = x·tanβ), not on flat ground (y = 0) — everything
-        // else (including an inclined launch from the top) lands at y = 0.
-        const onIncline = mode === 'inclined' && setup.launchFrom === 'base';
-        const floor = onIncline ? ns.x * Math.tan(setup.beta ?? 0) : 0;
+        // Inclined trajectories land back on the sloped surface in BOTH
+        // launch modes: base → y = x·tanβ; top → y = H − x·tanβ (clamped
+        // to ground level). Everything else lands at y = 0.
+        let floor = 0;
+        if (mode === 'inclined') {
+          const tb = Math.tan(setup.beta ?? 0);
+          floor = setup.launchFrom === 'top'
+            ? Math.max(0, (setup.topHeight ?? 0) - ns.x * tb)
+            : ns.x * tb;
+        }
         const [tbx, tby] = toCanvas(ns.x, Math.max(floor, ns.y), scale, height);
         trailRef.current.push([tbx, tby]);
         if (trailRef.current.length > 140) trailRef.current.shift();
@@ -410,7 +436,7 @@ export function ProjectileModeCanvas({
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isRunning, isPaused, speedIdx, scale, height, mode, setup.beta, setup.launchFrom, draw, onTick, onComplete]);
+  }, [isRunning, isPaused, speedIdx, scale, height, mode, setup.beta, setup.launchFrom, setup.topHeight, draw, onTick, onComplete]);
 
   return (
     <div className="space-y-2">
