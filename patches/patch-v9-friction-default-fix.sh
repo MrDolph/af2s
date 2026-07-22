@@ -1,3 +1,31 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v9: fix friction sim "doing nothing" on Run
+#
+#   Not actually a code bug — the DEFAULT slider values happened to land
+#   exactly in the static-friction regime in BOTH tabs:
+#     Flat:    applied=15N vs max static friction μsN=19.62N  -> never moves
+#     Incline: angle=20° vs angle of repose (tan⁻¹μs)=21.8°   -> never slides
+#   So pressing Run with untouched sliders correctly showed a stationary
+#   block — which looks exactly like a broken animation on first try.
+#
+#   Fix: changed the defaults (applied 15N->25N, angle 20°->35°) so both
+#   tabs clearly show motion the moment you press Run, while the sliders
+#   can still be pulled back down to demonstrate the static case on purpose.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v9-friction-default-fix.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "✗ Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+mkdir -p "src/app/simulations/friction"
+
+echo "  → src/app/simulations/friction/page.tsx"
+cat > "src/app/simulations/friction/page.tsx" << 'AFEOF'
 'use client';
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceDot, ReferenceLine } from 'recharts';
@@ -5,7 +33,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { FrictionCanvas, FrictionMode } from '@/components/simulation/FrictionCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
-import { flatFriction, inclineDynamics, frictionCurve } from '@/lib/physics/friction';
+import { flatFriction, inclineFriction, frictionCurve } from '@/lib/physics/friction';
 
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'];
 const CC: Record<string, string> = {
@@ -29,9 +57,8 @@ const TEACHER_NOTES: Record<FrictionMode, string[]> = {
   ],
   incline: [
     'The angle at which a block JUST starts to slide is the angle of repose θr, where tanθr = μs — a clean way to measure friction experimentally.',
-    'On the slope, the FULL weight mg acts straight down — resolve it into two components relative to the incline: mg sinθ (down the slope, drives sliding) and mg cosθ (into the slope, balanced by the normal reaction N).',
-    'Below θr the block is static and friction exactly balances mg sinθ. Above it, friction is capped at μkN and the block slides down: a = g(sinθ − μk cosθ).',
-    'Pushing a block UP the slope needs the applied force to overcome BOTH mg sinθ and friction — and once moving, friction switches to act DOWN the slope, opposing the upward push, so more force is needed to keep it moving up than to just hold it in place.',
+    'On the slope, gravity splits into two components: mg sinθ (down the slope, drives sliding) and mg cosθ (into the slope, creates the normal reaction N).',
+    'Below θr the block is static and friction exactly balances mg sinθ. Above it, friction is capped at μkN and the block accelerates: a = g(sinθ − μk cosθ).',
     'This is literally how a plumb-line/tilt-table experiment measures μs for sand, wood, or rubber in a school lab.',
     'A steeper slope always needs a HIGHER μ to prevent sliding — this is why steep roofs need rougher tiles.',
   ],
@@ -47,7 +74,6 @@ const EXERCISES: Record<FrictionMode, { q: string; a: string }[]> = {
     { q: 'A block just begins to slide on a slope at 22°. Find μs.', a: 'μs = tan22° ≈ 0.40.' },
     { q: 'A 4kg block sits on a 35° slope with μs=0.5. Does it slide? Show your working.', a: 'mg sinθ = 4×9.81×sin35° ≈ 22.5N. μs·mg cosθ = 0.5×4×9.81×cos35° ≈ 16.1N. Since 22.5N > 16.1N, YES it slides.' },
     { q: 'A block slides down a 40° slope with μk=0.2. Find its acceleration.', a: 'a = g(sinθ − μk cosθ) = 9.81(sin40° − 0.2cos40°) ≈ 9.81(0.643−0.153) ≈ 4.81 m/s².' },
-    { q: 'A 5kg block on a 30° slope (μs=0.4, μk=0.3) is pushed with a 60N force up the slope. Find the acceleration.', a: 'mg sinθ=5×9.81×sin30°=24.5N. N=5×9.81×cos30°=42.5N. Kinetic friction=0.3×42.5=12.7N (acts down-slope, opposing the push). Net=60−24.5−12.7=22.8N. a=22.8/5≈4.56 m/s² up the slope.' },
   ],
 };
 
@@ -74,19 +100,6 @@ function StatRow({ label, value, unit, color }: { label: string; value: string; 
       <span className="text-xs text-gray-500">{label}</span>
       <span className={`text-xs font-semibold tabular-nums ${color}`}>{value} <span className="text-gray-400 font-normal">{unit}</span></span>
     </div>
-  );
-}
-
-function ToggleChip({ label, active, onClick, color }: { label: string; active: boolean; onClick: () => void; color: string }) {
-  return (
-    <button onClick={onClick}
-      className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
-        active ? 'border-transparent text-white' : 'border-gray-200 bg-white text-gray-400'
-      }`}
-      style={active ? { backgroundColor: color } : undefined}>
-      <span className={`inline-block h-1.5 w-1.5 rounded-full ${active ? 'bg-white' : 'bg-gray-300'}`} />
-      {label}
-    </button>
   );
 }
 
@@ -126,27 +139,18 @@ export default function FrictionPage() {
   const [mass, setMass] = useState(5);
   const [applied, setApplied] = useState(25);
   const [angle, setAngle] = useState(35);
-  const [appliedIncline, setAppliedIncline] = useState(0); // 0 = gravity only (slides down if steep enough)
   const [muS, setMuS] = useState(0.4);
   const [muK, setMuK] = useState(0.3);
-
-  // Force-arrow visibility — purely cosmetic, shared across both modes so a
-  // preference carries over when switching tabs.
-  const [showWeight, setShowWeight] = useState(true);
-  const [showComponents, setShowComponents] = useState(true);
-  const [showNormal, setShowNormal] = useState(true);
-  const [showFriction, setShowFriction] = useState(true);
-  const [showApplied, setShowApplied] = useState(true);
 
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 80);
-  }, [mode, mass, applied, angle, appliedIncline, muS, muK, reset]);
+  }, [mode, mass, applied, angle, muS, muK, reset]);
 
   const flat = flatFriction(mass, applied, muS, muK);
-  const inc = inclineDynamics(mass, angle, muS, muK, appliedIncline, 0);
+  const inc = inclineFriction(mass, angle, muS, muK);
 
   return (
     <>
@@ -193,9 +197,7 @@ export default function FrictionPage() {
             <div className="space-y-3 min-w-0">
               <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <FrictionCanvas key={resetKey} mode={mode} mass={mass} applied={applied} angle={angle}
-                  appliedIncline={appliedIncline} muS={muS} muK={muK} isRunning={isRunning} isPaused={isPaused} resetKey={resetKey}
-                  showWeight={showWeight} showComponents={showComponents} showNormal={showNormal}
-                  showFriction={showFriction} showApplied={showApplied}
+                  muS={muS} muK={muK} isRunning={isRunning} isPaused={isPaused} resetKey={resetKey}
                   width={640} height={300} />
               </div>
 
@@ -205,7 +207,7 @@ export default function FrictionPage() {
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
                 <EmbedButton path="/embed/friction"
                   title={`${MODE_META[mode].title} friction — A-Factor STEM Studio`}
-                  params={{ mode, mass, applied, angle, appliedIncline, muS, muK }} />
+                  params={{ mode, mass, applied, angle, muS, muK }} />
               </div>
 
               {mode === 'flat' && (
@@ -219,30 +221,13 @@ export default function FrictionPage() {
               )}
 
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Show forces</p>
-                <div className="flex flex-wrap gap-1.5">
-                  <ToggleChip label="Weight (mg)" active={showWeight} onClick={() => setShowWeight(v => !v)} color="#8b5cf6" />
-                  {mode === 'incline' && (
-                    <ToggleChip label="Components (∥ & ⊥)" active={showComponents} onClick={() => setShowComponents(v => !v)} color="#a855f7" />
-                  )}
-                  <ToggleChip label="Normal (N)" active={showNormal} onClick={() => setShowNormal(v => !v)} color="#3b82f6" />
-                  <ToggleChip label="Friction (f)" active={showFriction} onClick={() => setShowFriction(v => !v)} color="#ef4444" />
-                  <ToggleChip label="Applied (F)" active={showApplied} onClick={() => setShowApplied(v => !v)} color="#059669" />
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <Slider label="Mass" unit="kg" value={mass} min={1} max={20} step={0.5} set={setMass} color="#6366f1" />
                 {mode === 'flat' && (
                   <Slider label="Applied force" unit="N" value={applied} min={0} max={80} step={1} set={setApplied} color="#f59e0b" />
                 )}
                 {mode === 'incline' && (
-                  <>
-                    <Slider label="Incline angle" unit="°" value={angle} min={0} max={60} step={1} set={setAngle} color="#f59e0b" />
-                    <Slider label="Applied push (up-slope)" unit="N" value={appliedIncline} min={0} max={100} step={1} set={setAppliedIncline} color="#059669"
-                      note="0 = gravity only. Push past mg sinθ + friction to send the block UP the slope." />
-                  </>
+                  <Slider label="Incline angle" unit="°" value={angle} min={0} max={60} step={1} set={setAngle} color="#f59e0b" />
                 )}
                 <Slider label="Static μs" unit="" value={muS} min={0.05} max={1} step={0.01} set={v => setMuS(Math.max(v, muK))} color="#10b981" />
                 <Slider label="Kinetic μk" unit="" value={muK} min={0.05} max={1} step={0.01} set={v => setMuK(Math.min(v, muS))} color="#8b5cf6" note="μk is kept ≤ μs, as it always is physically" />
@@ -261,13 +246,11 @@ export default function FrictionPage() {
                     <StatRow label="Acceleration" value={flat.acceleration.toFixed(2)} unit="m/s²" color="text-purple-600" />
                   </>}
                   {mode === 'incline' && <>
-                    <StatRow label="Weight (mg)" value={inc.weight.toFixed(1)} unit="N" color="text-violet-600" />
                     <StatRow label="Normal reaction N" value={inc.N.toFixed(1)} unit="N" color="text-indigo-600" />
-                    <StatRow label="mg sinθ (∥ to slope)" value={inc.gravityAlong.toFixed(1)} unit="N" color="text-emerald-600" />
-                    <StatRow label="mg cosθ (⊥ to slope)" value={inc.gravityPerp.toFixed(1)} unit="N" color="text-amber-600" />
-                    <StatRow label="Max static friction" value={inc.staticMax.toFixed(1)} unit="N" color="text-rose-500" />
-                    <StatRow label="Angle of repose" value={inc.reposeAngle.toFixed(1)} unit="°" color="text-purple-600" />
-                    <StatRow label="At rest, would…" value={inc.direction === 'static' ? 'stay still' : inc.direction === 'up' ? 'move up' : 'slide down'} unit="" color="text-gray-600" />
+                    <StatRow label="mg sinθ" value={inc.gravityAlong.toFixed(1)} unit="N" color="text-emerald-600" />
+                    <StatRow label="Max static friction" value={inc.staticMax.toFixed(1)} unit="N" color="text-amber-600" />
+                    <StatRow label="Angle of repose" value={inc.reposeAngle.toFixed(1)} unit="°" color="text-rose-500" />
+                    <StatRow label="State" value={inc.sliding ? 'sliding' : 'static'} unit="" color="text-purple-600" />
                   </>}
                 </div>
               </div>
@@ -322,3 +305,11 @@ export default function FrictionPage() {
     </>
   );
 }
+AFEOF
+
+echo ""
+echo "✓ Patch v9 applied."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"

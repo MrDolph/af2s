@@ -26,33 +26,64 @@ export function flatFriction(mass: number, applied: number, muS: number, muK: nu
   return { N, staticMax, friction: kinetic, netForce: net, acceleration: net / mass, moving: true };
 }
 
-export interface InclineResult {
+// ── Incline (bidirectional) ─────────────────────────────────────────────────────
+// Positive direction = UP the slope throughout. An optional applied force
+// (also up-slope-positive) lets the block be pushed UP against gravity, not
+// just slide down under its own weight — friction automatically flips to
+// whichever side opposes the actual (or impending) motion.
+export interface InclineDynamicsResult {
   N: number;
-  gravityAlong: number;   // mg sinθ (down-slope)
-  staticMax: number;      // μs·mg·cosθ
-  friction: number;
-  acceleration: number;   // down-slope, 0 if static
-  sliding: boolean;
-  reposeAngle: number;    // tan⁻¹(μs) in degrees
+  gravityAlong: number;   // mg sinθ — magnitude of weight's down-slope component
+  gravityPerp: number;    // mg cosθ — magnitude of weight's into-slope component (== N at equilibrium)
+  weight: number;         // mg — full weight magnitude
+  appliedForce: number;   // signed, up-slope positive (as given)
+  friction: number;       // signed, up-slope positive
+  netForce: number;       // signed, up-slope positive
+  acceleration: number;   // signed, up-slope positive
+  moving: boolean;
+  direction: 'up' | 'down' | 'static';
+  staticMax: number;
+  reposeAngle: number;    // tan⁻¹(μs) in degrees — the F=0 slipping threshold
 }
 
-export function inclineFriction(mass: number, thetaDeg: number, muS: number, muK: number): InclineResult {
+export function inclineDynamics(
+  mass: number, thetaDeg: number, muS: number, muK: number, appliedForce: number, v: number
+): InclineDynamicsResult {
   const th = (thetaDeg * Math.PI) / 180;
-  const N = mass * G * Math.cos(th);
-  const along = mass * G * Math.sin(th);
-  const staticMax = muS * N;
+  const weight = mass * G;
+  const N = weight * Math.cos(th);
+  const gravityAlong = weight * Math.sin(th);   // always pulls down-slope
+  const gravityPerp = N;
+  const maxStatic = muS * N;
   const reposeAngle = (Math.atan(muS) * 180) / Math.PI;
-  if (along <= staticMax) {
-    return { N, gravityAlong: along, staticMax, friction: along, acceleration: 0, sliding: false, reposeAngle };
+  const nonFriction = appliedForce - gravityAlong; // net of applied (up +) and gravity (down −), excluding friction
+
+  if (v === 0) {
+    if (Math.abs(nonFriction) <= maxStatic) {
+      return {
+        N, gravityAlong, gravityPerp, weight, appliedForce, friction: -nonFriction, netForce: 0,
+        acceleration: 0, moving: false, direction: 'static', staticMax: maxStatic, reposeAngle,
+      };
+    }
+    const friction = -Math.sign(nonFriction) * maxStatic;
+    const netForce = nonFriction + friction;
+    const acceleration = netForce / mass;
+    return {
+      N, gravityAlong, gravityPerp, weight, appliedForce, friction, netForce, acceleration,
+      moving: true, direction: acceleration > 0 ? 'up' : 'down', staticMax: maxStatic, reposeAngle,
+    };
   }
-  const kinetic = muK * N;
+  const friction = -Math.sign(v) * muK * N;
+  const netForce = nonFriction + friction;
+  const acceleration = netForce / mass;
   return {
-    N, gravityAlong: along, staticMax, friction: kinetic,
-    acceleration: (along - kinetic) / mass, sliding: true, reposeAngle,
+    N, gravityAlong, gravityPerp, weight, appliedForce, friction, netForce, acceleration,
+    moving: true, direction: v > 0 ? 'up' : 'down', staticMax: maxStatic, reposeAngle,
   };
 }
 
-// Friction-vs-applied-force curve: the classic ramp-then-plateau graph.
+// Friction-vs-applied-force curve: the classic ramp-then-plateau graph
+// (flat-surface version, used by the flat-mode f–F graph).
 export function frictionCurve(mass: number, muS: number, muK: number, fMax: number, points = 100) {
   return Array.from({ length: points + 1 }, (_, i) => {
     const F = (i / points) * fMax;
