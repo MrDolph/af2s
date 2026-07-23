@@ -81,7 +81,7 @@ function StatRow({ label, value, unit, color }: { label: string; value: string; 
 function ToggleChip({ label, active, onClick, color }: { label: string; active: boolean; onClick: () => void; color: string }) {
   return (
     <button onClick={onClick}
-      className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+      className={`flex items-center gap-1.5 rounded-full border px-2.5 py-2 text-[11px] font-medium transition ${
         active ? 'border-transparent text-white' : 'border-gray-200 bg-white text-gray-400'
       }`}
       style={active ? { backgroundColor: color } : undefined}>
@@ -167,7 +167,7 @@ export default function FrictionPage() {
                 {CURRICULA.map(c => (
                   <button key={c}
                     onClick={() => setActiveCurricula(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CC[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}

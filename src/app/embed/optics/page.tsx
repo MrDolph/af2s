@@ -37,10 +37,7 @@ function PoweredBy() {
 
 function OpticsEmbedInner() {
   const sp = useSearchParams();
-  const mode = ((): OpticsMode => {
-    const m = sp.get('mode');
-    return m === 'lens' || m === 'mirror' ? m : 'snell';
-  })();
+  const mode = ((): OpticsMode => (sp.get('mode') === 'lens' ? 'lens' : 'snell'))();
   const showControls = sp.get('controls') !== '0';
 
   const [n1, setN1] = useState(() => num(sp, 'n1', 1.0, 1, 2.5));

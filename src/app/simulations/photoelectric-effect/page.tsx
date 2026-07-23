@@ -121,7 +121,7 @@ export default function PhotoelectricPage() {
                 {CURRICULA.map(c => (
                   <button key={c}
                     onClick={() => setActiveCurricula(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CC[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}
@@ -166,7 +166,7 @@ export default function PhotoelectricPage() {
                 <div className="flex flex-wrap gap-1.5">
                   {METALS.map((m, i) => (
                     <button key={m.name} onClick={() => setMetalIdx(i)}
-                      className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                      className={`rounded-full border px-2.5 py-2 text-[11px] font-medium transition ${
                         metalIdx === i ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-200'
                       }`}>{m.name} ({m.phi} eV)</button>
                   ))}

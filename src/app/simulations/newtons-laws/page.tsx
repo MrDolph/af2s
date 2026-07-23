@@ -204,7 +204,7 @@ export default function NewtonsLawsPage() {
                 {CURRICULA.map(c => (
                   <button key={c}
                     onClick={() => setActiveCurricula(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CC[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}
@@ -286,7 +286,7 @@ export default function NewtonsLawsPage() {
                     <div className="flex gap-1 bg-gray-100 p-0.5 rounded-lg">
                       {(['v', 'a', 'x'] as GraphType[]).map(g => (
                         <button key={g} onClick={() => setGraphType(g)}
-                          className={`px-3 py-1 rounded-md text-xs font-medium transition ${
+                          className={`px-3 py-2 rounded-md text-xs font-medium transition ${
                             graphType === g ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500'
                           }`}>{g === 'v' ? 'Velocity' : g === 'a' ? 'Acceleration' : 'Displacement'}</button>
                       ))}
@@ -356,7 +356,7 @@ export default function NewtonsLawsPage() {
                     <div className="grid grid-cols-3 gap-1 bg-gray-100 p-1 rounded-xl">
                       {(['push', 'rocket', 'collision'] as Scenario3[]).map(s => (
                         <button key={s} onClick={() => setScenario3(s)}
-                          className={`py-1.5 rounded-lg text-xs font-medium capitalize transition ${
+                          className={`py-2 rounded-lg text-xs font-medium capitalize transition ${
                             scenario3 === s ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500'
                           }`}>{s}</button>
                       ))}

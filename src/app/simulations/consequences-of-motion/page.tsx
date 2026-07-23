@@ -1,13 +1,15 @@
 'use client';
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { ElevatorCanvas } from '@/components/simulation/ElevatorCanvas';
+import { WeightlessnessCanvas } from '@/components/simulation/WeightlessnessCanvas';
 import { WalkingCanvas } from '@/components/simulation/WalkingCanvas';
+import { PropulsionCanvas } from '@/components/simulation/PropulsionCanvas';
 import { CollisionCanvas } from '@/components/simulation/CollisionCanvas';
 import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 import {
-  apparentWeight, solveCollision, rocketAnalytics,
+  apparentWeight, solveCollision, rocketAnalytics, rocketStateAt,
   ElevatorState, CollisionParams, g,
 } from '@/lib/physics/consequences';
 
@@ -135,6 +137,11 @@ export default function ConsequencesPage() {
   const [rocketMass, setRocketMass] = useState(5000);
   const [exhaustSpeed, setExhaustSpeed] = useState(2000);
   const [massFlowRate, setMassFlowRate] = useState(10);
+  const [fuelFraction, setFuelFraction] = useState(0.6);
+  const [liveRocket, setLiveRocket] = useState({ t: 0, v: 0, burnedOut: false });
+
+  // Weightlessness — live readout from the falling chamber
+  const [liveFall, setLiveFall] = useState({ t: 0, distance: 0 });
 
   // Collision
   const [collM1, setCollM1] = useState(3);
@@ -145,8 +152,22 @@ export default function ConsequencesPage() {
   const [collE, setCollE] = useState(0.6);
   const [collResult, setCollResult] = useState<ReturnType<typeof solveCollision> | null>(null);
 
-  const collParams: CollisionParams = { m1: collM1, m2: collM2, u1: collU1, u2: collU2, type: collType, e: collE };
+  // Stable object identity: without this, the instant the collision finishes
+  // (onComplete calling setCollResult/setIsComplete/setIsRunning) the page
+  // re-renders and recreates this object with a new reference. Since
+  // CollisionCanvas's phase-reset effect depends on [params], that new
+  // reference retriggers it at the exact moment impact transitions to
+  // "after" — resetting the whole sequence right when it should be showing
+  // the post-collision result. Same root cause as the earlier Newton's 2nd
+  // law "vibrating block" bug.
+  const collParams: CollisionParams = useMemo(
+    () => ({ m1: collM1, m2: collM2, u1: collU1, u2: collU2, type: collType, e: collE }),
+    [collM1, collM2, collU1, collU2, collType, collE]
+  );
   const rocketA = rocketAnalytics(rocketMass, exhaustSpeed, massFlowRate);
+  const rocketDryMass = rocketMass * (1 - fuelFraction);
+  const rocketFuelMass = rocketMass * fuelFraction;
+  const rocketBurnout = rocketStateAt(1e9, rocketDryMass, rocketFuelMass, exhaustSpeed, massFlowRate); // final state after full burn
   const elevAppW = apparentWeight(elevMass, elevState === 'freefall' ? -g : elevState.includes('up') ? (elevState.includes('accel') ? elevAccel : elevState.includes('decel') ? -elevAccel : 0) : elevState.includes('down') ? (elevState.includes('accel') ? -elevAccel : elevState.includes('decel') ? elevAccel : 0) : 0);
   const collRes = solveCollision(collParams);
 
@@ -158,18 +179,34 @@ export default function ConsequencesPage() {
     setIsRunning(false); setIsPaused(false);
     setIsComplete(false); setResetKey(k => k + 1);
     setCollResult(null);
+    setLiveRocket({ t: 0, v: 0, burnedOut: false });
+    setLiveFall({ t: 0, distance: 0 });
   }, []);
 
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 100);
-  }, [topic, elevMass, elevState, elevAccel, frictionEnabled, rocketMass, exhaustSpeed, massFlowRate, collM1, collM2, collU1, collU2, collType, collE, reset]);
+  }, [topic, elevMass, elevState, elevAccel, frictionEnabled, rocketMass, exhaustSpeed, massFlowRate, fuelFraction, wlHeight, collM1, collM2, collU1, collU2, collType, collE, reset]);
 
   // Elevator is a tall, portrait-ish shaft; walking/collision are wide
   // and short — pick the matching base aspect before scaling up.
   const consBase = topic === 'elevator' ? { w: 500, h: 320 } : { w: 660, h: 200 };
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, consBase.w, consBase.h, 900);
+
+  const lastTickRef = useRef(0);
+  const handleRocketTick = useCallback((t: number, v: number, burnedOut: boolean) => {
+    const now = performance.now();
+    if (now - lastTickRef.current < 60) return;
+    lastTickRef.current = now;
+    setLiveRocket({ t, v, burnedOut });
+  }, []);
+  const handleFallTick = useCallback((t: number, distance: number) => {
+    const now = performance.now();
+    if (now - lastTickRef.current < 60) return;
+    lastTickRef.current = now;
+    setLiveFall({ t, distance });
+  }, []);
 
   return (
     <>
@@ -186,7 +223,7 @@ export default function ConsequencesPage() {
                 {CURRICULA.map(c => (
                   <button key={c}
                     onClick={() => setActiveCurricula(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CC[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}
@@ -231,46 +268,9 @@ export default function ConsequencesPage() {
                 )}
 
                 {topic === 'weightlessness' && (
-                  <div className="space-y-4 p-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {[
-                        { label: 'On Earth surface', g: 9.81, color: 'bg-red-50 border-red-200', textColor: 'text-red-700', icon: '🌍' },
-                        { label: `At ${wlHeight}km orbit`, g: orbitG, color: 'bg-blue-50 border-blue-200', textColor: 'text-blue-700', icon: '🛸' },
-                        { label: 'In free fall', g: 0, color: 'bg-purple-50 border-purple-200', textColor: 'text-purple-700', icon: '🪂' },
-                      ].map(s => (
-                        <div key={s.label} className={`rounded-xl border ${s.color} p-4 text-center`}>
-                          <span className="text-2xl block mb-2">{s.icon}</span>
-                          <p className="text-xs text-gray-500 mb-1">{s.label}</p>
-                          <p className={`text-lg font-bold ${s.textColor}`}>{s.g.toFixed(2)} m/s²</p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            Apparent weight: {(elevMass * Math.max(0, s.g - (s.g === 0 ? 9.81 : 0))).toFixed(0)} N
-                          </p>
-                          <p className="text-xs font-medium mt-2 text-gray-600">
-                            {s.g === 0 ? '✓ Weightless' : s.g < 5 ? 'Near weightless' : 'Normal weight'}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-center">
-                      <p className="text-xs text-indigo-500 mb-1">Key insight</p>
-                      <p className="text-sm text-indigo-800 leading-relaxed">
-                        At {wlHeight}km altitude, g = {orbitG.toFixed(2)} m/s² — gravity is still {(orbitG/9.81*100).toFixed(0)}% of Earth surface gravity.
-                        Astronauts float not because gravity is absent, but because they are in continuous free fall (orbit).
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                      {[
-                        { label: 'ISS orbit', h: 400 }, { label: 'GPS orbit', h: 20200 },
-                        { label: 'GEO orbit', h: 35786 }, { label: 'Moon orbit', h: 384400 },
-                      ].map(o => (
-                        <button key={o.label} onClick={() => setWlHeight(o.h)}
-                          className={`rounded-xl border p-3 transition text-xs ${wlHeight === o.h ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'}`}>
-                          <p className="font-medium">{o.label}</p>
-                          <p className="opacity-70">{o.h < 1000 ? `${o.h}km` : `${(o.h/1000).toFixed(0)}k km`}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <WeightlessnessCanvas key={resetKey} mass={elevMass} gValue={orbitG}
+                    isRunning={isRunning} isPaused={isPaused} onTick={handleFallTick}
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
 
                 {topic === 'walking' && (
@@ -280,55 +280,10 @@ export default function ConsequencesPage() {
                 )}
 
                 {topic === 'propulsion' && (
-                  <div className="p-4 space-y-4">
-                    {/* Rocket diagram */}
-                    <div className="relative h-44 rounded-xl border border-gray-100 bg-gradient-to-b from-slate-900 to-slate-800 overflow-hidden">
-                      {/* Stars */}
-                      {Array.from({ length: 30 }, (_, i) => (
-                        <div key={i} className="absolute w-0.5 h-0.5 bg-white rounded-full opacity-60"
-                          style={{ left: `${(i * 37) % 100}%`, top: `${(i * 53) % 100}%` }} />
-                      ))}
-                      {/* Rocket */}
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-0">
-                        {/* Exhaust */}
-                        <div className="flex flex-col gap-0.5 mr-1">
-                          {[...Array(4)].map((_, i) => (
-                            <div key={i} className="h-1.5 rounded-full bg-orange-400 opacity-80"
-                              style={{ width: `${20 + i * 12}px`, marginLeft: `${i * 4}px` }} />
-                          ))}
-                        </div>
-                        {/* Body */}
-                        <div className="w-20 h-12 bg-indigo-400 rounded-lg flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">{rocketMass}kg</span>
-                        </div>
-                        {/* Nose */}
-                        <div className="w-0 h-0 border-t-[24px] border-t-transparent border-b-[24px] border-b-transparent border-l-[20px] border-l-indigo-500" />
-                      </div>
-                      {/* Labels */}
-                      <div className="absolute bottom-2 left-0 right-0 flex justify-between px-4">
-                        <span className="text-red-400 text-xs">← Exhaust (reaction)</span>
-                        <span className="text-emerald-400 text-xs">Thrust → motion (action)</span>
-                      </div>
-                    </div>
-                    {/* Analytics */}
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { l: 'Thrust', v: `${rocketA.thrust.toFixed(0)} N`, c: 'text-amber-600' },
-                        { l: 'Acceleration', v: `${rocketA.acceleration.toFixed(2)} m/s²`, c: 'text-indigo-600' },
-                        { l: 'Exhaust speed', v: `${exhaustSpeed} m/s`, c: 'text-emerald-600' },
-                        { l: 'Mass flow rate', v: `${massFlowRate} kg/s`, c: 'text-rose-500' },
-                      ].map(s => (
-                        <div key={s.l} className="rounded-xl bg-gray-50 border border-gray-100 px-3 py-2.5 text-center">
-                          <p className="text-xs text-gray-400 mb-0.5">{s.l}</p>
-                          <p className={`text-sm font-semibold ${s.c}`}>{s.v}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-800">
-                      <p className="font-medium mb-1">Momentum conservation</p>
-                      <p>Before launch: total momentum = 0. After ejecting exhaust backward at {exhaustSpeed} m/s, rocket gains equal momentum forward. No external force needed — rockets work in vacuum.</p>
-                    </div>
-                  </div>
+                  <PropulsionCanvas key={resetKey} rocketMass={rocketMass} fuelFraction={fuelFraction}
+                    exhaustSpeed={exhaustSpeed} massFlowRate={massFlowRate}
+                    isRunning={isRunning} isPaused={isPaused} onTick={handleRocketTick}
+                    width={canvasSize.width} height={canvasSize.height} />
                 )}
 
                 {topic === 'collision' && (
@@ -339,18 +294,69 @@ export default function ConsequencesPage() {
                 )}
               </div>
 
-              {/* Controls */}
-              {topic !== 'weightlessness' && topic !== 'propulsion' && (
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <SimulationControls
-                    isRunning={isRunning && !isComplete} isPaused={isPaused}
-                    onRun={() => { setIsRunning(true); setIsPaused(false); setIsComplete(false); }}
-                    onPause={() => setIsPaused(p => !p)}
-                    onReset={reset}
-                  />
-                  {isComplete && <span className="text-xs font-medium text-emerald-600">✓ Complete — Reset to go again</span>}
+              {/* Supplementary content: kept as extra explanatory context
+                  alongside the real animated canvas above, not a substitute
+                  for it. */}
+              {topic === 'weightlessness' && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      { label: 'On Earth surface', gv: 9.81, color: 'bg-red-50 border-red-200', textColor: 'text-red-700', icon: '🌍' },
+                      { label: `At ${wlHeight}km orbit`, gv: orbitG, color: 'bg-blue-50 border-blue-200', textColor: 'text-blue-700', icon: '🛸' },
+                      { label: 'Deep space', gv: 0, color: 'bg-purple-50 border-purple-200', textColor: 'text-purple-700', icon: '🪐' },
+                    ].map(s => (
+                      <div key={s.label} className={`rounded-xl border ${s.color} p-4 text-center`}>
+                        <span className="text-2xl block mb-2">{s.icon}</span>
+                        <p className="text-xs text-gray-500 mb-1">{s.label}</p>
+                        <p className={`text-lg font-bold ${s.textColor}`}>{s.gv.toFixed(2)} m/s²</p>
+                        <p className="text-xs font-medium mt-2 text-gray-600">
+                          {s.gv < 0.1 ? '✓ No gravity to fall under' : s.gv < 5 ? 'Weaker gravity' : 'Full gravity — still weightless if falling'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-center">
+                    <p className="text-xs text-indigo-500 mb-1">Key insight</p>
+                    <p className="text-sm text-indigo-800 leading-relaxed">
+                      At {wlHeight}km altitude, g = {orbitG.toFixed(2)} m/s² — gravity is still {(orbitG / 9.81 * 100).toFixed(0)}% of Earth surface gravity.
+                      The falling chamber above reads 0N the instant it starts moving, at every altitude — astronauts float not because gravity is absent, but because they (and their station) are in continuous free fall.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    {[
+                      { label: 'ISS orbit', h: 400 }, { label: 'GPS orbit', h: 20200 },
+                      { label: 'GEO orbit', h: 35786 }, { label: 'Moon orbit', h: 384400 },
+                    ].map(o => (
+                      <button key={o.label} onClick={() => setWlHeight(o.h)}
+                        className={`rounded-xl border p-3 transition text-xs ${wlHeight === o.h ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+                        <p className="font-medium">{o.label}</p>
+                        <p className="opacity-70">{o.h < 1000 ? `${o.h}km` : `${(o.h / 1000).toFixed(0)}k km`}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
+
+              {topic === 'propulsion' && (
+                <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-800">
+                  <p className="font-medium mb-1">Momentum conservation</p>
+                  <p>Before launch: total momentum = 0. Ejecting exhaust backward at {exhaustSpeed} m/s gives the rocket equal momentum forward — no external force needed, which is why rockets (unlike jets) work in a vacuum. Thrust stays constant, but as fuel burns the rocket&apos;s mass falls, so acceleration a = thrust/mass keeps climbing through the burn.</p>
+                </div>
+              )}
+
+              {/* Controls */}
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <SimulationControls
+                  isRunning={isRunning && !isComplete} isPaused={isPaused}
+                  onRun={() => { setIsRunning(true); setIsPaused(false); setIsComplete(false); }}
+                  onPause={() => setIsPaused(p => !p)}
+                  onReset={reset}
+                />
+                {isComplete && <span className="text-xs font-medium text-emerald-600">✓ Complete — Reset to go again</span>}
+                {topic === 'propulsion' && liveRocket.burnedOut && (
+                  <span className="text-xs font-medium text-amber-600">🔥 Engine cutoff — coasting</span>
+                )}
+              </div>
 
               {/* Params */}
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
@@ -370,7 +376,7 @@ export default function ConsequencesPage() {
                           ['decel-down', 'Decelerating ↓'], ['freefall', '🆘 Free fall'],
                         ] as [ElevatorState, string][]).map(([s, l]) => (
                           <button key={s} onClick={() => setElevState(s)}
-                            className={`px-2 py-1.5 rounded-lg text-xs font-medium border transition ${
+                            className={`px-2 py-2 rounded-lg text-xs font-medium border transition ${
                               elevState === s
                                 ? s === 'freefall' ? 'bg-red-500 text-white border-red-500' : 'bg-indigo-600 text-white border-indigo-600'
                                 : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
@@ -403,7 +409,8 @@ export default function ConsequencesPage() {
 
                 {topic === 'propulsion' && (
                   <>
-                    <Slider label="Rocket mass" unit="kg" value={rocketMass} min={500} max={50000} step={500} set={setRocketMass} color="#6366f1" />
+                    <Slider label="Rocket mass (total)" unit="kg" value={rocketMass} min={500} max={50000} step={500} set={setRocketMass} color="#6366f1" />
+                    <Slider label="Fuel fraction" unit="" value={fuelFraction} min={0.2} max={0.9} step={0.05} set={setFuelFraction} color="#8b5cf6" note={`${rocketFuelMass.toFixed(0)}kg fuel, ${rocketDryMass.toFixed(0)}kg dry mass`} />
                     <Slider label="Exhaust speed" unit="m/s" value={exhaustSpeed} min={200} max={5000} step={100} set={setExhaustSpeed} color="#f59e0b" />
                     <Slider label="Mass flow rate" unit="kg/s" value={massFlowRate} min={1} max={100} step={1} set={setMassFlowRate} color="#10b981" />
                   </>
@@ -414,7 +421,7 @@ export default function ConsequencesPage() {
                     <div className="grid grid-cols-3 gap-1 bg-gray-100 p-1 rounded-xl">
                       {(['elastic', 'inelastic', 'perfectly-inelastic'] as CollisionParams['type'][]).map(t => (
                         <button key={t} onClick={() => setCollType(t)}
-                          className={`py-1.5 rounded-lg text-[10px] font-medium transition ${
+                          className={`py-2 rounded-lg text-[10px] font-medium transition ${
                             collType === t ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500'
                           }`}>{t === 'perfectly-inelastic' ? 'Stick together' : t.charAt(0).toUpperCase() + t.slice(1)}</button>
                       ))}
@@ -452,7 +459,9 @@ export default function ConsequencesPage() {
                     { l: 'True weight (Earth)', v: `${(elevMass * 9.81).toFixed(0)} N`, c: 'text-gray-600' },
                     { l: `g at ${wlHeight}km`, v: `${orbitG.toFixed(2)} m/s²`, c: 'text-indigo-600' },
                     { l: 'Weight at altitude', v: `${(elevMass * orbitG).toFixed(0)} N`, c: 'text-amber-600' },
-                    { l: 'Apparent (orbit)', v: '0 N (free fall)', c: 'text-red-500' },
+                    { l: 'Apparent (falling)', v: '0 N (free fall)', c: 'text-red-500' },
+                    { l: 'Fall time (live)', v: `${liveFall.t.toFixed(1)} s`, c: 'text-gray-600' },
+                    { l: 'Fallen (live)', v: `${liveFall.distance.toFixed(1)} m`, c: 'text-purple-600' },
                   ].map(r => (
                     <div key={r.l} className="flex justify-between items-center rounded-lg bg-gray-50 px-3 py-2">
                       <span className="text-xs text-gray-500">{r.l}</span>
@@ -473,9 +482,12 @@ export default function ConsequencesPage() {
                   ))}
 
                   {topic === 'propulsion' && [
-                    { l: 'Thrust', v: `${rocketA.thrust.toFixed(0)} N`, c: 'text-amber-600' },
-                    { l: 'Acceleration', v: `${rocketA.acceleration.toFixed(3)} m/s²`, c: 'text-indigo-600' },
+                    { l: 'Thrust (at launch)', v: `${rocketA.thrust.toFixed(0)} N`, c: 'text-amber-600' },
+                    { l: 'Acceleration (at launch)', v: `${rocketA.acceleration.toFixed(3)} m/s²`, c: 'text-indigo-600' },
                     { l: 'T = v_e × ṁ', v: `${exhaustSpeed}×${massFlowRate}=${rocketA.thrust.toFixed(0)}`, c: 'text-gray-600' },
+                    { l: 'Burnout speed', v: `${rocketBurnout.v.toFixed(0)} m/s`, c: 'text-purple-600' },
+                    { l: 'Live speed', v: `${liveRocket.v.toFixed(0)} m/s`, c: 'text-emerald-600' },
+                    { l: 'Live status', v: liveRocket.burnedOut ? 'Coasting (Newton 1st)' : liveRocket.t > 0 ? 'Burning' : 'Ready', c: liveRocket.burnedOut ? 'text-amber-600' : 'text-gray-600' },
                   ].map(r => (
                     <div key={r.l} className="flex justify-between items-center rounded-lg bg-gray-50 px-3 py-2">
                       <span className="text-xs text-gray-500">{r.l}</span>

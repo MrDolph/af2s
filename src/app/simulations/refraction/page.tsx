@@ -16,7 +16,6 @@ const CC: Record<string, string> = {
 const MODE_META: Record<OpticsMode, { title: string; icon: string; sub: string; eq: string }> = {
   snell:  { title: 'Refraction', icon: '💠', sub: 'Light crossing a boundary', eq: 'n₁ sinθ₁ = n₂ sinθ₂' },
   lens:   { title: 'Lenses',     icon: '🔍', sub: 'Convex & concave',          eq: '1/f = 1/u + 1/v' },
-  mirror: { title: 'Mirrors',    icon: '🪞', sub: 'Concave & convex',          eq: '1/f = 1/u + 1/v' },
 };
 
 const PRESETS = [
@@ -42,13 +41,6 @@ const TEACHER_NOTES: Record<OpticsMode, string[]> = {
     'Two principal rays fix the image: parallel-to-axis (bends through F) and through the optical centre (undeviated).',
     'Lens power P = 1/f (f in metres), unit dioptre — opticians add powers of lenses in contact.',
   ],
-  mirror: [
-    'Concave mirror (converging, f > 0): same image rules as a convex lens — but real images form on the SAME side as the object.',
-    'Convex mirror (diverging, f < 0): always virtual, upright, diminished — that is why it is used for car wing mirrors and shop security ("objects are closer than they appear").',
-    'Focal length f = R/2 where R is the radius of curvature.',
-    'Uses of concave mirrors: shaving/makeup mirrors (object inside F → magnified upright virtual image), torch and headlamp reflectors (bulb at F → parallel beam).',
-    'The mirror formula is identical to the lens formula in the real-is-positive convention.',
-  ],
 };
 
 const EXERCISES: Record<OpticsMode, { q: string; a: string }[]> = {
@@ -61,11 +53,6 @@ const EXERCISES: Record<OpticsMode, { q: string; a: string }[]> = {
     { q: 'An object 30cm from a convex lens of f=20cm. Find the image position and magnification.', a: '1/v = 1/20 − 1/30 = 1/60 → v = 60cm (real). m = v/u = 2 (magnified, inverted).' },
     { q: 'An object 10cm from a convex lens of f=15cm. Describe the image.', a: '1/v = 1/15 − 1/10 = −1/30 → v = −30cm: virtual, upright, m=3 — a magnifying glass.' },
     { q: 'Find the power of a converging lens with f = 25cm.', a: 'P = 1/f = 1/0.25 = +4 dioptres.' },
-  ],
-  mirror: [
-    { q: 'An object 40cm from a concave mirror of f=15cm. Find the image.', a: '1/v = 1/15 − 1/40 = 5/120 → v = 24cm: real, inverted, m = 0.6 (diminished).' },
-    { q: 'Why are convex mirrors used as driving mirrors?', a: 'They always give an upright, diminished, virtual image with a much wider field of view than a plane mirror.' },
-    { q: 'A concave mirror has radius of curvature 60cm. Where must a bulb be placed for a parallel beam?', a: 'f = R/2 = 30cm. Place the bulb at the focal point, 30cm from the pole.' },
   ],
 };
 
@@ -130,7 +117,7 @@ export default function RefractionPage() {
                 {CURRICULA.map(c => (
                   <button key={c}
                     onClick={() => setActiveCurricula(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CC[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}
@@ -178,7 +165,7 @@ export default function RefractionPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {PRESETS.map(p => (
                       <button key={p.label} onClick={() => { setN1(p.n1); setN2(p.n2); }}
-                        className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                        className={`rounded-full border px-2.5 py-2 text-[11px] font-medium transition ${
                           n1 === p.n1 && n2 === p.n2
                             ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
                             : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-200'
@@ -197,12 +184,10 @@ export default function RefractionPage() {
                     <div className="flex gap-2">
                       {([true, false] as const).map(c => (
                         <button key={String(c)} onClick={() => setConverging(c)}
-                          className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition ${
+                          className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium transition ${
                             converging === c ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
                           }`}>
-                          {mode === 'lens'
-                            ? (c ? 'Convex (converging)' : 'Concave (diverging)')
-                            : (c ? 'Concave (converging)' : 'Convex (diverging)')}
+                          {c ? 'Convex (converging)' : 'Concave (diverging)'}
                         </button>
                       ))}
                     </div>
@@ -231,9 +216,6 @@ export default function RefractionPage() {
                     <StatRow label="Orientation" value={img.atInfinity ? '—' : img.inverted ? 'inverted' : 'upright'} unit="" color="text-rose-500" />
                     {mode === 'lens' && (
                       <StatRow label="Power" value={lensPower(f / 100).toFixed(2)} unit="D" color="text-purple-600" />
-                    )}
-                    {mode === 'mirror' && (
-                      <StatRow label="Radius R = 2f" value={(2 * focal).toFixed(0)} unit="cm" color="text-purple-600" />
                     )}
                   </>}
                 </div>

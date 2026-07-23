@@ -1,10 +1,21 @@
 'use client';
 import { useEffect, useState, type RefObject } from 'react';
 
+// Below this container width, cap the aspect ratio so the canvas doesn't
+// become too short to see clearly. Wide "landscape" bases (e.g. 660x300,
+// aspect ~2.2) would otherwise shrink to under 160px tall on a typical
+// phone screen — barely enough room to make out force arrows, labels, or a
+// pendulum's swing. Capping at 1.6 keeps a comfortably taller canvas on
+// narrow screens without touching anything on tablet/desktop widths.
+const MOBILE_BREAKPOINT = 600;
+const MOBILE_MAX_ASPECT = 1.6;
+
 /**
  * Measures the width of a wrapping container (via an externally-created ref)
  * and returns a canvas size that fills it (up to maxWidth), preserving the
- * aspect ratio of baseWidth:baseHeight.
+ * aspect ratio of baseWidth:baseHeight — except on narrow (mobile-width)
+ * containers, where the aspect ratio is capped so the canvas stays tall
+ * enough to read clearly rather than becoming a thin strip.
  *
  * Usage:
  *   const boxRef = useRef<HTMLDivElement>(null);
@@ -35,7 +46,8 @@ export function useResponsiveCanvasSize(
       const available = el.clientWidth;
       if (!available) return;
       const w = Math.round(Math.min(available, maxWidth));
-      const h = Math.round(w / aspect);
+      const effectiveAspect = available < MOBILE_BREAKPOINT ? Math.min(aspect, MOBILE_MAX_ASPECT) : aspect;
+      const h = Math.round(w / effectiveAspect);
       setSize(prev => (prev.width === w && prev.height === h ? prev : { width: w, height: h }));
     };
 
@@ -48,3 +60,4 @@ export function useResponsiveCanvasSize(
 
   return size;
 }
+

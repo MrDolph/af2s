@@ -1,7 +1,8 @@
 'use client';
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceDot, ReferenceLine } from 'recharts';
 import { AppHeader } from '@/components/layout/AppHeader';
+import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { ElasticityCanvas, ElasticityMode } from '@/components/simulation/ElasticityCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
 import { extension, springEnergy, forceExtensionCurve, wireExtension, stress, strain, youngModulus, WIRE_MATERIALS } from '@/lib/physics/elasticity';
@@ -115,8 +116,27 @@ export default function ElasticityPage() {
   const [wireLoad, setWireLoad] = useState(60);
   const material = WIRE_MATERIALS[matIdx];
 
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+  const [unloadKey, setUnloadKey] = useState(0);
+  const [settled, setSettled] = useState(false);
+  const [broken, setBroken] = useState(false);
+
   const A = Math.PI * Math.pow((wireDiamMm / 1000) / 2, 2);
   const e = wireExtension(wireLoad, wireLength, A, material.E);
+
+  const reset = useCallback(() => {
+    setIsRunning(false); setIsPaused(false);
+    setResetKey(k => k + 1);
+    setSettled(false); setBroken(false);
+  }, []);
+
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(reset, 100);
+  }, [mode, load, k, elasticLimitF, wireLength, wireDiamMm, matIdx, wireLoad, reset]);
 
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 320, 980);
@@ -136,7 +156,7 @@ export default function ElasticityPage() {
                 {CURRICULA.map(c => (
                   <button key={c}
                     onClick={() => setActiveCurricula(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CC[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}
@@ -165,10 +185,28 @@ export default function ElasticityPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
             <div className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
-                <ElasticityCanvas mode={mode}
+                <ElasticityCanvas key={resetKey} mode={mode}
                   load={mode === 'hooke' ? load : wireLoad} k={k} elasticLimitF={elasticLimitF}
                   wireLength={wireLength} wireDiamMm={wireDiamMm} youngE={material.E} materialName={material.name}
+                  breakingStressMPa={material.breakingStressMPa}
+                  isRunning={isRunning} isPaused={isPaused} unloadKey={unloadKey}
+                  onSettled={() => setSettled(true)} onBroken={() => setBroken(true)}
                   width={canvasSize.width} height={canvasSize.height} />
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <SimulationControls isRunning={isRunning} isPaused={isPaused}
+                  onRun={() => { setIsRunning(true); setIsPaused(false); }}
+                  onPause={() => setIsPaused(p => !p)} onReset={reset} />
+                {mode === 'hooke' && settled && (
+                  <button onClick={() => { setUnloadKey(k => k + 1); setSettled(false); }}
+                    className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
+                    Remove load
+                  </button>
+                )}
+                {mode === 'wire' && broken && (
+                  <span className="text-xs font-medium text-red-600">💥 Snapped — Reset to try again</span>
+                )}
               </div>
 
               <div className="flex justify-end">
@@ -198,7 +236,7 @@ export default function ElasticityPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {WIRE_MATERIALS.map((m, i) => (
                       <button key={m.name} onClick={() => setMatIdx(i)}
-                        className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                        className={`rounded-full border px-2.5 py-2 text-[11px] font-medium transition ${
                           matIdx === i ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-200'
                         }`}>{m.name}</button>
                     ))}

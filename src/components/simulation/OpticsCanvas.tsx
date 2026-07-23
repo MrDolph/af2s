@@ -2,16 +2,16 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { snellTheta2, criticalAngle, thinLensImage } from '@/lib/physics/optics';
 
-export type OpticsMode = 'snell' | 'lens' | 'mirror';
+export type OpticsMode = 'snell' | 'lens';
 
 interface Props {
   mode: OpticsMode;
   // snell
   n1: number; n2: number; theta1: number;
-  // lens / mirror (cm as display units)
+  // lens (cm as display units)
   focal: number;          // |f| in cm
   objectDist: number;     // u in cm
-  converging: boolean;    // true: convex lens / concave mirror
+  converging: boolean;    // true = convex (converging), false = concave (diverging)
   width?: number; height?: number;
 }
 
@@ -118,80 +118,53 @@ export function OpticsCanvas({ mode, n1, n2, theta1, focal, objectDist, convergi
 
     // Device
     ctx.save();
-    if (s.mode === 'lens') {
-      ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(cx, axisY - 78); ctx.lineTo(cx, axisY + 78); ctx.stroke();
-      // Arrowheads: outward = converging (convex), inward = diverging (concave)
-      const d = s.converging ? 1 : -1;
-      [[-78, -1], [78, 1]].forEach(([yo, sgn]) => {
-        ctx.fillStyle = '#6366f1';
-        ctx.beginPath();
-        ctx.moveTo(cx, axisY + yo);
-        ctx.lineTo(cx - 8, axisY + yo - sgn * d * 10);
-        ctx.lineTo(cx + 8, axisY + yo - sgn * d * 10);
-        ctx.closePath(); ctx.fill();
-      });
-    } else {
-      // Mirror arc: concave (converging) opens left toward the object.
-      ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 4;
+    ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx, axisY - 78); ctx.lineTo(cx, axisY + 78); ctx.stroke();
+    // Arrowheads: outward = converging (convex), inward = diverging (concave)
+    const d = s.converging ? 1 : -1;
+    [[-78, -1], [78, 1]].forEach(([yo, sgn]) => {
+      ctx.fillStyle = '#6366f1';
       ctx.beginPath();
-      const bow = s.converging ? 26 : -26;
-      ctx.moveTo(cx + bow, axisY - 80);
-      ctx.quadraticCurveTo(cx - bow, axisY, cx + bow, axisY + 80);
-      ctx.stroke();
-      // hatching behind mirror
-      ctx.lineWidth = 1; ctx.strokeStyle = '#c7d2fe';
-      for (let y = -70; y <= 70; y += 14) {
-        ctx.beginPath();
-        ctx.moveTo(cx + bow + 3, axisY + y);
-        ctx.lineTo(cx + bow + 12, axisY + y - 8);
-        ctx.stroke();
-      }
-    }
+      ctx.moveTo(cx, axisY + yo);
+      ctx.lineTo(cx - 8, axisY + yo - sgn * d * 10);
+      ctx.lineTo(cx + 8, axisY + yo - sgn * d * 10);
+      ctx.closePath(); ctx.fill();
+    });
     ctx.restore();
 
-    // Focal points
+    // Focal points — a lens has two physical focal points, since light can
+    // enter from either side.
     const fPx = s.focal * scale;
     ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-    [[-fPx, 'F'], [fPx, 'F'], [-2 * fPx, '2F'], [2 * fPx, '2F']].forEach(([dx, lab]) => {
-      const x = cx + (dx as number);
+    ([[-fPx, 'F'], [fPx, 'F'], [-2 * fPx, '2F'], [2 * fPx, '2F']] as [number, string][]).forEach(([dx, lab]) => {
+      const x = cx + dx;
       if (x < 10 || x > W - 10) return;
       ctx.beginPath(); ctx.arc(x, axisY, 3, 0, Math.PI * 2); ctx.fill();
-      ctx.fillText(lab as string, x, axisY + 16);
+      ctx.fillText(lab, x, axisY + 16);
     });
 
     // Object
     const objX = cx - u * scale;
     objectArrow(ctx, objX, axisY, axisY - hObj, '#0f172a', 'O');
 
-    // Image
-    const sideSign = s.mode === 'mirror' ? -1 : 1; // real image forms LEFT of a mirror
+    // Image — real forms on the opposite side (light passes through);
+    // virtual forms on the same side as the object.
     if (!img.atInfinity) {
-      const imgX = img.real ? cx + sideSign * img.v * scale : cx - Math.abs(img.v) * scale * (s.mode === 'mirror' ? -1 : 1);
-      // Simpler + convention-correct: real → opposite side (lens) / same side (mirror);
-      // virtual → same side as object (lens) / behind mirror.
-      const ix = s.mode === 'lens'
-        ? (img.real ? cx + img.v * scale : cx - Math.abs(img.v) * scale)
-        : (img.real ? cx - img.v * scale : cx + Math.abs(img.v) * scale);
-      void imgX;
-      const hImg = hObj * img.m * (img.inverted ? 1 : -1); // inverted draws below? tip direction:
+      const ix = img.real ? cx + img.v * scale : cx - Math.abs(img.v) * scale;
       const tipY = img.inverted ? axisY + hObj * img.m : axisY - hObj * img.m;
       if (ix > -40 && ix < W + 40) {
         objectArrow(ctx, ix, axisY, tipY, img.real ? '#10b981' : '#8b5cf6', img.real ? 'I (real)' : 'I (virtual)');
       }
-      void hImg;
 
       // Principal rays from object tip
       const tip: [number, number] = [objX, axisY - hObj];
       const dev = cx;
       ctx.save();
-      // Ray 1: parallel to axis → through/away-from F after device
+      // Ray 1: parallel to axis → through/away-from F after the lens
       arrow(ctx, tip[0], tip[1], dev, tip[1], '#ef4444', 1.6, 0.5);
-      // after device it must pass through the image tip
       const drawTo = (fromX: number, fromY: number, toX: number, toY: number, color: string, dashed = false) => {
         ctx.save(); if (dashed) ctx.setLineDash([5, 4]);
         ctx.strokeStyle = color; ctx.lineWidth = 1.6;
-        // extend beyond the target
         const ang = Math.atan2(toY - fromY, toX - fromX);
         const ext = 60;
         ctx.beginPath(); ctx.moveTo(fromX, fromY);
@@ -199,14 +172,9 @@ export function OpticsCanvas({ mode, n1, n2, theta1, focal, objectDist, convergi
         ctx.stroke(); ctx.restore();
       };
       drawTo(dev, tip[1], ix, tipY, '#ef4444', !img.real);
-      // Ray 2: through the centre (lens) — undeviated; mirror: to pole, reflects symmetric
-      if (s.mode === 'lens') {
-        drawTo(tip[0], tip[1], cx, axisY, '#3b82f6');
-        drawTo(cx, axisY, ix, tipY, '#3b82f6', !img.real);
-      } else {
-        arrow(ctx, tip[0], tip[1], cx, axisY, '#3b82f6', 1.6, 0.5);
-        drawTo(cx, axisY, ix, tipY, '#3b82f6', !img.real);
-      }
+      // Ray 2: through the optical centre — undeviated
+      drawTo(tip[0], tip[1], cx, axisY, '#3b82f6');
+      drawTo(cx, axisY, ix, tipY, '#3b82f6', !img.real);
       ctx.restore();
     } else {
       ctx.fillStyle = '#64748b'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';

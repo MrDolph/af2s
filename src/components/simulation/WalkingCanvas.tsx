@@ -12,20 +12,33 @@ export function WalkingCanvas({ isRunning, isPaused, frictionEnabled, width = 68
   const rafRef = useRef<number>(0);
   const tRef = useRef(0);
   const xRef = useRef(100);
+  const lastFrameRef = useRef<number | null>(null);
   const simRef = useRef({ isRunning, isPaused, frictionEnabled });
   simRef.current = { isRunning, isPaused, frictionEnabled };
 
-  useEffect(() => { tRef.current = 0; xRef.current = 100; }, [frictionEnabled]);
+  useEffect(() => { tRef.current = 0; xRef.current = 100; lastFrameRef.current = null; }, [frictionEnabled]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { isRunning: r, isPaused: p, frictionEnabled: fr } = simRef.current;
     const W = canvas.width, H = canvas.height;
 
-    if (r && !p) {
-      tRef.current += 0.025;
-      if (fr) xRef.current = Math.min(xRef.current + 1.8, W - 100);
+    let dt = 0;
+    if (r && !p && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        dt = Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
+    if (dt > 0) {
+      tRef.current += dt * 1.5; // matches the original leg-swing pacing
+      if (fr) {
+        xRef.current += dt * 108; // ~1.8px/frame at 60fps, now real-time
+        if (xRef.current > W - 100) xRef.current = 100; // loop back for a continuous demo
+      }
     }
 
     const t = tRef.current;

@@ -249,7 +249,7 @@ export default function OscillationsPage() {
                 {CURRICULA.map(c => (
                   <button key={c}
                     onClick={() => setActiveCurricula(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CC[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}
@@ -320,7 +320,7 @@ export default function OscillationsPage() {
                     <div className="flex gap-1 bg-gray-100 p-1 rounded-xl w-fit">
                       {(['bifilar', 'cantilever'] as const).map(m => (
                         <button key={m} onClick={() => setBifMode(m)}
-                          className={`px-4 py-1.5 rounded-lg text-xs font-medium transition capitalize ${
+                          className={`px-4 py-2 rounded-lg text-xs font-medium transition capitalize ${
                             bifMode === m ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500'
                           }`}>{m}</button>
                       ))}
@@ -367,7 +367,7 @@ export default function OscillationsPage() {
                     <div className="flex gap-1 bg-gray-100 p-0.5 rounded-lg overflow-x-auto">
                       {(['displacement', 'velocity', 'acceleration', 'energy', 'phase'] as GraphMode[]).map(gm => (
                         <button key={gm} onClick={() => setGraphMode(gm)}
-                          className={`shrink-0 px-2.5 py-1 rounded-md text-[10px] font-medium transition ${
+                          className={`shrink-0 px-2.5 py-2 rounded-md text-[10px] font-medium transition ${
                             graphMode === gm ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500'
                           }`}>
                           {gm === 'displacement' ? 'x–t' : gm === 'velocity' ? 'v–t' : gm === 'acceleration' ? 'a–t' : gm === 'energy' ? 'Energy' : 'Phase (v–x)'}

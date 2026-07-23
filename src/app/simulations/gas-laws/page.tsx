@@ -154,7 +154,7 @@ export default function GasLawsPage() {
               <div className="flex gap-1.5 flex-wrap">
                 {CURRICULA.map(c => (
                   <button key={c} onClick={() => toggleC(c)}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CURRICULUM_COLORS[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}
@@ -207,7 +207,7 @@ export default function GasLawsPage() {
                       <div className="grid grid-cols-2 gap-1.5">
                         {Object.entries(VAN_DER_WAALS).filter(([k]) => k !== 'ideal').map(([key, g]) => (
                           <button key={key} onClick={() => setSelectedGas(key)}
-                            className={`text-xs px-2 py-1.5 rounded-lg border font-medium transition text-left ${
+                            className={`text-xs px-2 py-2 rounded-lg border font-medium transition text-left ${
                               selectedGas === key ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                             }`}>
                             <span className="font-mono">{g.formula}</span>
@@ -239,7 +239,7 @@ export default function GasLawsPage() {
                     <div className="grid grid-cols-4 gap-1 bg-gray-100 p-1 rounded-xl">
                       {(['P', 'V', 'n', 'T'] as SolveFor[]).map(s => (
                         <button key={s} onClick={() => setSolveFor(s)}
-                          className={`py-1.5 rounded-lg text-xs font-medium transition ${
+                          className={`py-2 rounded-lg text-xs font-medium transition ${
                             solveFor === s ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500'
                           }`}>Solve {s}</button>
                       ))}

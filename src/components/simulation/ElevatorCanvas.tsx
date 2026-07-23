@@ -17,12 +17,15 @@ export function ElevatorCanvas({ mass, elevState, manualAccel, isRunning, isPaus
   const yRef = useRef(220);
   const vyRef = useRef(0);
   const timeRef = useRef(0);
+  const lastFrameRef = useRef<number | null>(null);
   const simRef = useRef({ mass, elevState, manualAccel, isRunning, isPaused });
   simRef.current = { mass, elevState, manualAccel, isRunning, isPaused };
 
-  useEffect(() => { yRef.current = 220; vyRef.current = 0; timeRef.current = 0; }, [elevState, mass, manualAccel]);
+  useEffect(() => {
+    yRef.current = 220; vyRef.current = 0; timeRef.current = 0; lastFrameRef.current = null;
+  }, [elevState, mass, manualAccel]);
 
-  const draw = useCallback(() => {
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { mass: m, elevState: st, manualAccel: ma, isRunning: r, isPaused: p } = simRef.current;
@@ -32,13 +35,22 @@ export function ElevatorCanvas({ mass, elevState, manualAccel, isRunning, isPaus
     const Wapp = apparentWeight(m, accel);
     const Wtrue = m * g;
 
-    if (r && !p) {
-      vyRef.current += accel * 0.016 * 60; // pixels/s
-      yRef.current -= vyRef.current * 0.016;
+    let dt = 0;
+    if (r && !p && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        dt = Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
+    if (dt > 0) {
+      vyRef.current += accel * dt * 60; // px/s (60 = same visual scale as before)
+      yRef.current -= vyRef.current * dt;
       // Clamp
       if (yRef.current < 60) { yRef.current = 60; vyRef.current = 0; }
       if (yRef.current > H - 80) { yRef.current = H - 80; vyRef.current = 0; }
-      timeRef.current += 0.016;
+      timeRef.current += dt;
     }
 
     ctx.clearRect(0, 0, W, H);

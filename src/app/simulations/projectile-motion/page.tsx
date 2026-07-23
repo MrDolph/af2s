@@ -193,7 +193,7 @@ export default function ProjectileMotionPage() {
                 {CURRICULA.map(c => (
                   <button key={c}
                     onClick={() => setActiveCurricula(p => p.includes(c) ? p.filter(x => x !== c) : [...p, c])}
-                    className={`text-xs px-2.5 py-1 rounded-full border font-medium transition ${
+                    className={`text-xs px-2.5 py-2 rounded-full border font-medium transition ${
                       activeCurricula.includes(c) ? CC[c] + ' border-transparent' : 'bg-white text-gray-400 border-gray-200'
                     }`}>{c}</button>
                 ))}
@@ -227,7 +227,7 @@ export default function ProjectileMotionPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-gray-500">{MODE_META[mode].sub}</span>
             {MODE_META[mode].eqs.map(eq => (
-              <span key={eq} className="rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-mono text-gray-700">{eq}</span>
+              <span key={eq} className="rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-xs font-mono text-gray-700">{eq}</span>
             ))}
           </div>
 
@@ -298,7 +298,7 @@ export default function ProjectileMotionPage() {
                     <div className="flex gap-2">
                       {(['base', 'top'] as const).map(v => (
                         <button key={v} onClick={() => setILaunchFrom(v)}
-                          className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium transition ${
+                          className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium transition ${
                             iLaunchFrom === v ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
                           }`}>
                           {v === 'base' ? 'Base — up the slope' : 'Top — down the slope'}
@@ -360,7 +360,7 @@ export default function ProjectileMotionPage() {
                       ...(mode !== 'vertical' ? [{ l: 'x', v: livePos.x.toFixed(1), u: 'm' }] : []),
                       { l: 'y', v: livePos.y.toFixed(1), u: 'm' },
                     ].map(r => (
-                      <div key={r.l} className="flex justify-between rounded-lg bg-white/70 px-3 py-1.5">
+                      <div key={r.l} className="flex justify-between rounded-lg bg-white/70 px-3 py-2">
                         <span className="text-xs text-indigo-400 font-mono">{r.l}</span>
                         <span className="text-xs font-semibold text-indigo-700 tabular-nums">{r.v} <span className="font-normal text-indigo-300">{r.u}</span></span>
                       </div>

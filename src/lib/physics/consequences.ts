@@ -57,6 +57,53 @@ export function rocketAnalytics(m: number, exhaustSpeed: number, massFlowRate: n
   return { thrust: +thrust.toFixed(1), acceleration: +a.toFixed(3) };
 }
 
+// Rocket state at time t, accounting for the mass lost as fuel burns — this
+// is the actual reason rocket acceleration climbs through a launch even
+// though the engine's thrust stays constant: a = thrust / m(t), and m(t)
+// keeps falling. Velocity follows the Tsiolkovsky rocket equation
+// v(t) = v_e · ln(m0/m(t)), which is exact for constant exhaust speed and
+// constant mass flow rate (no gravity/drag — this demo is framed as deep
+// space / momentum conservation, not a full launch trajectory).
+export interface RocketState {
+  t: number;
+  mass: number;
+  v: number;
+  thrust: number;
+  acceleration: number;
+  fuelRemaining: number;
+  fuelFraction: number; // 0..1
+  burnedOut: boolean;
+  burnTime: number;
+}
+export function rocketBurnTime(fuelMass: number, massFlowRate: number): number {
+  return massFlowRate > 0 ? fuelMass / massFlowRate : Infinity;
+}
+export function rocketStateAt(
+  t: number, dryMass: number, fuelMass: number, exhaustSpeed: number, massFlowRate: number
+): RocketState {
+  const m0 = dryMass + fuelMass;
+  const burnTime = rocketBurnTime(fuelMass, massFlowRate);
+  const tBurn = Math.min(t, burnTime);
+  const massBurned = massFlowRate * tBurn;
+  const mass = m0 - massBurned;
+  const burnedOut = t >= burnTime;
+  const thrust = burnedOut ? 0 : exhaustSpeed * massFlowRate;
+  const acceleration = burnedOut ? 0 : thrust / mass;
+  const v = exhaustSpeed * Math.log(m0 / mass); // same value once burned out (mass frozen at dryMass)
+  return {
+    t, mass, v, thrust, acceleration,
+    fuelRemaining: fuelMass - massBurned,
+    fuelFraction: fuelMass > 0 ? (fuelMass - massBurned) / fuelMass : 0,
+    burnedOut, burnTime,
+  };
+}
+
+// ── Free fall / weightlessness ───────────────────────────────────────────────
+// Distance fallen under constant acceleration gValue, starting from rest.
+export function freeFallDistance(t: number, gValue: number): number {
+  return 0.5 * gValue * t * t;
+}
+
 // ── Impulse ───────────────────────────────────────────────────────────────────
 export function impulse(force: number, time: number) {
   return force * time;
