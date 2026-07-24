@@ -42,3 +42,22 @@ export function maxGratingOrder(wavelength: number, slitSpacing: number): number
   if (slitSpacing <= 0 || wavelength <= 0) return 0;
   return Math.floor(slitSpacing / wavelength);
 }
+
+// ── Young's double-slit interference ─────────────────────────────────────────
+// Two coherent slits separated by d, screen at distance D: bright fringes
+// form where the path difference from the two slits is a whole number of
+// wavelengths. Standard small-angle result for this level:
+// fringe spacing Δy = λD/d — every bright (or dark) band is this far from
+// its neighbour, regardless of which order it is.
+export function fringeSpacing(wavelength: number, slitSpacing: number, screenDist: number): number {
+  return (wavelength * screenDist) / slitSpacing;
+}
+// Position of the n-th bright fringe from the centre.
+export function brightFringePosition(n: number, wavelength: number, slitSpacing: number, screenDist: number): number {
+  return n * fringeSpacing(wavelength, slitSpacing, screenDist);
+}
+
+export function maxFringeOrder(wavelength: number, slitSpacing: number): number {
+  if (slitSpacing <= 0 || wavelength <= 0) return 0;
+  return Math.floor(slitSpacing / wavelength);
+}

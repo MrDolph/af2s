@@ -5,8 +5,9 @@ interface Props {
   sourceType: 'point' | 'extended';
   sourceRadiusPx: number;   // half-height of the source (0 for a point source)
   objectRadiusPx: number;   // half-height of the opaque object
-  objectDistPx: number;     // source -> object
+  objectDistPx: number;     // source -> object (also the centre of the sweep when animating)
   screenDistPx: number;     // source -> screen
+  isRunning: boolean; isPaused: boolean;
   width?: number; height?: number;
 }
 
@@ -16,22 +17,49 @@ function lineAtX(p1: Vec, p2: Vec, x: number): number {
   return p1.y + t * (p2.y - p1.y);
 }
 
-export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, objectDistPx, screenDistPx, width = 660, height = 300 }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const sim = useRef({ sourceType, sourceRadiusPx, objectRadiusPx, objectDistPx, screenDistPx });
-  sim.current = { sourceType, sourceRadiusPx, objectRadiusPx, objectDistPx, screenDistPx };
+const SWEEP_PERIOD = 5; // s — one full back-and-forth pass of the object
 
-  const draw = useCallback(() => {
+export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, objectDistPx, screenDistPx, isRunning, isPaused, width = 660, height = 300 }: Props) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rafRef = useRef<number>(0);
+  const lastFrameRef = useRef<number | null>(null);
+  const t = useRef(0);
+  const sim = useRef({ sourceType, sourceRadiusPx, objectRadiusPx, objectDistPx, screenDistPx, isRunning, isPaused });
+  sim.current = { sourceType, sourceRadiusPx, objectRadiusPx, objectDistPx, screenDistPx, isRunning, isPaused };
+
+  useEffect(() => { t.current = 0; lastFrameRef.current = null; }, [sourceType, sourceRadiusPx, objectRadiusPx, objectDistPx, screenDistPx]);
+
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const s = sim.current;
     const W = canvas.width, H = canvas.height;
+
+    const animate = s.isRunning && !s.isPaused;
+    if (animate && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        t.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
+
+    // Sweep the object between just past the source and just short of the
+    // screen, so the umbra/penumbra visibly change size and position as it
+    // moves — bounded to stay clear of both endpoints.
+    const minDist = 55, maxDist = s.screenDistPx - 45;
+    const sweepMid = (minDist + maxDist) / 2, sweepAmp = (maxDist - minDist) / 2;
+    const objectDistPx = animate
+      ? sweepMid + sweepAmp * Math.sin((2 * Math.PI / SWEEP_PERIOD) * t.current)
+      : Math.min(Math.max(s.objectDistPx, minDist), maxDist);
+
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, W, H);
 
     const midY = H / 2;
     const srcX = 50;
-    const objX = srcX + s.objectDistPx;
+    const objX = srcX + objectDistPx;
     const scrX = Math.min(srcX + s.screenDistPx, W - 20);
     const rs = s.sourceType === 'point' ? 0.001 : s.sourceRadiusPx;
     const ro = s.objectRadiusPx;
@@ -121,9 +149,14 @@ export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, obje
         : 'Extended source → umbra (no light at all) surrounded by penumbra (partly lit, some of the source is visible from there)',
       W / 2, H - 6,
     );
+
+    rafRef.current = requestAnimationFrame(draw);
   }, []);
 
-  useEffect(() => { draw(); });
+  useEffect(() => {
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [draw]);
 
   return (
     <canvas ref={canvasRef} width={width} height={height}

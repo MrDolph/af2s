@@ -1,9 +1,10 @@
 'use client';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ShadowsCanvas } from '@/components/simulation/ShadowsCanvas';
 import { EclipseCanvas, EclipseType } from '@/components/simulation/EclipseCanvas';
 import { PinholeCanvas } from '@/components/simulation/PinholeCanvas';
+import { SimulationControls } from '@/components/simulation/SimulationControls';
 
 type Topic = 'shadows' | 'eclipse' | 'pinhole';
 
@@ -61,18 +62,35 @@ function RectilinearEmbedInner() {
   const [pinholeScreenDist, setPinholeScreenDist] = useState(() => num(sp, 'v', 160, 40, 260));
   const [pinholeRadius, setPinholeRadius] = useState(() => num(sp, 'r', 1, 0, 12));
 
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+  const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(reset, 100);
+  }, [topic, sourceType, sourceRadius, objectRadius, objectDist, screenDist, eclipseType, orbitalOffset, objectHeight, pinholeObjectDist, pinholeScreenDist, pinholeRadius, reset]);
+
   return (
     <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
       {topic === 'shadows' && (
-        <ShadowsCanvas sourceType={sourceType} sourceRadiusPx={sourceRadius} objectRadiusPx={objectRadius}
-          objectDistPx={objectDist} screenDistPx={screenDist} width={640} height={280} />
+        <ShadowsCanvas key={resetKey} sourceType={sourceType} sourceRadiusPx={sourceRadius} objectRadiusPx={objectRadius}
+          objectDistPx={objectDist} screenDistPx={screenDist}
+          isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
       )}
       {topic === 'eclipse' && (
-        <EclipseCanvas eclipseType={eclipseType} orbitalOffset={orbitalOffset} width={640} height={280} />
+        <EclipseCanvas key={resetKey} eclipseType={eclipseType} orbitalOffset={orbitalOffset}
+          isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
       )}
       {topic === 'pinhole' && (
         <PinholeCanvas objectHeightPx={objectHeight} objectDistPx={pinholeObjectDist} screenDistPx={pinholeScreenDist}
           pinholeRadiusPx={pinholeRadius} width={640} height={280} />
+      )}
+      {topic !== 'pinhole' && (
+        <SimulationControls isRunning={isRunning} isPaused={isPaused}
+          onRun={() => { setIsRunning(true); setIsPaused(false); }}
+          onPause={() => setIsPaused(p => !p)} onReset={reset} />
       )}
       {showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">

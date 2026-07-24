@@ -5,7 +5,9 @@ export type EclipseType = 'solar' | 'lunar';
 
 interface Props {
   eclipseType: EclipseType;
-  orbitalOffset: number; // 0 = perfectly aligned (eclipse happens); larger = the Moon's orbit is tilted away and the shadow misses
+  orbitalOffset: number; // used as a fixed value only when not animating (paused/reset)
+  isRunning: boolean; isPaused: boolean;
+  onTick?: (offset: number, eclipseHappening: boolean) => void;
   width?: number; height?: number;
 }
 
@@ -15,16 +17,41 @@ function lineAtX(p1: Vec, p2: Vec, x: number): number {
   return p1.y + t * (p2.y - p1.y);
 }
 
-export function EclipseCanvas({ eclipseType, orbitalOffset, width = 660, height = 300 }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const sim = useRef({ eclipseType, orbitalOffset });
-  sim.current = { eclipseType, orbitalOffset };
+const ORBIT_PERIOD = 6; // s — one full simulated orbit
+const MAX_OFFSET = 110; // px — the swing of the ~5° real orbital tilt, scaled for visibility
 
-  const draw = useCallback(() => {
+export function EclipseCanvas({ eclipseType, orbitalOffset, isRunning, isPaused, onTick, width = 660, height = 300 }: Props) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rafRef = useRef<number>(0);
+  const lastFrameRef = useRef<number | null>(null);
+  const t = useRef(0);
+  const sim = useRef({ eclipseType, orbitalOffset, isRunning, isPaused, onTick });
+  sim.current = { eclipseType, orbitalOffset, isRunning, isPaused, onTick };
+
+  useEffect(() => { t.current = 0; lastFrameRef.current = null; }, [eclipseType, orbitalOffset]);
+
+  const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const s = sim.current;
     const W = canvas.width, H = canvas.height;
+
+    const animate = s.isRunning && !s.isPaused;
+    if (animate && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        t.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
+    // Orbiting: the offset sweeps continuously through the full tilt range,
+    // so the body drifts in and out of alignment exactly like a real
+    // ~5°-inclined orbit carrying the shadow past its target most months.
+    const offset = animate
+      ? MAX_OFFSET * Math.sin((2 * Math.PI / ORBIT_PERIOD) * t.current)
+      : s.orbitalOffset;
+
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, W, H);
     // Starfield
@@ -41,7 +68,7 @@ export function EclipseCanvas({ eclipseType, orbitalOffset, width = 660, height 
     const targetX = W * 0.86;    // Earth (solar) or Moon (lunar) — the body the shadow may fall on
     const targetR = s.eclipseType === 'solar' ? 26 : 14;
 
-    const smallY = midY + s.orbitalOffset;
+    const smallY = midY + offset;
 
     ctx.fillStyle = '#fbbf24';
     ctx.beginPath(); ctx.arc(sunX, midY, sunR, 0, Math.PI * 2); ctx.fill();
@@ -100,6 +127,7 @@ export function EclipseCanvas({ eclipseType, orbitalOffset, width = 660, height 
     ctx.fillText(s.eclipseType === 'solar' ? 'Earth' : 'Moon', targetX, midY - targetR - 8);
 
     const eclipseHappening = umbraTopAtTarget < midY + targetR && umbraBotAtTarget > midY - targetR;
+    s.onTick?.(offset, eclipseHappening);
     ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
     ctx.fillStyle = eclipseHappening ? '#f87171' : '#94a3b8';
     ctx.fillText(
@@ -110,9 +138,14 @@ export function EclipseCanvas({ eclipseType, orbitalOffset, width = 660, height 
     );
     ctx.fillStyle = '#64748b'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
     ctx.fillText('Not to scale — real Sun-Earth-Moon distances/sizes span hundreds of times these proportions', 8, H - 8);
+
+    rafRef.current = requestAnimationFrame(draw);
   }, []);
 
-  useEffect(() => { draw(); });
+  useEffect(() => {
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [draw]);
 
   return (
     <canvas ref={canvasRef} width={width} height={height}

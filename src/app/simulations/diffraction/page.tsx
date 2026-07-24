@@ -4,7 +4,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { DiffractionCanvas, DiffractionMode } from '@/components/simulation/DiffractionCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
-import { firstMinimumAngle, spreadFraction, maxGratingOrder } from '@/lib/physics/diffraction';
+import { firstMinimumAngle, spreadFraction, maxGratingOrder, fringeSpacing, maxFringeOrder } from '@/lib/physics/diffraction';
 import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'];
@@ -17,6 +17,7 @@ const CC: Record<string, string> = {
 const MODE_META: Record<DiffractionMode, { title: string; icon: string; sub: string; eq: string }> = {
   'single-slit': { title: 'Single slit', icon: '🌊', sub: 'Spreading through a gap', eq: 'sinθ = λ/a' },
   grating:       { title: 'Diffraction grating', icon: '🎨', sub: 'Multiple slits — spectral orders', eq: 'd sinθ = nλ' },
+  'double-slit': { title: "Young's double slit", icon: '〰️', sub: 'Interference — bright & dark fringes', eq: 'Δy = λD/d' },
 };
 
 const TEACHER_NOTES: Record<DiffractionMode, string[]> = {
@@ -34,6 +35,13 @@ const TEACHER_NOTES: Record<DiffractionMode, string[]> = {
     'Because sinθ depends on λ, different colours diffract to different angles for the same order — this is how gratings are used to split light into a spectrum in a spectrometer.',
     'Gratings with more lines per millimetre have a SMALLER slit spacing d, which — from the grating equation — spreads the orders out to LARGER angles.',
   ],
+  'double-slit': [
+    'Young\u2019s double-slit experiment (1801) was the first strong evidence that light behaves as a wave — only overlapping waves can interfere, and interference is exactly what the alternating bright/dark fringes show.',
+    'Two coherent slits (same frequency, constant phase relationship) illuminated by a single source act as two synchronised wave sources. Where a crest meets a crest (or trough meets trough), the waves add — constructive interference, a bright fringe. Where a crest meets a trough, they cancel — destructive interference, a dark fringe.',
+    'Fringe spacing formula: Δy = λD/d, where D is the slit-to-screen distance and d is the slit separation — every bright band sits this far from its neighbour, regardless of order.',
+    'A SMALLER slit separation d gives WIDER-spaced fringes (easier to see individually); a LARGER d packs the fringes closer together.',
+    'This is genuinely the same physics as the diffraction grating (many slits) — a grating just uses many more slits, which sharpens the bright fringes into much narrower, more precisely-located lines.',
+  ],
 };
 
 const EXERCISES: Record<DiffractionMode, { q: string; a: string }[]> = {
@@ -46,6 +54,12 @@ const EXERCISES: Record<DiffractionMode, { q: string; a: string }[]> = {
     { q: 'A grating has 400 lines per millimetre. Find the slit spacing d in nanometres.', a: 'd = 1mm/400 = 1/400 mm = 2500nm.' },
     { q: 'Using d=2000nm and λ=500nm, find the angle of the first-order (n=1) maximum.', a: 'sinθ = nλ/d = 500/2000 = 0.25 → θ = 14.5°.' },
     { q: 'Why does white light passed through a grating produce a spectrum at each order (except n=0)?', a: 'Each wavelength satisfies d sinθ = nλ at a different angle θ (since λ differs), so red, green, blue etc. all diffract to slightly different angles for the same order, spreading white light into its component colours — except at n=0, where sinθ=0 works for every λ, so all colours overlap and stay white.' },
+  ],
+  'double-slit': [
+    { q: 'In a double-slit experiment, λ=600nm, the slits are 0.5mm apart, and the screen is 1.2m away. Find the fringe spacing.', a: 'Δy = λD/d = (600×10⁻⁹ × 1.2) / (0.5×10⁻³) = 1.44×10⁻³ m = 1.44mm.' },
+    { q: 'The slit separation in a double-slit experiment is halved, with everything else unchanged. What happens to the fringe spacing?', a: 'Δy = λD/d, so halving d DOUBLES the fringe spacing — the bright and dark bands spread further apart.' },
+    { q: 'Explain, in terms of path difference, why a bright fringe forms at a point equidistant from both slits.', a: 'At that point the path difference is zero, so light from both slits arrives exactly in phase (crest meets crest) — constructive interference, giving the bright central fringe.' },
+    { q: 'Why must the two slits be illuminated by light from the SAME single source, rather than two separate identical lamps?', a: 'Interference needs a constant, unchanging phase relationship between the two waves (coherence). Two separate lamps emit light with random, constantly-shifting phase relative to each other, so any interference pattern would wash out instantly rather than staying fixed and visible.' },
   ],
 };
 
@@ -86,13 +100,15 @@ export default function DiffractionPage() {
   const [wavelengthNm, setWavelengthNm] = useState(550);
   const [slitWidthNm, setSlitWidthNm] = useState(1000);
   const [slitSpacingNm, setSlitSpacingNm] = useState(2000);
+  const [doubleSlitSepUm, setDoubleSlitSepUm] = useState(500); // micrometres — realistic double-slit scale (0.2-1mm)
+  const doubleSlitSepNm = doubleSlitSepUm * 1000;
 
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 100);
-  }, [mode, wavelengthNm, slitWidthNm, slitSpacingNm, reset]);
+  }, [mode, wavelengthNm, slitWidthNm, slitSpacingNm, doubleSlitSepUm, reset]);
 
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 300, 980);
@@ -100,6 +116,7 @@ export default function DiffractionPage() {
   const minAngle = firstMinimumAngle(wavelengthNm, slitWidthNm);
   const spread = spreadFraction(wavelengthNm, slitWidthNm);
   const maxOrder = maxGratingOrder(wavelengthNm, slitSpacingNm);
+  const maxFringeN = maxFringeOrder(wavelengthNm, doubleSlitSepNm);
 
   return (
     <>
@@ -146,6 +163,7 @@ export default function DiffractionPage() {
             <div className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <DiffractionCanvas key={resetKey} mode={mode} wavelengthNm={wavelengthNm} slitWidthNm={slitWidthNm} slitSpacingNm={slitSpacingNm}
+                  doubleSlitSepNm={doubleSlitSepNm}
                   isRunning={isRunning} isPaused={isPaused}
                   width={canvasSize.width} height={canvasSize.height} />
               </div>
@@ -156,7 +174,7 @@ export default function DiffractionPage() {
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
                 <EmbedButton path="/embed/diffraction"
                   title={`${MODE_META[mode].title} — A-Factor STEM Studio`}
-                  params={{ mode, wavelength: wavelengthNm, width: slitWidthNm, spacing: slitSpacingNm }} />
+                  params={{ mode, wavelength: wavelengthNm, width: slitWidthNm, spacing: slitSpacingNm, sep: doubleSlitSepNm }} />
               </div>
 
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
@@ -169,6 +187,10 @@ export default function DiffractionPage() {
                 {mode === 'grating' && (
                   <Slider label="Slit spacing (d)" unit="nm" value={slitSpacingNm} min={500} max={5000} step={50} set={setSlitSpacingNm} color="#f59e0b"
                     note="Smaller spacing → orders spread to wider angles" />
+                )}
+                {mode === 'double-slit' && (
+                  <Slider label="Slit separation (d)" unit="μm" value={doubleSlitSepUm} min={200} max={1000} step={10} set={setDoubleSlitSepUm} color="#f59e0b"
+                    note="Smaller separation → wider-spaced fringes" />
                 )}
               </div>
             </div>
@@ -186,6 +208,11 @@ export default function DiffractionPage() {
                     <StatRow label="Max order visible" value={`±${maxOrder}`} unit="" color="text-indigo-600" />
                     <StatRow label="n=1 angle" value={maxOrder >= 1 ? (Math.asin(wavelengthNm / slitSpacingNm) * 180 / Math.PI).toFixed(1) : '—'} unit={maxOrder >= 1 ? '°' : ''} color="text-emerald-600" />
                     <StatRow label="Lines per mm" value={(1e6 / slitSpacingNm).toFixed(0)} unit="" color="text-purple-600" />
+                  </>}
+                  {mode === 'double-slit' && <>
+                    <StatRow label="Fringe spacing (D=1m)" value={(fringeSpacing(wavelengthNm * 1e-9, doubleSlitSepNm * 1e-9, 1) * 1000).toFixed(2)} unit="mm" color="text-indigo-600" />
+                    <StatRow label="Max order (this scale)" value={`±${maxFringeN}`} unit="" color="text-emerald-600" />
+                    <StatRow label="Nature" value="constructive/destructive interference" unit="" color="text-purple-600" />
                   </>}
                 </div>
               </div>

@@ -1,6 +1,7 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
+import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { ShadowsCanvas } from '@/components/simulation/ShadowsCanvas';
 import { EclipseCanvas, EclipseType } from '@/components/simulation/EclipseCanvas';
 import { PinholeCanvas } from '@/components/simulation/PinholeCanvas';
@@ -95,6 +96,9 @@ export default function RectilinearPropagationPage() {
   const [topic, setTopic] = useState<Topic>('shadows');
   const [openEx, setOpenEx] = useState<number | null>(null);
   const [activeCurricula, setActiveCurricula] = useState(['WAEC', 'IGCSE', 'SAT']);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
 
   const [sourceType, setSourceType] = useState<'point' | 'extended'>('extended');
   const [sourceRadius, setSourceRadius] = useState(35);
@@ -109,6 +113,13 @@ export default function RectilinearPropagationPage() {
   const [pinholeObjectDist, setPinholeObjectDist] = useState(140);
   const [pinholeScreenDist, setPinholeScreenDist] = useState(160);
   const [pinholeRadius, setPinholeRadius] = useState(1);
+
+  const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(reset, 100);
+  }, [topic, sourceType, sourceRadius, objectRadius, objectDist, screenDist, eclipseType, orbitalOffset, objectHeight, pinholeObjectDist, pinholeScreenDist, pinholeRadius, reset]);
 
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 300, 980);
@@ -162,12 +173,14 @@ export default function RectilinearPropagationPage() {
             <div className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {topic === 'shadows' && (
-                  <ShadowsCanvas sourceType={sourceType} sourceRadiusPx={sourceRadius} objectRadiusPx={objectRadius}
+                  <ShadowsCanvas key={resetKey} sourceType={sourceType} sourceRadiusPx={sourceRadius} objectRadiusPx={objectRadius}
                     objectDistPx={objectDist} screenDistPx={screenDist}
+                    isRunning={isRunning} isPaused={isPaused}
                     width={canvasSize.width} height={canvasSize.height} />
                 )}
                 {topic === 'eclipse' && (
-                  <EclipseCanvas eclipseType={eclipseType} orbitalOffset={orbitalOffset}
+                  <EclipseCanvas key={resetKey} eclipseType={eclipseType} orbitalOffset={orbitalOffset}
+                    isRunning={isRunning} isPaused={isPaused}
                     width={canvasSize.width} height={canvasSize.height} />
                 )}
                 {topic === 'pinhole' && (
@@ -177,7 +190,12 @@ export default function RectilinearPropagationPage() {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-end gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                {topic !== 'pinhole' ? (
+                  <SimulationControls isRunning={isRunning} isPaused={isPaused}
+                    onRun={() => { setIsRunning(true); setIsPaused(false); }}
+                    onPause={() => setIsPaused(p => !p)} onReset={reset} />
+                ) : <span />}
                 <EmbedButton path="/embed/rectilinear-propagation"
                   title={`${TOPIC_META[topic].title} — A-Factor STEM Studio`}
                   params={
