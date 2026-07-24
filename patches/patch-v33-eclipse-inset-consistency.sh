@@ -1,3 +1,46 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v33: fix "View from Earth" inset not
+# corresponding to the actual eclipse state for solar/annular
+#
+#   DIAGNOSIS. The inset used a completely separate, uncoordinated
+#   calculation from the main diagram's none/partial/total classification
+#   — raw Moon vertical offset, normalised against the orbit's maximum
+#   possible offset, with NO check against validGeometry at all. Verified
+#   numerically that this was actively wrong: at the Moon's far-side node
+#   (irrelevant for solar/annular — no eclipse is geometrically possible
+#   there), its raw vertical offset is ALSO near zero, just as it is at
+#   the correct near-side node — so the inset showed a near-total-eclipse
+#   picture even when the main diagram correctly showed no eclipse at all
+#   and no shadow cone was even being drawn.
+#
+#   FIX. The inset's Sun/Moon overlap is now derived directly from the
+#   SAME umbra/penumbra values used to classify none/partial/total for
+#   the main diagram (lifted to a shared scope, not recomputed
+#   separately), and the overlap decision is keyed directly off
+#   eclipseState rather than a separately-clamped continuous value that
+#   could disagree with it near the edges. Verified numerically across
+#   the full 360° orbit, for both solar and annular Moon sizes, that the
+#   inset's overlap now agrees with eclipseState at every single degree —
+#   overlap exactly when state is partial or total, clear separation
+#   exactly when state is none, with a smooth, meaningful gradient (more
+#   overlap deeper into a total eclipse, less near the edges) rather than
+#   an abrupt binary jump.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v33-eclipse-inset-consistency.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "-- A-Factor patch v33: fix View from Earth inset consistency --"
+mkdir -p "src/components/simulation"
+
+echo "  -> src/components/simulation/EclipseCanvas.tsx"
+cat > "src/components/simulation/EclipseCanvas.tsx" << 'AFEOF'
 'use client';
 import { useRef, useEffect, useCallback } from 'react';
 
@@ -277,3 +320,18 @@ export function EclipseCanvas({ eclipseType, orbitAngleDeg, isRunning, isPaused,
       className="w-full rounded-xl border border-gray-200" style={{ display: 'block' }} />
   );
 }
+AFEOF
+
+echo ""
+echo "Patch v33 applied -- 1 files written."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /simulations/rectilinear-propagation -> Eclipses tab, Solar and"
+echo "Annular modes. Press Run and watch the View from Earth inset -- it"
+echo "should now show the Sun/Moon discs separated whenever the main label"
+echo "says 'No eclipse', and overlapping whenever it says Partial or Total,"
+echo "at every point in the orbit, including the far side where the old"
+echo "version incorrectly showed near-alignment."

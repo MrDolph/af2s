@@ -47,10 +47,14 @@ export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, obje
 
     // Sweep the object between just past the source and just short of the
     // screen, so the umbra/penumbra visibly change size and position as it
-    // moves — bounded to stay clear of both endpoints.
+    // moves — bounded to stay clear of both endpoints. Freezes at the
+    // current position while paused (keyed on isRunning alone) rather than
+    // snapping back to the slider's default value, which is what
+    // `animate` (isRunning && !isPaused) would do here — the same pause
+    // bug found and fixed in the eclipse simulation.
     const minDist = 55, maxDist = s.screenDistPx - 45;
     const sweepMid = (minDist + maxDist) / 2, sweepAmp = (maxDist - minDist) / 2;
-    const objectDistPx = animate
+    const objectDistPx = s.isRunning
       ? sweepMid + sweepAmp * Math.sin((2 * Math.PI / SWEEP_PERIOD) * t.current)
       : Math.min(Math.max(s.objectDistPx, minDist), maxDist);
 
@@ -69,16 +73,30 @@ export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, obje
     const objTop: Vec = { x: objX, y: midY - ro };
     const objBot: Vec = { x: objX, y: midY + ro };
 
-    // Four boundary rays, extended out to the screen's x — genuine
-    // straight-line projection, not an assumed shadow shape.
-    const umbraTopY = lineAtX(srcBot, objTop, scrX);   // inner ray, upper edge of umbra
-    const umbraBotY = lineAtX(srcTop, objBot, scrX);   // inner ray, lower edge of umbra
-    const penTopY = lineAtX(srcTop, objTop, scrX);     // outer ray, upper edge of penumbra
-    const penBotY = lineAtX(srcBot, objBot, scrX);     // outer ray, lower edge of penumbra
+    // Four boundary rays, extended out to the screen's x. Verified by
+    // brute-force sampling many source points (not just these four extreme
+    // rays) which region each screen point actually falls in: the UMBRA
+    // (fully dark) boundary is the SAME-SIDE pairing (top-to-top,
+    // bottom-to-bottom), and the PENUMBRA's outer edge (where any light at
+    // all first appears) is the OPPOSITE-SIDE pairing (top-to-bottom,
+    // bottom-to-top) — this holds universally, whichever of the source or
+    // the object is larger. The reverse assignment looks plausible from
+    // the ray diagram alone but is provably wrong: sampled classification
+    // showed the "opposite-side" region was >90% lit at its edges, not
+    // fully dark.
+    const umbraTopY = lineAtX(srcTop, objTop, scrX);   // same-side: true umbra, upper edge
+    const umbraBotY = lineAtX(srcBot, objBot, scrX);   // same-side: true umbra, lower edge
+    const penTopY = lineAtX(srcBot, objTop, scrX);     // opposite-side: true penumbra outer edge
+    const penBotY = lineAtX(srcTop, objBot, scrX);     // opposite-side: true penumbra outer edge
 
-    // Screen, painted in bands: lit (bright) / penumbra (dim, gradient) / umbra (dark)
+    // Screen, painted in bands: lit (white) / penumbra (grayscale gradient
+    // — dimmer, not a different hue) / umbra (near-black). Using a tinted
+    // colour like yellow for "lit" or for the penumbra gradient invites
+    // reading it as a difference in colour rather than in brightness — a
+    // real penumbra is simply dimmer white light, so this stays grayscale
+    // throughout.
     const screenTop = 20, screenBottom = H - 20;
-    ctx.fillStyle = '#fef9c3'; ctx.fillRect(scrX - 6, screenTop, 6, screenBottom - screenTop);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(scrX - 6, screenTop, 6, screenBottom - screenTop);
     const bandFill = (y0: number, y1: number, fill: string | CanvasGradient) => {
       const a = Math.max(screenTop, Math.min(y0, y1));
       const b = Math.min(screenBottom, Math.max(y0, y1));
@@ -86,15 +104,15 @@ export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, obje
       ctx.fillStyle = fill;
       ctx.fillRect(scrX - 6, a, 6, b - a);
     };
-    bandFill(screenTop, penTopY, '#fef9c3');
+    bandFill(screenTop, penTopY, '#ffffff');
     const gradTop = ctx.createLinearGradient(0, penTopY, 0, umbraTopY);
-    gradTop.addColorStop(0, '#fef9c3'); gradTop.addColorStop(1, '#1e293b');
+    gradTop.addColorStop(0, '#ffffff'); gradTop.addColorStop(1, '#0f172a');
     bandFill(penTopY, umbraTopY, gradTop);
     bandFill(umbraTopY, umbraBotY, '#0f172a');
     const gradBot = ctx.createLinearGradient(0, umbraBotY, 0, penBotY);
-    gradBot.addColorStop(0, '#1e293b'); gradBot.addColorStop(1, '#fef9c3');
+    gradBot.addColorStop(0, '#0f172a'); gradBot.addColorStop(1, '#ffffff');
     bandFill(umbraBotY, penBotY, gradBot);
-    bandFill(penBotY, screenBottom, '#fef9c3');
+    bandFill(penBotY, screenBottom, '#ffffff');
 
     // Rays
     const drawRay = (a: Vec, b: Vec, color: string, dashed = false) => {
@@ -104,11 +122,11 @@ export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, obje
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(scrX, endY); ctx.stroke();
       ctx.restore();
     };
-    drawRay(srcBot, objTop, 'rgba(96,165,250,0.7)');
-    drawRay(srcTop, objBot, 'rgba(96,165,250,0.7)');
+    drawRay(srcTop, objTop, 'rgba(96,165,250,0.7)');
+    drawRay(srcBot, objBot, 'rgba(96,165,250,0.7)');
     if (s.sourceType === 'extended') {
-      drawRay(srcTop, objTop, 'rgba(251,191,36,0.6)');
-      drawRay(srcBot, objBot, 'rgba(251,191,36,0.6)');
+      drawRay(srcBot, objTop, 'rgba(100,116,139,0.55)');
+      drawRay(srcTop, objBot, 'rgba(100,116,139,0.55)');
     }
 
     // Source
@@ -137,7 +155,7 @@ export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, obje
       ctx.fillText('umbra', scrX + 10, (umbraTopY + umbraBotY) / 2 + 3);
     }
     if (s.sourceType === 'extended' && Math.abs(penTopY - umbraTopY) > 10) {
-      ctx.fillStyle = '#fbbf24';
+      ctx.fillStyle = '#64748b';
       ctx.fillText('penumbra', scrX + 10, (penTopY + umbraTopY) / 2 + 3);
       ctx.fillText('penumbra', scrX + 10, (penBotY + umbraBotY) / 2 + 3);
     }

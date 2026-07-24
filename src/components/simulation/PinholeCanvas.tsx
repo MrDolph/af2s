@@ -41,7 +41,7 @@ export function PinholeCanvas({ objectHeightPx, objectDistPx, screenDistPx, pinh
     const pinX = Math.min(objX + s.objectDistPx, W - 60);
     const scrX = Math.min(pinX + s.screenDistPx, W - 20);
 
-    const objBase = midY, objTip = midY - s.objectHeightPx;
+    const objBase = midY + s.objectHeightPx / 2, objTip = midY - s.objectHeightPx / 2;
 
     // Camera box (barrier with the pinhole, and the back screen wall)
     ctx.fillStyle = '#1e293b';

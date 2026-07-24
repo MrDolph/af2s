@@ -1,3 +1,268 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v29: eclipse rebuilt to match standard
+# literature diagrams — real Moon-orbits-Earth mechanics restored, with
+# exactly 4 ray lines (the classic umbra/penumbra tangent construction)
+#
+#   Earth is fixed and the Moon genuinely orbits it on a real, clearly
+#   visible elliptical path (drawn to scale with the motion, not a
+#   decorative loop) in BOTH modes. The orbit's two nodes (where it
+#   crosses the Sun-Earth line) are marked. Solar eclipses need the Moon
+#   on the Sun-facing side of its orbit; lunar eclipses need the Moon on
+#   the far side, with Earth in between — the correct geometry either way,
+#   continuously animated lap after lap.
+#
+#   Exactly four ray lines are drawn from the Sun to the current
+#   occluder's edges, extended onward to where they land — the standard
+#   textbook umbra/penumbra tangent-line construction, not a shaded cone.
+#   The same-side pair (top-to-top, bottom-to-bottom) is the true umbra;
+#   the opposite-side pair (bottom-to-top, top-to-bottom, dashed here) is
+#   the penumbra's outer edge — this pairing was verified by brute-force
+#   sampling in the shadows simulation elsewhere in this app, and is
+#   reused here unchanged.
+#
+#   Tuned the orbital tilt (30°, exaggerated from the real ~5° for
+#   visibility) so eclipses are a genuinely narrow, rare fraction of the
+#   orbit rather than triggering across a wide swath of it — verified
+#   numerically with a full 360° sweep: solar eclipses occur in a single
+#   ~7.5%-of-orbit window centred on the correct node, lunar eclipses in a
+#   ~16%-of-orbit window centred on the other node (lunar eclipses being
+#   more forgiving of alignment than solar ones, because Earth's shadow is
+#   larger than the Moon's — this asymmetry is physically correct, not a
+#   bug, matching how real lunar eclipses are visible from the whole
+#   night side of Earth while solar eclipses trace a narrow path).
+#
+#   Kept the geometric-validity check (occluder must genuinely sit between
+#   the Sun and the target) from the previous investigation — without it,
+#   the ray extrapolation can numerically "detect" an eclipse when the
+#   Moon is on the wrong side of Earth entirely.
+#
+#   Kept the "View from Earth" inset panel (Sun/Moon overlapping discs for
+#   solar; the Moon's disc darkening for lunar) showing what an observer
+#   would actually see, alongside the side-on orbital diagram.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v29-eclipse-orbit-and-rays.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "-- A-Factor patch v29: eclipse with real orbit + 4-ray construction --"
+mkdir -p "src/app/embed/rectilinear-propagation" "src/app/simulations/rectilinear-propagation" "src/components/simulation"
+
+echo "  -> src/components/simulation/EclipseCanvas.tsx"
+cat > "src/components/simulation/EclipseCanvas.tsx" << 'AFEOF'
+'use client';
+import { useRef, useEffect, useCallback } from 'react';
+
+export type EclipseType = 'solar' | 'lunar';
+
+interface Props {
+  eclipseType: EclipseType;
+  orbitAngleDeg: number; // used as a fixed value only when not animating (paused/reset)
+  isRunning: boolean; isPaused: boolean;
+  onTick?: (angleDeg: number, eclipseHappening: boolean) => void;
+  width?: number; height?: number;
+}
+
+interface Vec { x: number; y: number; }
+function lineAtX(p1: Vec, p2: Vec, x: number): number {
+  const t = (x - p1.x) / (p2.x - p1.x);
+  return p1.y + t * (p2.y - p1.y);
+}
+
+const ORBIT_PERIOD = 9;   // s — one full simulated lunar orbit, repeating continuously
+const TILT_DEG = 30;      // exaggerated for visibility (real inclination ~5°) — chosen so the
+                           // eclipse window is a genuinely narrow, "rare" fraction of the orbit
+const ORBIT_R = 110;       // px — the Moon's orbital radius around Earth
+
+export function EclipseCanvas({ eclipseType, orbitAngleDeg, isRunning, isPaused, onTick, width = 660, height = 320 }: Props) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rafRef = useRef<number>(0);
+  const lastFrameRef = useRef<number | null>(null);
+  const t = useRef(0);
+  const sim = useRef({ eclipseType, orbitAngleDeg, isRunning, isPaused, onTick });
+  sim.current = { eclipseType, orbitAngleDeg, isRunning, isPaused, onTick };
+
+  useEffect(() => { t.current = 0; lastFrameRef.current = null; }, [eclipseType, orbitAngleDeg]);
+
+  const draw = useCallback((timestamp?: number) => {
+    const canvas = canvasRef.current; if (!canvas) return;
+    const ctx = canvas.getContext('2d'); if (!ctx) return;
+    const s = sim.current;
+    const W = canvas.width, H = canvas.height;
+
+    const animate = s.isRunning && !s.isPaused;
+    if (animate && timestamp !== undefined) {
+      if (lastFrameRef.current !== null) {
+        t.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      }
+      lastFrameRef.current = timestamp;
+    } else {
+      lastFrameRef.current = timestamp ?? null;
+    }
+    // The Moon genuinely orbits Earth, continuously, lap after lap — it
+    // passes near alignment twice per orbit (the two nodes) and is
+    // clearly off-axis the rest of the time, exactly like a real orbit.
+    const angleDeg = animate ? ((t.current / ORBIT_PERIOD) * 360) % 360 : s.orbitAngleDeg;
+    const angleRad = (angleDeg * Math.PI) / 180;
+    const tiltRad = (TILT_DEG * Math.PI) / 180;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    for (let i = 0; i < 40; i++) ctx.fillRect((i * 53) % W, (i * 97) % H, 1, 1);
+
+    const midY = H / 2;
+    const sunX = 55, sunR = 42;
+    const earthX = W * 0.62, earthR = 22, moonR = 10;
+
+    const moonX = earthX + ORBIT_R * Math.cos(angleRad);
+    const moonY = midY + ORBIT_R * Math.sin(angleRad) * Math.sin(tiltRad);
+
+    // Sun
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath(); ctx.arc(sunX, midY, sunR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fde68a'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText('Sun', sunX, midY + sunR + 16);
+
+    // The Moon's actual orbital path around Earth — a real, clearly
+    // visible ellipse (the projection of its tilted circular orbit), not
+    // a decorative loop. This IS the orbit, drawn to scale with the
+    // motion below, in both modes.
+    ctx.save();
+    ctx.strokeStyle = 'rgba(148,163,184,0.55)'; ctx.setLineDash([5, 4]); ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    ctx.ellipse(earthX, midY, ORBIT_R, ORBIT_R * Math.sin(tiltRad), 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+    // The two nodes — where the tilted orbit crosses the Sun-Earth line,
+    // the only points where an eclipse can happen.
+    ctx.fillStyle = 'rgba(148,163,184,0.8)';
+    [earthX - ORBIT_R, earthX + ORBIT_R].forEach(nx => {
+      ctx.beginPath(); ctx.arc(nx, midY, 2.5, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // Earth is always the target/occluder's fixed reference; the Moon is
+    // always the body actually moving. Which one blocks light from the
+    // other depends on which side of the orbit the Moon is currently on:
+    // solar eclipse needs the Moon between the Sun and Earth; lunar
+    // eclipse needs Earth between the Sun and the Moon.
+    const occ = s.eclipseType === 'solar' ? { x: moonX, y: moonY, r: moonR } : { x: earthX, y: midY, r: earthR };
+    const target = s.eclipseType === 'solar' ? { x: earthX, y: midY, r: earthR } : { x: moonX, y: moonY, r: moonR };
+
+    // A ray extrapolated to the target's x is only physically meaningful
+    // if the occluder genuinely sits between the Sun and the target —
+    // otherwise it's just a line extrapolated the wrong way. This is what
+    // correctly restricts eclipses to the Moon's near side (solar) or far
+    // side (lunar) of its orbit, not both.
+    const validGeometry = occ.x > sunX && target.x > occ.x;
+
+    const srcTop: Vec = { x: sunX, y: midY - sunR }, srcBot: Vec = { x: sunX, y: midY + sunR };
+    const occTop: Vec = { x: occ.x, y: occ.y - occ.r }, occBot: Vec = { x: occ.x, y: occ.y + occ.r };
+    // Exactly four rays, the classic umbra/penumbra construction: the
+    // same-side pair (top-to-top, bottom-to-bottom) marks the true umbra;
+    // the opposite-side pair (bottom-to-top, top-to-bottom) marks the
+    // penumbra's outer edge — verified by brute-force sampling in the
+    // shadows simulation elsewhere in this app. Each ray is drawn all the
+    // way from the Sun's edge, touching the occluder's edge, and onward
+    // to where it actually lands.
+    const drawRay = (from: Vec, throughPoint: Vec, color: string, dashed = false) => {
+      const endY = lineAtX(from, throughPoint, target.x);
+      ctx.save(); if (dashed) ctx.setLineDash([4, 3]);
+      ctx.strokeStyle = color; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(throughPoint.x, throughPoint.y);
+      if (validGeometry) ctx.lineTo(target.x, endY);
+      ctx.stroke(); ctx.restore();
+    };
+    drawRay(srcTop, occTop, 'rgba(96,165,250,0.75)');
+    drawRay(srcBot, occBot, 'rgba(96,165,250,0.75)');
+    drawRay(srcBot, occTop, 'rgba(148,163,184,0.6)', true);
+    drawRay(srcTop, occBot, 'rgba(148,163,184,0.6)', true);
+
+    // Earth
+    ctx.fillStyle = '#3b82f6';
+    ctx.beginPath(); ctx.arc(earthX, midY, earthR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#bfdbfe'; ctx.font = 'bold 10px system-ui';
+    ctx.fillText('Earth', earthX, midY - earthR - 8);
+
+    // Moon
+    ctx.fillStyle = '#cbd5e1';
+    ctx.beginPath(); ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#e2e8f0'; ctx.font = '9px system-ui';
+    ctx.fillText('Moon', moonX, moonY - moonR - 6);
+
+    let eclipseHappening = false;
+    if (validGeometry) {
+      const umbraTopAtTarget = lineAtX(srcTop, occTop, target.x);
+      const umbraBotAtTarget = lineAtX(srcBot, occBot, target.x);
+      eclipseHappening = umbraTopAtTarget < target.y + target.r && umbraBotAtTarget > target.y - target.r;
+      if (eclipseHappening) {
+        ctx.save();
+        ctx.beginPath(); ctx.arc(target.x, target.y, target.r, 0, Math.PI * 2); ctx.clip();
+        ctx.fillStyle = 'rgba(15,23,42,0.7)';
+        ctx.fillRect(target.x - target.r, Math.max(target.y - target.r, umbraTopAtTarget), target.r * 2,
+          Math.min(target.y + target.r, umbraBotAtTarget) - Math.max(target.y - target.r, umbraTopAtTarget));
+        ctx.restore();
+      }
+    }
+    s.onTick?.(angleDeg, eclipseHappening);
+
+    // "View from Earth" inset — what an observer would actually see.
+    const insetX = W - 78, insetY = H - 66, insetR = 30;
+    ctx.save();
+    ctx.fillStyle = 'rgba(15,23,42,0.9)';
+    ctx.beginPath(); ctx.roundRect(insetX - insetR - 10, insetY - insetR - 18, insetR * 2 + 20, insetR * 2 + 30, 8); ctx.fill();
+    ctx.strokeStyle = 'rgba(148,163,184,0.4)'; ctx.stroke();
+    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText('View from Earth', insetX, insetY - insetR - 6);
+    if (s.eclipseType === 'solar') {
+      const sunEarthOffset = moonY - midY; // reuse the Moon's current misalignment for the inset
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath(); ctx.arc(insetX, insetY, insetR, 0, Math.PI * 2); ctx.fill();
+      const clamp = Math.max(-1, Math.min(1, sunEarthOffset / (ORBIT_R * Math.sin(tiltRad))));
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath(); ctx.arc(insetX, insetY + clamp * insetR * 1.6, insetR * 0.98, 0, Math.PI * 2); ctx.fill();
+    } else {
+      const darkness = eclipseHappening ? 0.75 : 0.05;
+      ctx.fillStyle = '#e2e8f0';
+      ctx.beginPath(); ctx.arc(insetX, insetY, insetR, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = `rgba(127,29,29,${darkness})`;
+      ctx.beginPath(); ctx.arc(insetX, insetY, insetR, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+
+    ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = eclipseHappening ? '#f87171' : '#94a3b8';
+    ctx.fillText(
+      eclipseHappening
+        ? (s.eclipseType === 'solar' ? '☾ SOLAR ECLIPSE — the Moon blocks sunlight from reaching Earth' : '🌍 LUNAR ECLIPSE — the Moon passes through Earth\u2019s shadow')
+        : 'No eclipse right now — the Moon is not at a node',
+      W / 2 - 40, 22,
+    );
+    ctx.fillStyle = '#64748b'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText('Not to scale. Dashed ellipse = the Moon\u2019s real orbit around Earth; the dots are its two nodes.', 8, H - 8);
+
+    rafRef.current = requestAnimationFrame(draw);
+  }, []);
+
+  useEffect(() => {
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [draw]);
+
+  return (
+    <canvas ref={canvasRef} width={width} height={height}
+      className="w-full rounded-xl border border-gray-200" style={{ display: 'block' }} />
+  );
+}
+AFEOF
+
+echo "  -> src/app/simulations/rectilinear-propagation/page.tsx"
+cat > "src/app/simulations/rectilinear-propagation/page.tsx" << 'AFEOF'
 'use client';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -34,11 +299,9 @@ const TEACHER_NOTES: Record<Topic, string[]> = {
   ],
   eclipse: [
     'A solar eclipse happens when the Moon passes directly between the Sun and Earth, casting its shadow onto Earth\u2019s surface — people in the umbra see a total eclipse, people in the penumbra see a partial one.',
-    'The Moon\u2019s umbra on Earth\u2019s surface is genuinely small — typically only 100-270km wide (the "path of totality") — while Earth itself is nearly 12,750km across. Only a narrow strip of Earth ever sees a total eclipse at once; a much wider (but still limited) surrounding region sees a partial eclipse, and everywhere else sees none at all.',
     'A lunar eclipse happens when Earth passes directly between the Sun and the Moon, and the Moon passes through Earth\u2019s shadow.',
     'Eclipses don\u2019t happen every month because the Moon\u2019s orbit is tilted about 5° relative to Earth\u2019s orbit around the Sun — most months, the Moon\u2019s shadow (or Earth\u2019s shadow) simply misses, passing above or below the target body.',
     'A remarkable coincidence: the Sun is about 400 times wider than the Moon, but also about 400 times farther away — so they have almost the same apparent size in our sky, which is why the Moon can only just barely cover the Sun during a total solar eclipse.',
-    'The Moon\u2019s orbit is slightly elliptical, so its distance from Earth (and therefore its apparent size) varies. If a solar eclipse happens while the Moon is near the farthest point of its orbit, it looks slightly smaller than the Sun and can\u2019t fully cover it — even at perfect alignment, a bright ring of sunlight remains visible around the Moon\u2019s edge. This is an ANNULAR eclipse (from "annulus", meaning ring), a genuinely different outcome from a total eclipse, not just a partial one.',
     'This whole topic is a direct, large-scale consequence of the same rectilinear-propagation geometry used for a tabletop shadow demo — only the distances and sizes change.',
   ],
   pinhole: [
@@ -60,7 +323,6 @@ const EXERCISES: Record<Topic, { q: string; a: string }[]> = {
     { q: 'Distinguish between a solar eclipse and a lunar eclipse in terms of the positions of the Sun, Earth, and Moon.', a: 'Solar eclipse: Moon is between the Sun and Earth, and the Moon\u2019s shadow falls on Earth. Lunar eclipse: Earth is between the Sun and the Moon, and the Moon passes through Earth\u2019s shadow.' },
     { q: 'Explain why we do not see a solar and a lunar eclipse every single month, even though the Moon orbits Earth roughly every month.', a: 'The Moon\u2019s orbital plane is tilted about 5° relative to Earth\u2019s orbital plane around the Sun. Most months, this tilt carries the Moon\u2019s shadow (or its path through Earth\u2019s shadow) above or below the target body, so no eclipse occurs — only when the alignment is nearly exact does the shadow actually land.' },
     { q: 'A person standing in the umbra of the Moon\u2019s shadow during a solar eclipse sees a total eclipse. What would a person standing in the penumbra see instead?', a: 'A partial eclipse — from the penumbra, only part of the Sun\u2019s disc is covered by the Moon, since part of the Sun is still visible from that position.' },
-    { q: 'Explain, in terms of distance, why some solar eclipses are annular rather than total.', a: 'The Moon\u2019s orbit is slightly elliptical, so its distance from Earth varies. If the eclipse happens while the Moon is near the farthest point of its orbit, its apparent size in the sky is smaller than the Sun\u2019s — so even at perfect alignment, the Moon\u2019s silhouette cannot fully cover the Sun\u2019s disc, leaving a bright ring (the annulus) visible around its edge.' },
   ],
   pinhole: [
     { q: 'An object 1.6m tall stands 4m from a pinhole camera. The screen is 20cm behind the pinhole. Find the height of the image.', a: 'hI = hO×(v/u) = 1.6×(0.2/4) = 0.08m = 8cm.' },
@@ -110,7 +372,6 @@ export default function RectilinearPropagationPage() {
   const [screenDist, setScreenDist] = useState(420);
 
   const [eclipseType, setEclipseType] = useState<EclipseType>('solar');
-  const [liveEclipseState, setLiveEclipseState] = useState<'none' | 'partial' | 'total'>('none');
   const [orbitAngleDeg, setOrbitAngleDeg] = useState(180);
 
   const [objectHeight, setObjectHeight] = useState(90);
@@ -184,7 +445,7 @@ export default function RectilinearPropagationPage() {
                 )}
                 {topic === 'eclipse' && (
                   <EclipseCanvas key={resetKey} eclipseType={eclipseType} orbitAngleDeg={orbitAngleDeg}
-                    isRunning={isRunning} isPaused={isPaused} onTick={(_a, state) => setLiveEclipseState(state)}
+                    isRunning={isRunning} isPaused={isPaused}
                     width={canvasSize.width} height={canvasSize.height} />
                 )}
                 {topic === 'pinhole' && (
@@ -231,7 +492,7 @@ export default function RectilinearPropagationPage() {
 
                 {topic === 'eclipse' && <>
                   <div className="flex gap-2">
-                    {(['solar', 'annular', 'lunar'] as const).map(t => (
+                    {(['solar', 'lunar'] as const).map(t => (
                       <button key={t} onClick={() => setEclipseType(t)}
                         className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium capitalize transition ${
                           eclipseType === t ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
@@ -239,7 +500,7 @@ export default function RectilinearPropagationPage() {
                     ))}
                   </div>
                   <Slider label="Moon's position in orbit" unit="°" value={orbitAngleDeg} min={0} max={359} step={1} set={setOrbitAngleDeg} color="#6366f1"
-                    note="180° = between Sun and Earth (solar/annular node). 0°/360° = opposite side (lunar node). Press Run to orbit continuously." />
+                    note="180° = between Sun and Earth (solar node). 0°/360° = opposite side (lunar node). Press Run to orbit continuously." />
                 </>}
 
                 {topic === 'pinhole' && <>
@@ -261,7 +522,6 @@ export default function RectilinearPropagationPage() {
                     <StatRow label="Umbra converges at" value={uLen === null ? 'never (source ≤ object)' : uLen.toFixed(0)} unit={uLen === null ? '' : 'px beyond object'} color="text-emerald-600" />
                   </>}
                   {topic === 'eclipse' && <>
-                    <StatRow label="Current state" value={liveEclipseState === 'total' ? 'TOTAL' : liveEclipseState === 'partial' ? 'PARTIAL' : 'none'} unit="" color={liveEclipseState === 'total' ? 'text-red-600' : liveEclipseState === 'partial' ? 'text-amber-600' : 'text-gray-400'} />
                     <StatRow label="Sun angular diameter" value={SUN_ANGULAR_DIAMETER_DEG.toFixed(3)} unit="°" color="text-amber-600" />
                     <StatRow label="Moon angular diameter" value={MOON_ANGULAR_DIAMETER_DEG.toFixed(3)} unit="°" color="text-indigo-600" />
                     <StatRow label="Ratio" value={(SUN_ANGULAR_DIAMETER_DEG / MOON_ANGULAR_DIAMETER_DEG).toFixed(3)} unit="" color="text-purple-600" />
@@ -325,3 +585,164 @@ export default function RectilinearPropagationPage() {
     </>
   );
 }
+AFEOF
+
+echo "  -> src/app/embed/rectilinear-propagation/page.tsx"
+cat > "src/app/embed/rectilinear-propagation/page.tsx" << 'AFEOF'
+'use client';
+import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { ShadowsCanvas } from '@/components/simulation/ShadowsCanvas';
+import { EclipseCanvas, EclipseType } from '@/components/simulation/EclipseCanvas';
+import { PinholeCanvas } from '@/components/simulation/PinholeCanvas';
+import { SimulationControls } from '@/components/simulation/SimulationControls';
+
+type Topic = 'shadows' | 'eclipse' | 'pinhole';
+
+function num(sp: URLSearchParams, key: string, fallback: number, min: number, max: number) {
+  const v = Number(sp.get(key));
+  return Number.isFinite(v) && sp.get(key) !== null ? Math.min(max, Math.max(min, v)) : fallback;
+}
+
+function Slider({ label, unit, value, min, max, step, set, color }: {
+  label: string; unit: string; value: number; min: number; max: number;
+  step: number; set: (v: number) => void; color: string;
+}) {
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-xs">
+        <span className="text-gray-500">{label}</span>
+        <span className="font-medium tabular-nums text-gray-800">{value} <span className="font-normal text-gray-400">{unit}</span></span>
+      </div>
+      <input type="range" min={min} max={max} step={step} value={value}
+        onChange={e => set(Number(e.target.value))} className="w-full" style={{ accentColor: color }} />
+    </div>
+  );
+}
+
+function PoweredBy() {
+  return (
+    <p className="text-center text-[10px] text-gray-400">
+      Powered by{' '}
+      <a href="/" target="_blank" rel="noopener noreferrer" className="font-medium text-indigo-500 hover:text-indigo-600">
+        A-Factor STEM Studio
+      </a>
+    </p>
+  );
+}
+
+function RectilinearEmbedInner() {
+  const sp = useSearchParams();
+  const topic = ((): Topic => {
+    const t = sp.get('topic');
+    return t === 'eclipse' || t === 'pinhole' ? t : 'shadows';
+  })();
+  const showControls = sp.get('controls') !== '0';
+
+  const [sourceType, setSourceType] = useState<'point' | 'extended'>(() => (sp.get('src') === 'point' ? 'point' : 'extended'));
+  const [sourceRadius, setSourceRadius] = useState(() => num(sp, 'sr', 35, 5, 60));
+  const [objectRadius, setObjectRadius] = useState(() => num(sp, 'or', 24, 8, 50));
+  const [objectDist, setObjectDist] = useState(() => num(sp, 'od', 160, 60, 300));
+  const [screenDist, setScreenDist] = useState(() => num(sp, 'sd', 420, 100, 560));
+
+  const [eclipseType, setEclipseType] = useState<EclipseType>(() => (sp.get('type') === 'lunar' ? 'lunar' : 'solar'));
+  const [orbitAngleDeg, setOrbitAngleDeg] = useState(() => num(sp, 'angle', 180, 0, 359));
+
+  const [objectHeight, setObjectHeight] = useState(() => num(sp, 'h', 90, 30, 130));
+  const [pinholeObjectDist, setPinholeObjectDist] = useState(() => num(sp, 'u', 140, 60, 260));
+  const [pinholeScreenDist, setPinholeScreenDist] = useState(() => num(sp, 'v', 160, 40, 260));
+  const [pinholeRadius, setPinholeRadius] = useState(() => num(sp, 'r', 1, 0, 12));
+
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+  const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(reset, 100);
+  }, [topic, sourceType, sourceRadius, objectRadius, objectDist, screenDist, eclipseType, orbitAngleDeg, objectHeight, pinholeObjectDist, pinholeScreenDist, pinholeRadius, reset]);
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      {topic === 'shadows' && (
+        <ShadowsCanvas key={resetKey} sourceType={sourceType} sourceRadiusPx={sourceRadius} objectRadiusPx={objectRadius}
+          objectDistPx={objectDist} screenDistPx={screenDist}
+          isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
+      )}
+      {topic === 'eclipse' && (
+        <EclipseCanvas key={resetKey} eclipseType={eclipseType} orbitAngleDeg={orbitAngleDeg}
+          isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
+      )}
+      {topic === 'pinhole' && (
+        <PinholeCanvas objectHeightPx={objectHeight} objectDistPx={pinholeObjectDist} screenDistPx={pinholeScreenDist}
+          pinholeRadiusPx={pinholeRadius} width={640} height={280} />
+      )}
+      {topic !== 'pinhole' && (
+        <SimulationControls isRunning={isRunning} isPaused={isPaused}
+          onRun={() => { setIsRunning(true); setIsPaused(false); }}
+          onPause={() => setIsPaused(p => !p)} onReset={reset} />
+      )}
+      {showControls && (
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
+          {topic === 'shadows' && <>
+            <div className="flex gap-2">
+              {(['point', 'extended'] as const).map(t => (
+                <button key={t} onClick={() => setSourceType(t)}
+                  className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium capitalize transition ${
+                    sourceType === t ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                  }`}>{t}</button>
+              ))}
+            </div>
+            {sourceType === 'extended' && (
+              <Slider label="Source size" unit="px" value={sourceRadius} min={5} max={60} step={1} set={setSourceRadius} color="#fbbf24" />
+            )}
+            <Slider label="Object size" unit="px" value={objectRadius} min={8} max={50} step={1} set={setObjectRadius} color="#64748b" />
+            <Slider label="Object distance" unit="px" value={objectDist} min={60} max={300} step={5} set={setObjectDist} color="#6366f1" />
+            <Slider label="Screen distance" unit="px" value={screenDist} min={objectDist + 40} max={560} step={5} set={setScreenDist} color="#8b5cf6" />
+          </>}
+          {topic === 'eclipse' && <>
+            <div className="flex gap-2">
+              {(['solar', 'lunar'] as const).map(t => (
+                <button key={t} onClick={() => setEclipseType(t)}
+                  className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium capitalize transition ${
+                    eclipseType === t ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                  }`}>{t}</button>
+              ))}
+            </div>
+            <Slider label="Moon's orbital position" unit="°" value={orbitAngleDeg} min={0} max={359} step={1} set={setOrbitAngleDeg} color="#6366f1" />
+          </>}
+          {topic === 'pinhole' && <>
+            <Slider label="Object height" unit="px" value={objectHeight} min={30} max={130} step={5} set={setObjectHeight} color="#0f172a" />
+            <Slider label="Object distance (u)" unit="px" value={pinholeObjectDist} min={60} max={260} step={5} set={setPinholeObjectDist} color="#6366f1" />
+            <Slider label="Screen distance (v)" unit="px" value={pinholeScreenDist} min={40} max={260} step={5} set={setPinholeScreenDist} color="#8b5cf6" />
+            <Slider label="Pinhole size" unit="px" value={pinholeRadius} min={0} max={12} step={0.5} set={setPinholeRadius} color="#f59e0b" />
+          </>}
+        </div>
+      )}
+      <PoweredBy />
+    </div>
+  );
+}
+
+export default function RectilinearEmbedPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-xs text-gray-400">Loading simulation…</div>}>
+      <RectilinearEmbedInner />
+    </Suspense>
+  );
+}
+AFEOF
+
+echo ""
+echo "Patch v29 applied -- 3 files written."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /simulations/rectilinear-propagation -> Eclipses tab. Press Run"
+echo "and watch the Moon genuinely orbit Earth along the dashed elliptical"
+echo "path, with exactly 4 ray lines from the Sun, only eclipsing briefly"
+echo "near each of the two marked nodes."

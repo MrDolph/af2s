@@ -54,8 +54,11 @@ function RectilinearEmbedInner() {
   const [objectDist, setObjectDist] = useState(() => num(sp, 'od', 160, 60, 300));
   const [screenDist, setScreenDist] = useState(() => num(sp, 'sd', 420, 100, 560));
 
-  const [eclipseType, setEclipseType] = useState<EclipseType>(() => (sp.get('type') === 'lunar' ? 'lunar' : 'solar'));
-  const [orbitalOffset, setOrbitalOffset] = useState(() => num(sp, 'offset', 0, 0, 120));
+  const [eclipseType, setEclipseType] = useState<EclipseType>(() => {
+    const v = sp.get('type');
+    return v === 'lunar' || v === 'annular' ? v : 'solar';
+  });
+  const [orbitAngleDeg, setOrbitAngleDeg] = useState(() => num(sp, 'angle', 180, 0, 359));
 
   const [objectHeight, setObjectHeight] = useState(() => num(sp, 'h', 90, 30, 130));
   const [pinholeObjectDist, setPinholeObjectDist] = useState(() => num(sp, 'u', 140, 60, 260));
@@ -70,7 +73,7 @@ function RectilinearEmbedInner() {
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 100);
-  }, [topic, sourceType, sourceRadius, objectRadius, objectDist, screenDist, eclipseType, orbitalOffset, objectHeight, pinholeObjectDist, pinholeScreenDist, pinholeRadius, reset]);
+  }, [topic, sourceType, sourceRadius, objectRadius, objectDist, screenDist, eclipseType, orbitAngleDeg, objectHeight, pinholeObjectDist, pinholeScreenDist, pinholeRadius, reset]);
 
   return (
     <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
@@ -80,7 +83,7 @@ function RectilinearEmbedInner() {
           isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
       )}
       {topic === 'eclipse' && (
-        <EclipseCanvas key={resetKey} eclipseType={eclipseType} orbitalOffset={orbitalOffset}
+        <EclipseCanvas key={resetKey} eclipseType={eclipseType} orbitAngleDeg={orbitAngleDeg}
           isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
       )}
       {topic === 'pinhole' && (
@@ -113,14 +116,14 @@ function RectilinearEmbedInner() {
           </>}
           {topic === 'eclipse' && <>
             <div className="flex gap-2">
-              {(['solar', 'lunar'] as const).map(t => (
+              {(['solar', 'annular', 'lunar'] as const).map(t => (
                 <button key={t} onClick={() => setEclipseType(t)}
                   className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium capitalize transition ${
                     eclipseType === t ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
                   }`}>{t}</button>
               ))}
             </div>
-            <Slider label="Orbital offset" unit="px" value={orbitalOffset} min={0} max={120} step={2} set={setOrbitalOffset} color="#6366f1" />
+            <Slider label="Moon's orbital position" unit="°" value={orbitAngleDeg} min={0} max={359} step={1} set={setOrbitAngleDeg} color="#6366f1" />
           </>}
           {topic === 'pinhole' && <>
             <Slider label="Object height" unit="px" value={objectHeight} min={30} max={130} step={5} set={setObjectHeight} color="#0f172a" />
