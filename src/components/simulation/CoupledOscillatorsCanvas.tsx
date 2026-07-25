@@ -173,7 +173,7 @@ export function CoupledOscillatorsCanvas({
     ctx.fillRect(wallX1 - 10, trackY - 50, 10, 100);
     ctx.fillRect(wallX2, trackY - 50, 10, 100);
 
-    function drawSpring(xA: number, xB: number, y: number, coils: number, amp: number, color: string) {
+    function drawSpring(ctx: CanvasRenderingContext2D, xA: number, xB: number, y: number, coils: number, amp: number, color: string) {
       const len = xB - xA;
       const seg = len / (coils * 2);
       ctx.strokeStyle = color;
@@ -195,9 +195,9 @@ export function CoupledOscillatorsCanvas({
     const mW1 = 18 + Math.min(s.params.m1, 5) * 10;
     const mW2 = 18 + Math.min(s.params.m2, 5) * 10;
 
-    drawSpring(wallX1, sx1 - mW1 / 2, trackY, 10, 12, '#6366f1');
-    drawSpring(sx1 + mW1 / 2, sx2 - mW2 / 2, trackY, 10, 12, '#f59e0b');
-    drawSpring(sx2 + mW2 / 2, wallX2, trackY, 10, 12, '#10b981');
+    drawSpring(ctx, wallX1, sx1 - mW1 / 2, trackY, 10, 12, '#6366f1');
+    drawSpring(ctx, sx1 + mW1 / 2, sx2 - mW2 / 2, trackY, 10, 12, '#f59e0b');
+    drawSpring(ctx, sx2 + mW2 / 2, wallX2, trackY, 10, 12, '#10b981');
 
     ctx.fillStyle = '#6366f1';
     ctx.fillRect(sx1 - mW1 / 2, trackY - 22, mW1, 44);
