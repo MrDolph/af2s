@@ -25,23 +25,26 @@ const TOPIC_META: Record<Topic, { title: string; icon: string; sub: string; eq: 
 
 const TEACHER_NOTES: Record<Topic, string[]> = {
   production: [
-    'Charging by FRICTION: rubbing two different insulators transfers electrons from one to the other. Whichever material holds electrons less strongly ends up positive; the other ends up negative — equal and opposite charges.',
-    'Charging by CONDUCTION (contact): touching a charged object to a neutral conductor lets charge (the same sign) spread onto it. The originally-charged object loses some of its charge in the process.',
-    'Charging by INDUCTION: bringing a charged object NEAR (not touching) a conductor separates its charges — no contact, no net charge change yet. Earthing the conductor while the inducing charge is still present lets the repelled charge escape, leaving a net charge OPPOSITE to the inducing object once the earth connection and the object are both removed (in that order).',
-    'A key exam distinction: conduction leaves the object with the SAME sign of charge as the charging body; induction leaves it with the OPPOSITE sign.',
+    'In ALL of these methods, only ELECTRONS ever move. Protons are locked inside the nucleus and never transfer between objects — every "positive charge" you see is really a region that has LOST electrons, not one that gained protons.',
+    'Charging by FRICTION: rubbing two different insulators transfers electrons from one to the other. Whichever material holds electrons less strongly ends up positive (lost electrons); the other ends up negative (gained electrons) — equal and opposite charges.',
+    'Charging by CONDUCTION (contact): the rod and the body must actually TOUCH — this is real physical contact, not just closeness. A negative rod has excess electrons that spread onto the neutral body it touches. A positive rod is short of electrons, so it instead pulls electrons OFF the body it touches. Either way, the body ends up the SAME sign as the rod, and the rod\u2019s own charge is reduced.',
+    'Charging by INDUCTION: the rod comes very close to the conductor — close enough for its field to act — but must NOT touch it, unlike friction and conduction. A negative rod repels the conductor\u2019s free electrons to the far side; a positive rod attracts them to the near side. Earthing while the rod is still present lets electrons escape (negative rod) or draws extra electrons in (positive rod). Once the earth connection and then the rod are removed (in that order), the conductor is left with a net charge OPPOSITE the inducing rod.',
+    'A key exam distinction: conduction leaves the object with the SAME sign of charge as the charging body; induction leaves it with the OPPOSITE sign — and induction never involves contact at all.',
     'The order of steps matters for induction: the earth connection must be broken BEFORE the charged rod is taken away — if the rod is removed first, the separated charges simply recombine and no net charge is left behind.',
   ],
   electroscope: [
     'A gold-leaf electroscope detects and estimates charge: charge spreads down the cap, rod, and onto the two thin leaves, which — carrying the same sign — repel each other and diverge.',
-    'Charging BY CONTACT: touch a charged rod to the cap; some charge transfers on, spreads through the instrument, and the leaves diverge and STAY diverged once the rod is removed.',
+    'As always, only ELECTRONS move here — never protons. Charging the electroscope with a negative rod pushes electrons IN (rod → cap → leaves). Charging it with a positive rod pulls the electroscope\u2019s own electrons OUT (leaves → cap → rod), leaving it short of electrons and therefore positive — the rod never "gives" it positive charge directly.',
+    'Charging BY CONTACT: touch a charged rod to the cap; electrons transfer, spread through the instrument, and the leaves diverge and STAY diverged once the rod is removed.',
     'TESTING the sign of an unknown charge: bring it near the cap of an already-charged electroscope (no contact). If the leaves diverge FURTHER, the unknown charge has the SAME sign as the electroscope. If the leaves diverge LESS, it has the OPPOSITE sign.',
     'This works by induction at the cap: a like charge repels the electroscope\u2019s own charge further down toward the leaves (more divergence); an unlike charge attracts it back up toward the cap (less divergence).',
     'An electroscope can also be charged BY INDUCTION (earthing the case while a charged rod is held near the cap, then removing the earth before the rod) — giving it a charge opposite to the rod, the same principle as the electrophorus.',
   ],
   electrophorus: [
     'An electrophorus is a device for producing charge repeatedly from a SINGLE charging of an insulating slab — the slab itself is charged once (by friction) and never touched again.',
-    'Sequence: place the metal disc on the charged slab (induction separates its charges) → touch the disc briefly to earth it (the repelled charge escapes) → lift the disc by its INSULATING handle.',
-    'The disc lifts away carrying a net charge OPPOSITE to the slab\u2019s charge — if the slab is negative, the disc becomes positive.',
+    'As with all induction, only ELECTRONS move here. The slab\u2019s negative charge repels the disc\u2019s free electrons to its top surface — the underside is simply short of electrons, not visited by positive charge.',
+    'Sequence: place the metal disc on the charged slab (induction separates its charges) → touch the disc briefly to earth it (the repelled electrons escape) → lift the disc by its INSULATING handle.',
+    'The disc lifts away carrying a net charge OPPOSITE to the slab\u2019s charge — if the slab is negative, the disc becomes positive (short of electrons).',
     'Because the slab\u2019s own charge is never used up (only induction happens, no charge transfers to or from the slab), this process can be repeated many times from a single rubbing of the slab.',
     'The insulating handle is essential — touching the metal disc directly (instead of through the handle) would earth it through your hand at the wrong moment and prevent it from carrying charge away.',
   ],
@@ -150,7 +153,7 @@ export default function ElectrostaticsChargingPage() {
             <div className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {topic === 'production' && (
-                  <ChargingMethodsCanvas key={resetKey} method={method}
+                  <ChargingMethodsCanvas key={resetKey} method={method} rodSign={rodSign}
                     isRunning={isRunning} isPaused={isPaused} onPhaseChange={setChargingPhaseLabel}
                     width={canvasSize.width} height={canvasSize.height} />
                 )}
@@ -190,6 +193,19 @@ export default function ElectrostaticsChargingPage() {
                           method === m ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
                         }`}>{m}</button>
                     ))}
+                    {method !== 'friction' && (
+                      <div className="pt-2 border-t border-gray-100 space-y-1.5">
+                        <span className="text-xs text-gray-500">Rod&apos;s charge</span>
+                        <div className="flex gap-2">
+                          {([1, -1] as const).map(sgn => (
+                            <button key={sgn} onClick={() => setRodSign(sgn)}
+                              className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium transition ${
+                                rodSign === sgn ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                              }`}>{sgn > 0 ? 'Positive (+)' : 'Negative (−)'}</button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 

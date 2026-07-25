@@ -121,10 +121,15 @@ export function ElectroscopeCanvas({ mode, rodSign, electroscopeSign, isRunning,
     });
 
     // Electron flow — while charge is actively transferring by contact,
-    // particles travel visibly from the cap, down the connecting rod,
-    // and out along each leaf, instead of charge simply appearing
-    // simultaneously at the cap AND the leaves with no transit shown.
+    // particles travel visibly along the cap-rod-leaf path, instead of
+    // charge simply appearing simultaneously at the cap AND the leaves
+    // with no transit shown. This is ALWAYS electrons (never drawn as a
+    // "+" particle) — a negative rod pushes electrons IN (cap -> leaves);
+    // a positive rod pulls the electroscope's own electrons OUT (leaves
+    // -> cap, up toward the rod), since positive charging works by the
+    // electroscope losing electrons, not by positive charge arriving.
     if (s.mode === 'charging' && running && t.current >= 0.9 && t.current < 2.4) {
+      const negative = s.rodSign < 0;
       const flowT = t.current - 0.9;
       const segALen = hingeY - capY;
       const nParticles = 6;
@@ -134,7 +139,8 @@ export function ElectroscopeCanvas({ mode, rodSign, electroscopeSign, isRunning,
         const segBLen = leafLen;
         const totalLen = segALen + segBLen;
         const speed = 130; // px/s along the path
-        const phase = (((flowT * speed) + i * (totalLen / nParticles)) % totalLen) / totalLen;
+        const rawPhase = (((flowT * speed) + i * (totalLen / nParticles)) % totalLen) / totalLen;
+        const phase = negative ? rawPhase : 1 - rawPhase; // reversed direction for a positive rod
         let px: number, py: number;
         if (phase * totalLen < segALen) {
           const f = (phase * totalLen) / segALen;
@@ -143,7 +149,7 @@ export function ElectroscopeCanvas({ mode, rodSign, electroscopeSign, isRunning,
           const f = (phase * totalLen - segALen) / segBLen;
           px = capX + dx * leafLen * f; py = hingeY + dy * leafLen * f;
         }
-        drawCharge(ctx, px, py, sign, 4);
+        drawCharge(ctx, px, py, -1, 4);
       }
     }
 

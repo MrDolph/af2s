@@ -24,9 +24,9 @@ const TOTAL = DURATIONS.reduce((a, b) => a + b, 0);
 const PHASE_LABELS = [
   'Insulating slab, charged negative by rubbing earlier — the disc is not yet placed',
   'Metal disc lowered onto the charged slab (insulating handle keeps your hand safe)',
-  'Induction: the disc\u2019s underside is pulled positive, its top pushed negative',
-  'Touch the disc with a finger — the repelled negative charge escapes to earth through you',
-  'Lift the disc by its insulating handle — it carries away a net POSITIVE charge',
+  'Induction: only the disc\u2019s free electrons move — repelled to the top, leaving the underside short of electrons (net positive there)',
+  'Touch the disc with a finger — the repelled electrons escape to earth through you',
+  'Lift the disc by its insulating handle — short of electrons overall, it carries away a net POSITIVE charge',
 ];
 
 export function ElectrophorusCanvas({ isRunning, isPaused, cycleCount, onCycleComplete, width = 660, height = 320 }: Props) {
@@ -104,20 +104,31 @@ export function ElectrophorusCanvas({ isRunning, isPaused, cycleCount, onCycleCo
     const grounded = phaseIdx === 3;
     const groundProgress = phaseIdx === 3 ? phaseT : phaseIdx > 3 ? 1 : 0;
     const lifted = phaseIdx === 4;
+    const settling = phaseIdx === 2 ? phaseT : phaseIdx === 3 ? 1 : phaseIdx === 4 ? 1 - phaseT : 0;
 
-    if (induced) {
-      // Bottom of disc: induced positive (attracted toward the slab's negative charge)
-      for (let i = -3; i <= 3; i++) drawCharge(ctx, slabX + i * 24, discY + 8, 1, 5);
-      // Top of disc: repelled negative — escapes once grounded
-      const topAlpha = grounded || lifted ? Math.max(0, 1 - groundProgress) : 1;
-      if (topAlpha > 0.05 && !lifted) {
-        ctx.save(); ctx.globalAlpha = topAlpha;
-        for (let i = -3; i <= 3; i++) drawCharge(ctx, slabX + i * 24, discY - 8, -1, 5);
-        ctx.restore();
+    // ONLY electrons move here — this is a fixed set of electron markers
+    // that redistributes by animating position (never appearing as a
+    // separate "+" object). Before induction they sit evenly spread
+    // across the disc; as induction proceeds they visibly migrate to the
+    // top surface (repelled by the slab's negative charge underneath),
+    // leaving the underside electron-short — shown only as a text label,
+    // since no positive charge actually arrived there. Once lifted clear
+    // of the slab's influence, the remaining electrons spread back out
+    // evenly over the now-isolated disc.
+    if (touching) {
+      const baseCount = 7;
+      const leftCount = grounded || lifted ? Math.max(0, baseCount - Math.round(3 * (grounded ? groundProgress : 1))) : baseCount;
+      for (let i = 0; i < leftCount; i++) {
+        const ix = i - (baseCount - 1) / 2;
+        const evenY = discY; // neutral / isolated: spread across the disc's middle
+        const clusteredY = discY - 8; // induced: clustered at the top surface
+        const y = evenY + (clusteredY - evenY) * settling;
+        drawCharge(ctx, slabX + ix * 24, y, -1, 5);
       }
-    }
-    if (touching && !induced) {
-      // brief neutral-looking contact moment right as it lands
+      if (induced && !lifted) {
+        ctx.fillStyle = '#dc2626'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText('+', slabX, discY + 20);
+      }
     }
 
     if (grounded) {
@@ -128,12 +139,10 @@ export function ElectrophorusCanvas({ isRunning, isPaused, cycleCount, onCycleCo
     }
 
     if (lifted && phaseT > 0.3) {
-      // Disc now carries net positive charge, spread over its underside
       ctx.save(); ctx.globalAlpha = Math.min(1, (phaseT - 0.3) / 0.3);
-      for (let i = -3; i <= 3; i++) drawCharge(ctx, slabX + i * 24, discY + 8, 1, 5);
-      ctx.restore();
       ctx.fillStyle = '#dc2626'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('disc now carries a net POSITIVE charge', slabX, discY + 34);
+      ctx.fillText('disc now carries a net POSITIVE charge (short of electrons)', slabX, discY + 34);
+      ctx.restore();
     }
 
     ctx.fillStyle = '#334155'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';

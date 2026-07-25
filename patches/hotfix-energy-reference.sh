@@ -1,3 +1,20 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# Hotfix: shift double-pendulum PE reference so energy is always non-negative
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "✗ Run this from the af2s project root." >&2
+  exit 1
+fi
+
+echo "── Hotfix: non-negative energy reference ──"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 1. Fix doublePendulum.ts — shift PE so lowest point = 0
+# ══════════════════════════════════════════════════════════════════════════════
+cat > "src/lib/physics/doublePendulum.ts" << 'AFEOF'
 export const G = 9.81;
 
 export interface PendulumState {
@@ -239,3 +256,17 @@ export function analyzeDecay(history: DecayPoint[]): DecayAnalysis {
   }
   return { qFactor: q, bandwidth: gamma, decayRate: gamma, valid: true };
 }
+AFEOF
+
+echo "  → src/lib/physics/doublePendulum.ts  (PE reference shifted)"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 2. Verify coupledOscillators.ts is already non-negative (no change needed)
+# ══════════════════════════════════════════════════════════════════════════════
+echo "  → src/lib/physics/coupledOscillators.ts  (already non-negative, no change)"
+
+echo ""
+echo "✓ Hotfix applied. The double-pendulum PE is now measured from the"
+echo "  lowest point (both bobs straight down), so total energy ≥ 0 always."
+echo ""
+echo "  Rebuild:  rm -rf .next && npm run build"

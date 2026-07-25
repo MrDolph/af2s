@@ -49,7 +49,7 @@ function ElectrostaticsChargingEmbedInner() {
   return (
     <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
       {topic === 'production' && (
-        <ChargingMethodsCanvas key={resetKey} method={method} isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
+        <ChargingMethodsCanvas key={resetKey} method={method} rodSign={rodSign} isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
       )}
       {topic === 'electroscope' && (
         <ElectroscopeCanvas key={resetKey} mode={electroscopeMode} rodSign={rodSign} electroscopeSign={electroscopeSign}
@@ -73,6 +73,16 @@ function ElectrostaticsChargingEmbedInner() {
                     method === m ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
                   }`}>{m}</button>
               ))}
+              {method !== 'friction' && (
+                <div className="flex gap-2 pt-1">
+                  {([1, -1] as const).map(sgn => (
+                    <button key={sgn} onClick={() => setRodSign(sgn)}
+                      className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium transition ${
+                        rodSign === sgn ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                      }`}>Rod: {sgn > 0 ? '+' : '−'}</button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           {topic === 'electroscope' && <>

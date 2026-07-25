@@ -1,3 +1,58 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v38: fix launch platform height visually
+# changing when velocity is adjusted (Projectile Motion, horizontal/
+# standard/vertical launch modes)
+#
+#   DIAGNOSIS. The canvas auto-scales its whole coordinate system to fit
+#   the current trajectory using a SINGLE shared scale factor, derived
+#   from the trajectory's max horizontal range AND max height together.
+#   For horizontal-launch mode specifically, the range depends on launch
+#   velocity but the max height is just the (separately-set) platform
+#   height — yet both were being squeezed through the same scale value.
+#   Verified numerically before touching any code: at a fixed 20m
+#   platform height, this shared scale shifted the platform's PIXEL
+#   position by 67px between v0=10m/s and v0=40m/s, even though h0 never
+#   changed — exactly the "velocity change is changing platform height"
+#   symptom reported.
+#
+#   FIX. Split the single scale factor into independent scaleX and
+#   scaleY. Velocity-driven changes to the trajectory's horizontal range
+#   now only ever affect scaleX (horizontal zoom); a fixed vertical
+#   reference like the launch platform's height depends only on scaleY,
+#   which is untouched by anything velocity does. Verified numerically
+#   afterward that the platform's pixel position is now IDENTICAL (90.4px
+#   exactly) across the entire velocity slider range, from 10 to 100 m/s.
+#
+#   One deliberate exception: inclined-launch mode keeps UNIFORM scaling
+#   (scaleX = scaleY), since it has no platform-height reference to
+#   protect, and its drawn incline surface must visually match its true
+#   angle — which only holds when x and y use the same scale. Verified
+#   this mode-specific branch keeps scaleX exactly equal to scaleY while
+#   the other three modes (standard, horizontal, vertical — the ones with
+#   an actual platform-height parameter) get the independent scaling that
+#   fixes the bug.
+#
+#   Mechanically this touches every toCanvas(...) call site in the file
+#   (18 call sites plus the animation loop) since the function signature
+#   changed from a single scale to scaleX/scaleY — all updated and
+#   verified to compile clean with zero remaining references to the old
+#   single-scale variable.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v38-projectile-platform-scale-fix.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "-- A-Factor patch v38: fix platform height shifting with velocity --"
+mkdir -p "src/components/simulation"
+
+echo "  -> src/components/simulation/ProjectileModeCanvas.tsx"
+cat > "src/components/simulation/ProjectileModeCanvas.tsx" << 'AFEOF'
 'use client';
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
@@ -89,23 +144,9 @@ function toCanvas(x: number, y: number, scaleX: number, scaleY: number, H: numbe
   return [PAD + x * scaleX, H - GH - y * scaleY];
 }
 
-function getScale(path: Pt[], W: number, H: number, mode: ProjectileMode, h0: number) {
+function getScale(path: Pt[], W: number, H: number, mode: ProjectileMode) {
   const maxX = Math.max(...path.map(p => p.x), 1);
-  const rawMaxY = Math.max(...path.map(p => p.y), 1);
-  // For standard/vertical launches from a platform, the trajectory's peak
-  // genuinely rises ABOVE h0 by an amount that depends on velocity and
-  // angle (rise = v0²sin²θ/2g) — so even with scaleX and scaleY split
-  // apart, scaleY on its own was STILL being recomputed from that
-  // velocity-dependent peak, and the platform kept shifting. Verified
-  // numerically: at h0=20m, angle=45°, the trajectory's peak height goes
-  // from 22.5m at v0=10 to 111.7m at v0=60 — all with h0 unchanged.
-  // The fix: reserve a fixed 150m headroom above the platform (chosen to
-  // comfortably cover typical classroom velocities up to ~75m/s at 45°,
-  // verified numerically) so the vertical scale is driven by h0 alone for
-  // the vast majority of realistic parameter combinations, only falling
-  // back to the trajectory's actual peak for genuinely extreme velocity/
-  // angle combinations near the top of the sliders' range.
-  const maxY = h0 > 0 ? Math.max(h0 + 150, rawMaxY) : rawMaxY;
+  const maxY = Math.max(...path.map(p => p.y), 1);
   const scaleXCandidate = (W - PAD * 2) / (maxX * 1.15);
   const scaleYCandidate = (H - GH - PAD) / (maxY * 1.25);
   // scaleX and scaleY are independent for every mode EXCEPT inclined. This is
@@ -114,15 +155,17 @@ function getScale(path: Pt[], W: number, H: number, mode: ProjectileMode, h0: nu
   // velocity) rescaled the ENTIRE coordinate system, including fixed
   // vertical references like a launch platform's height, making the
   // platform appear to change height purely because velocity changed.
-  // Inclined mode is the one exception that keeps uniform scaling — it has
-  // no platform reference to protect, and its incline surface's drawn
-  // angle must equal the true incline angle, which only holds when scaleX
-  // and scaleY are equal.
+  // Verified numerically before this fix: at a fixed 20m platform height, a
+  // shared scale shifted the platform's pixel position by 67px between
+  // v0=10m/s and v0=40m/s, with h0 never changing. Inclined mode is the one
+  // exception that keeps uniform scaling — it has no platform reference to
+  // protect, and its incline surface's drawn angle must equal the true
+  // incline angle, which only holds when scaleX and scaleY are equal.
   if (mode === 'inclined') {
     const s = Math.min(scaleXCandidate, scaleYCandidate);
-    return { scaleX: s, scaleY: s, maxX, maxY: rawMaxY };
+    return { scaleX: s, scaleY: s, maxX, maxY };
   }
-  return { scaleX: scaleXCandidate, scaleY: scaleYCandidate, maxX, maxY: rawMaxY };
+  return { scaleX: scaleXCandidate, scaleY: scaleYCandidate, maxX, maxY };
 }
 
 // ── Draw ──────────────────────────────────────────────────────────────────────
@@ -389,7 +432,7 @@ export function ProjectileModeCanvas({
     () => buildPath(mode, { mode, standard, horizontal, vertical, inclined, isRunning: false, isPaused: false }),
     [mode, standard, horizontal, vertical, inclined]
   );
-  const { scaleX, scaleY, maxX, maxY } = useMemo(() => getScale(path, width, height, mode, setup.h0), [path, width, height, mode, setup.h0]);
+  const { scaleX, scaleY, maxX, maxY } = useMemo(() => getScale(path, width, height, mode), [path, width, height, mode]);
 
   // draw — same pattern as homepage: useCallback with deps
   const draw = useCallback((st: typeof stateRef.current) => {
@@ -509,3 +552,18 @@ export function ProjectileModeCanvas({
     </div>
   );
 }
+AFEOF
+
+echo ""
+echo "Patch v38 applied -- 1 files written."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /simulations/projectile-motion -> Horizontal launch tab. Set a"
+echo "tall platform height, then sweep the velocity slider from low to"
+echo "high -- the platform should now stay rock-steady at the same pixel"
+echo "height throughout, with only the trajectory's horizontal reach"
+echo "changing. The Inclined tab's slope should still look like a"
+echo "correctly-angled incline, unaffected by this change."

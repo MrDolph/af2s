@@ -5,6 +5,7 @@ export type ChargingMethod = 'friction' | 'conduction' | 'induction';
 
 interface Props {
   method: ChargingMethod;
+  rodSign: 1 | -1; // conduction/induction only — friction's outcome is fixed by material choice
   isRunning: boolean; isPaused: boolean;
   onPhaseChange?: (phase: string) => void;
   width?: number; height?: number;
@@ -26,28 +27,43 @@ const DURATIONS: Record<ChargingMethod, number[]> = {
   conduction: [1.2, 1.4, 1.2],               // approach, touch/transfer, separate
   induction: [1.0, 1.4, 1.2, 0.8, 1.2],      // approach, polarize, ground, disconnect, remove
 };
-const PHASE_LABELS: Record<ChargingMethod, string[]> = {
-  friction: ['Rod and cloth, both neutral', 'Rubbing transfers electrons rod → cloth', 'Rod is left positive, cloth negative'],
-  conduction: ['Charged rod approaches a neutral sphere', 'Contact — electrons spread onto the sphere', 'Sphere keeps the SAME sign as the rod, rod\u2019s charge is reduced'],
-  induction: [
-    'Charged rod approaches — sphere still neutral overall',
-    'Polarisation: charges separate, but total charge is still zero',
-    'Earthing: the repelled charge escapes to ground',
-    'Ground wire disconnected — sphere now has a net charge',
-    'Rod removed — induced charge is OPPOSITE to the rod, spread evenly',
-  ],
-};
+const FRICTION_LABELS = ['Rod and cloth, both neutral', 'Rubbing transfers electrons rod → cloth', 'Rod is left positive, cloth negative'];
 
-export function ChargingMethodsCanvas({ method, isRunning, isPaused, onPhaseChange, width = 660, height = 300 }: Props) {
+function getPhaseLabels(method: ChargingMethod, rodSign: 1 | -1): string[] {
+  if (method === 'friction') return FRICTION_LABELS;
+  if (method === 'conduction') {
+    return rodSign < 0
+      ? ['Negatively charged rod approaches a neutral sphere', 'Contact — electrons flow from the rod onto the sphere', 'Sphere keeps the SAME sign as the rod (−), rod\u2019s charge is reduced']
+      : ['Positively charged rod approaches a neutral sphere', 'Contact — electrons flow from the sphere onto the rod', 'Sphere keeps the SAME sign as the rod (+), rod\u2019s charge is reduced'];
+  }
+  // induction
+  return rodSign < 0
+    ? [
+        'Negatively charged rod approaches — sphere still neutral overall',
+        'Electrons are repelled to the far side — only electrons move, the total charge is still zero',
+        'Earthing: the repelled electrons escape to ground',
+        'Ground wire disconnected — sphere now has a net charge',
+        'Rod removed — sphere is left short of electrons: net POSITIVE, opposite the rod',
+      ]
+    : [
+        'Positively charged rod approaches — sphere still neutral overall',
+        'Electrons are attracted to the near side — only electrons move, the total charge is still zero',
+        'Earthing: more electrons are drawn in from the ground',
+        'Ground wire disconnected — sphere now has a net charge',
+        'Rod removed — sphere is left with extra electrons: net NEGATIVE, opposite the rod',
+      ];
+}
+
+export function ChargingMethodsCanvas({ method, rodSign, isRunning, isPaused, onPhaseChange, width = 660, height = 300 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const lastFrameRef = useRef<number | null>(null);
   const t = useRef(0);
   const lastPhaseIdx = useRef(-1);
-  const sim = useRef({ method, isRunning, isPaused, onPhaseChange });
-  sim.current = { method, isRunning, isPaused, onPhaseChange };
+  const sim = useRef({ method, rodSign, isRunning, isPaused, onPhaseChange });
+  sim.current = { method, rodSign, isRunning, isPaused, onPhaseChange };
 
-  useEffect(() => { t.current = 0; lastFrameRef.current = null; lastPhaseIdx.current = -1; }, [method]);
+  useEffect(() => { t.current = 0; lastFrameRef.current = null; lastPhaseIdx.current = -1; }, [method, rodSign]);
 
   const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
@@ -75,7 +91,7 @@ export function ChargingMethodsCanvas({ method, isRunning, isPaused, onPhaseChan
       acc += durations[i];
     }
     if (!s.isRunning) { phaseIdx = 0; phaseT = 0; }
-    if (phaseIdx !== lastPhaseIdx.current) { lastPhaseIdx.current = phaseIdx; s.onPhaseChange?.(PHASE_LABELS[s.method][phaseIdx]); }
+    if (phaseIdx !== lastPhaseIdx.current) { lastPhaseIdx.current = phaseIdx; s.onPhaseChange?.(getPhaseLabels(s.method, s.rodSign)[phaseIdx]); }
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, H);
@@ -156,6 +172,7 @@ export function ChargingMethodsCanvas({ method, isRunning, isPaused, onPhaseChan
     } else if (s.method === 'conduction') {
       const sphereR = 34;
       const sphereX = W / 2 + 90;
+      const negative = s.rodSign < 0;
       // Rod tip approaches until it is in EXACT physical contact with the
       // sphere's surface (zero gap) — conduction requires actual contact,
       // so the rod reaches the sphere's surface exactly at the end of the
@@ -165,25 +182,40 @@ export function ChargingMethodsCanvas({ method, isRunning, isPaused, onPhaseChan
       const separate = phaseIdx === 2 ? phaseT : 0;
       const rodTipX = approach < 1 ? touchX - 100 * (1 - approach) : touchX + separate * 90;
 
+      // The rod's OWN static charge markers represent its net charge and
+      // never move — only the transfer animation below (always electrons)
+      // does. A negative rod shows its excess electrons directly; a
+      // positive rod is missing electrons, so a "+" label represents that
+      // deficiency rather than drawing fictitious moving positive charges.
+      const rodTransferred = phaseIdx >= 1 ? Math.min(1, phaseIdx === 1 ? phaseT : 1) : 0;
       ctx.fillStyle = '#93c5fd'; ctx.fillRect(rodTipX - 90, midY - 8, 90, 16);
       ctx.strokeStyle = '#2563eb'; ctx.strokeRect(rodTipX - 90, midY - 8, 90, 16);
       ctx.fillStyle = '#334155'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('negatively charged rod', rodTipX - 45, midY - 20);
-      for (let i = 0; i < 5; i++) drawCharge(ctx, rodTipX - 12 - i * 16, midY, -1, 5);
+      ctx.fillText(negative ? 'negatively charged rod' : 'positively charged rod', rodTipX - 45, midY - 20);
+      if (negative) {
+        const nRodElectrons = Math.round(5 - rodTransferred * 2); // loses some of its excess electrons
+        for (let i = 0; i < nRodElectrons; i++) drawCharge(ctx, rodTipX - 12 - i * 16, midY, -1, 5);
+      } else {
+        ctx.fillStyle = '#dc2626'; ctx.font = 'bold 12px system-ui';
+        ctx.fillText('+'.repeat(Math.max(1, 3 - Math.round(rodTransferred * 2))), rodTipX - 45, midY + 4);
+      }
 
       ctx.fillStyle = '#e2e8f0';
       ctx.beginPath(); ctx.arc(sphereX, midY, sphereR, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = '#94a3b8'; ctx.stroke();
       ctx.fillText('neutral sphere', sphereX, midY - 46);
 
-      // Electrons visibly cross the contact point (rod tip -> sphere
-      // surface) during the touch phase, then spread out over the
-      // sphere, rather than simply appearing on the sphere with no
-      // visible transfer.
+      // Electrons visibly cross the contact point during the touch phase
+      // — ALWAYS electrons, with the direction set by which object is
+      // attracting them: onto the sphere from a negative rod (repelled by
+      // the rod's excess electrons), or off the sphere onto a positive
+      // rod (drawn toward the rod's deficiency). Protons never move.
       if (phaseIdx === 1) {
         for (let i = 0; i < 4; i++) {
           const localPhase = (phaseT * 3 + i * 0.5) % 1;
-          const ex = rodTipX + (sphereX - sphereR - rodTipX) * Math.min(1, localPhase * 1.6);
+          const travel = Math.min(1, localPhase * 1.6);
+          const f = negative ? travel : 1 - travel; // reversed direction for a positive rod
+          const ex = rodTipX + (sphereX - sphereR - rodTipX) * f;
           drawCharge(ctx, ex, midY - 10 + i * 6, -1, 4.5);
         }
       }
@@ -191,34 +223,47 @@ export function ChargingMethodsCanvas({ method, isRunning, isPaused, onPhaseChan
         const n = Math.round((phaseIdx === 1 ? phaseT : 1) * 4);
         for (let i = 0; i < n; i++) {
           const a = (i / 4) * Math.PI * 2;
-          drawCharge(ctx, sphereX + Math.cos(a) * 20, midY + Math.sin(a) * 20, -1, 5);
+          drawCharge(ctx, sphereX + Math.cos(a) * 20, midY + Math.sin(a) * 20, s.rodSign, 5);
         }
       }
       if (phaseIdx === 2) {
         ctx.fillStyle = '#1e293b'; ctx.font = 'bold 10px system-ui';
-        ctx.fillText('rod: reduced (–)   sphere: (–), same sign as rod', W / 2, H - 16);
+        ctx.fillText(
+          negative ? 'rod: reduced (–)   sphere: (–), same sign as rod' : 'rod: reduced (+)   sphere: (+), same sign as rod',
+          W / 2, H - 16,
+        );
       }
     } else {
       // induction: approach(0) polarise(1) ground(2) disconnect(3) remove(4)
+      // The rod stops VERY close to the sphere but never touches it —
+      // induction relies on the field reaching across a small gap, unlike
+      // friction/conduction which need actual contact.
+      const negative = s.rodSign < 0;
+      const sphereR = 34;
+      const minGap = 12;
       const approach = phaseIdx === 0 ? phaseT : 1;
       const remove = phaseIdx === 4 ? phaseT : 0;
-      const gap = 130 * (1 - approach) + remove * 160;
+      const gap = minGap + 150 * (1 - approach) + remove * 170;
       const sphereX = W / 2 + 60;
-      const rodTipX = sphereX - 70 - gap;
+      const rodTipX = sphereX - sphereR - gap;
 
       ctx.fillStyle = '#93c5fd'; ctx.fillRect(rodTipX - 90, midY - 100, 16, 100);
       ctx.strokeStyle = '#2563eb'; ctx.strokeRect(rodTipX - 90, midY - 100, 16, 100);
       ctx.fillStyle = '#334155'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('negative rod', rodTipX - 82, midY - 110);
-      for (let i = 0; i < 4; i++) drawCharge(ctx, rodTipX - 82, midY - 90 + i * 25, -1, 5);
+      ctx.fillText(negative ? 'negative rod' : 'positive rod', rodTipX - 82, midY - 110);
+      if (negative) {
+        for (let i = 0; i < 4; i++) drawCharge(ctx, rodTipX - 82, midY - 90 + i * 25, -1, 5);
+      } else {
+        ctx.fillStyle = '#dc2626'; ctx.font = 'bold 14px system-ui';
+        ctx.fillText('+ + +', rodTipX - 82, midY - 40);
+      }
 
       ctx.fillStyle = '#e2e8f0';
-      ctx.beginPath(); ctx.arc(sphereX, midY, 34, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sphereX, midY, sphereR, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = '#94a3b8'; ctx.stroke();
 
       const polarised = phaseIdx >= 1;
       const grounded = phaseIdx === 2 || phaseIdx === 3;
-      const groundProgress = phaseIdx === 2 ? phaseT : phaseIdx > 2 ? 1 : 0;
       const finalCharge = phaseIdx === 4;
 
       if (grounded) {
@@ -228,29 +273,53 @@ export function ChargingMethodsCanvas({ method, isRunning, isPaused, onPhaseChan
         ctx.fillStyle = '#64748b'; ctx.font = '9px system-ui'; ctx.fillText('ground', sphereX + 80, midY + 84);
       }
 
+      // ONLY electrons move — this is drawn as a fixed set of electron
+      // markers that REDISTRIBUTE by animating their position (never
+      // appearing as new "positive charge" objects). The near side
+      // (toward the rod) simply ends up with fewer of them or more,
+      // depending on whether they're attracted or repelled; the resulting
+      // net-positive region is shown as a text label, not a moving
+      // particle, since no positive charge actually travelled there.
+      const baseCount = 6;
+      const nearAngle = Math.PI;   // toward the rod (left)
+      const farAngle = 0;          // away from the rod (right)
+      const clusterAngle = negative ? farAngle : nearAngle; // repelled away / attracted toward
+      const depletedSideLabel = negative ? { x: sphereX - 16, y: midY } : { x: sphereX + 16, y: midY };
+
+      // How many electrons have left (negative-rod case) or arrived
+      // (positive-rod case) via the ground wire so far.
+      const grndCount = grounded || finalCharge ? Math.round(2 * (phaseIdx === 2 ? phaseT : 1)) : 0;
+      const visibleCount = negative ? baseCount - grndCount : baseCount + grndCount;
+
       if (polarised) {
-        // near side (left, toward rod) positive; far side negative, fading as it's earthed away
-        for (let i = 0; i < 3; i++) drawCharge(ctx, sphereX - 16, midY - 16 + i * 16, 1, 5);
-        const farAlpha = grounded ? Math.max(0, 1 - groundProgress) : 1;
-        if (farAlpha > 0.05 && !finalCharge) {
-          ctx.save(); ctx.globalAlpha = farAlpha;
-          for (let i = 0; i < 3; i++) drawCharge(ctx, sphereX + 16, midY - 16 + i * 16, -1, 5);
-          ctx.restore();
+        for (let i = 0; i < visibleCount; i++) {
+          const baseA = (i / baseCount) * Math.PI * 2;
+          // Ease from the evenly-spread neutral angle toward a tight
+          // cluster around clusterAngle as polarisation/settling proceeds.
+          const clusterA = clusterAngle + ((i - (baseCount - 1) / 2) / baseCount) * (Math.PI * 0.6);
+          const settle = finalCharge ? 1 - remove : 1; // spread back out evenly once the rod is removed
+          const a = baseA + (clusterA - baseA) * settle;
+          const ex = sphereX + Math.cos(a) * 20, ey = midY + Math.sin(a) * 20;
+          drawCharge(ctx, ex, ey, -1, 5);
+        }
+        if (!finalCharge) {
+          ctx.fillStyle = '#dc2626'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+          ctx.fillText('+', depletedSideLabel.x, depletedSideLabel.y - 4);
         }
       }
       if (finalCharge) {
-        // Net positive, spread evenly
-        for (let i = 0; i < 4; i++) {
-          const a = (i / 4) * Math.PI * 2;
-          drawCharge(ctx, sphereX + Math.cos(a) * 20, midY + Math.sin(a) * 20, 1, 5);
-        }
-        ctx.fillStyle = '#1e293b'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-        ctx.fillText('Sphere left with a net POSITIVE charge — opposite to the rod', W / 2, H - 16);
+        ctx.fillStyle = negative ? '#dc2626' : '#2563eb'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText(negative ? 'net +' : 'net −', sphereX, midY - sphereR - 10);
+        ctx.fillStyle = '#1e293b'; ctx.font = 'bold 10px system-ui';
+        ctx.fillText(
+          negative ? 'Sphere is short 2 electrons: net POSITIVE, opposite the rod' : 'Sphere has 2 extra electrons: net NEGATIVE, opposite the rod',
+          W / 2, H - 16,
+        );
       }
     }
 
     ctx.fillStyle = '#334155'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-    ctx.fillText(PHASE_LABELS[s.method][phaseIdx] ?? '', W / 2, 24);
+    ctx.fillText(getPhaseLabels(s.method, s.rodSign)[phaseIdx] ?? '', W / 2, 24);
 
     rafRef.current = requestAnimationFrame(draw);
   }, []);
