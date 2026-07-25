@@ -89,8 +89,11 @@ export function ElectroscopeCanvas({ mode, rodSign, electroscopeSign, isRunning,
     }
     s.onTick?.(divergenceDeg);
 
-    // Charging/test rod
-    const rodTipX = capX - 20 - (1 - rodApproach) * 160;
+    // Charging/test rod — reaches EXACT contact with the cap's surface
+    // (the cap is drawn as an ellipse of x-radius 18, so contact is at
+    // capX-18) rather than stopping visibly short of it.
+    const capRadius = 18;
+    const rodTipX = capX - capRadius - (1 - rodApproach) * 160;
     if (rodApproach > 0.01) {
       ctx.fillStyle = '#93c5fd'; ctx.fillRect(rodTipX - 90, capY - 8, 90, 16);
       ctx.strokeStyle = '#2563eb'; ctx.strokeRect(rodTipX - 90, capY - 8, 90, 16);
@@ -105,7 +108,7 @@ export function ElectroscopeCanvas({ mode, rodSign, electroscopeSign, isRunning,
 
     // Cap and rod down to the leaves
     ctx.fillStyle = '#94a3b8';
-    ctx.beginPath(); ctx.ellipse(capX, capY, 18, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(capX, capY, capRadius, 8, 0, 0, Math.PI * 2); ctx.fill();
     ctx.fillRect(capX - 3, capY, 6, leafTopY - capY);
 
     // Leaves — hinge at the bottom of the rod, swinging apart by divergenceDeg
@@ -116,6 +119,33 @@ export function ElectroscopeCanvas({ mode, rodSign, electroscopeSign, isRunning,
       const dx = Math.sin(rad) * side, dy = Math.cos(rad);
       ctx.beginPath(); ctx.moveTo(capX, hingeY); ctx.lineTo(capX + dx * leafLen, hingeY + dy * leafLen); ctx.stroke();
     });
+
+    // Electron flow — while charge is actively transferring by contact,
+    // particles travel visibly from the cap, down the connecting rod,
+    // and out along each leaf, instead of charge simply appearing
+    // simultaneously at the cap AND the leaves with no transit shown.
+    if (s.mode === 'charging' && running && t.current >= 0.9 && t.current < 2.4) {
+      const flowT = t.current - 0.9;
+      const segALen = hingeY - capY;
+      const nParticles = 6;
+      for (let i = 0; i < nParticles; i++) {
+        const side = i % 2 === 0 ? -1 : 1;
+        const dx = Math.sin(rad) * side, dy = Math.cos(rad);
+        const segBLen = leafLen;
+        const totalLen = segALen + segBLen;
+        const speed = 130; // px/s along the path
+        const phase = (((flowT * speed) + i * (totalLen / nParticles)) % totalLen) / totalLen;
+        let px: number, py: number;
+        if (phase * totalLen < segALen) {
+          const f = (phase * totalLen) / segALen;
+          px = capX; py = capY + f * segALen;
+        } else {
+          const f = (phase * totalLen - segALen) / segBLen;
+          px = capX + dx * leafLen * f; py = hingeY + dy * leafLen * f;
+        }
+        drawCharge(ctx, px, py, sign, 4);
+      }
+    }
 
     // Charge distributed over the cap/rod/leaves once present
     if (chargeVisible > 0.05) {

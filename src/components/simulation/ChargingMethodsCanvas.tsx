@@ -83,43 +83,87 @@ export function ChargingMethodsCanvas({ method, isRunning, isPaused, onPhaseChan
     const midY = H / 2;
 
     if (s.method === 'friction') {
-      // approach(0) -> rub(1) -> separate(2)
+      // approach(0) -> rub(1) -> separate(2). The rod stays fixed; the
+      // cloth approaches until it is in EXACT physical contact (zero gap
+      // between the rod's right edge and the cloth's left edge) before
+      // any rubbing or charge transfer happens — rubbing requires
+      // contact, so the cloth reaches contact at the end of the approach
+      // phase and stays there, sliding vertically along the seam, rather
+      // than hovering apart from the rod the whole time.
+      const rodHalfW = 8, clothHalfW = 26;
+      const rodX = W / 2 - 70;
+      const clothTouchX = rodX + rodHalfW + clothHalfW; // exact contact position, gap = 0
+
       const approach = phaseIdx === 0 ? phaseT : 1;
-      const rubProgress = phaseIdx === 1 ? phaseT : phaseIdx > 1 ? 1 : 0;
       const separate = phaseIdx === 2 ? phaseT : 0;
-      const gap = 120 * (1 - approach) - separate * 100;
-      const rodX = W / 2 - 60 - gap / 2, clothX = W / 2 + 60 + gap / 2;
-      const wobble = phaseIdx === 1 ? Math.sin(t.current * 18) * 10 : 0;
+      // Before contact, cloth approaches from further right. Once
+      // approach completes, clothX snaps exactly onto the touching
+      // position and stays there through the whole rub phase.
+      const clothX = approach < 1
+        ? clothTouchX + 130 * (1 - approach)
+        : clothTouchX + separate * 100;
 
-      // Rod (glass)
-      ctx.fillStyle = '#c7d2fe'; ctx.fillRect(rodX - 8 + wobble, midY - 60, 16, 120);
-      ctx.strokeStyle = '#6366f1'; ctx.strokeRect(rodX - 8 + wobble, midY - 60, 16, 120);
+      // Rubbing = sliding along the seam while still touching, not
+      // wobbling apart from each other. Clamped so the cloth's stroke
+      // never carries it past the rod's own top/bottom edge.
+      const rubReach = 34;
+      const rubY = phaseIdx === 1 ? Math.sin(t.current * 7) * rubReach : 0;
+
+      // Rod (glass) — fixed
+      ctx.fillStyle = '#c7d2fe'; ctx.fillRect(rodX - rodHalfW, midY - 60, rodHalfW * 2, 120);
+      ctx.strokeStyle = '#6366f1'; ctx.strokeRect(rodX - rodHalfW, midY - 60, rodHalfW * 2, 120);
       ctx.fillStyle = '#334155'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('glass rod', rodX + wobble, midY - 70);
+      ctx.fillText('glass rod', rodX, midY - 70);
 
-      // Cloth (silk)
-      ctx.fillStyle = '#fecaca'; ctx.fillRect(clothX - 26 - wobble, midY - 50, 52, 100);
-      ctx.strokeStyle = '#ef4444'; ctx.strokeRect(clothX - 26 - wobble, midY - 50, 52, 100);
-      ctx.fillText('silk cloth', clothX - wobble, midY - 60);
+      // Cloth (silk) — approaches, then slides vertically while touching
+      const clothY = midY + rubY;
+      ctx.fillStyle = '#fecaca'; ctx.fillRect(clothX - clothHalfW, clothY - 50, clothHalfW * 2, 100);
+      ctx.strokeStyle = '#ef4444'; ctx.strokeRect(clothX - clothHalfW, clothY - 50, clothHalfW * 2, 100);
+      ctx.fillText('silk cloth', clothX, clothY - 60);
 
-      // Electrons transferring during rub phase
+      // A short motion streak at the contact seam while actively rubbing,
+      // so the sliding-while-touching motion reads clearly rather than
+      // looking like the cloth is merely twitching in place.
       if (phaseIdx === 1) {
-        for (let i = 0; i < 5; i++) {
-          const ex = rodX + wobble + (clothX - wobble - (rodX + wobble)) * Math.min(1, rubProgress * 1.4 - i * 0.08);
-          if (ex > rodX + wobble && ex < clothX - wobble) drawCharge(ctx, ex, midY - 30 + i * 15, -1, 5);
+        ctx.save();
+        ctx.strokeStyle = 'rgba(239,68,68,0.35)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(rodX + rodHalfW, midY - Math.sign(Math.cos(t.current * 7)) * rubReach * 0.6);
+        ctx.lineTo(rodX + rodHalfW, clothY);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Electrons transfer directly across the contact seam (a few
+      // pixels, not across an open gap) — spawning near the rod's
+      // surface and settling just inside the cloth's surface, at the
+      // CURRENT rubbing height so the transfer visibly tracks the
+      // sliding contact point.
+      const rubProgress = phaseIdx === 1 ? phaseT : phaseIdx > 1 ? 1 : 0;
+      if (phaseIdx === 1) {
+        for (let i = 0; i < 4; i++) {
+          const localPhase = (rubProgress * 3 + i * 0.6) % 1;
+          const ex = (rodX + rodHalfW) + (clothX - clothHalfW - (rodX + rodHalfW)) * localPhase;
+          const ey = clothY - 25 + i * 17;
+          drawCharge(ctx, ex, ey, -1, 4.5);
         }
       }
       const netCharge = phaseIdx >= 1 ? Math.min(1, rubProgress) : 0;
       if (netCharge > 0.05 || phaseIdx === 2) {
-        drawCharge(ctx, rodX + wobble, midY + 50, 1, 6);
-        drawCharge(ctx, clothX - wobble, midY + 50, -1, 6);
+        drawCharge(ctx, rodX, midY + 45, 1, 6);
+        drawCharge(ctx, clothX, clothY + 45, -1, 6);
       }
     } else if (s.method === 'conduction') {
+      const sphereR = 34;
+      const sphereX = W / 2 + 90;
+      // Rod tip approaches until it is in EXACT physical contact with the
+      // sphere's surface (zero gap) — conduction requires actual contact,
+      // so the rod reaches the sphere's surface exactly at the end of the
+      // approach phase rather than stopping visibly short of it.
+      const touchX = sphereX - sphereR;
       const approach = phaseIdx === 0 ? phaseT : 1;
       const separate = phaseIdx === 2 ? phaseT : 0;
-      const gap = 100 * (1 - approach) + separate * 90;
-      const sphereX = W / 2 + 90;
-      const rodTipX = sphereX - 60 - gap;
+      const rodTipX = approach < 1 ? touchX - 100 * (1 - approach) : touchX + separate * 90;
 
       ctx.fillStyle = '#93c5fd'; ctx.fillRect(rodTipX - 90, midY - 8, 90, 16);
       ctx.strokeStyle = '#2563eb'; ctx.strokeRect(rodTipX - 90, midY - 8, 90, 16);
@@ -128,10 +172,21 @@ export function ChargingMethodsCanvas({ method, isRunning, isPaused, onPhaseChan
       for (let i = 0; i < 5; i++) drawCharge(ctx, rodTipX - 12 - i * 16, midY, -1, 5);
 
       ctx.fillStyle = '#e2e8f0';
-      ctx.beginPath(); ctx.arc(sphereX, midY, 34, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sphereX, midY, sphereR, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = '#94a3b8'; ctx.stroke();
       ctx.fillText('neutral sphere', sphereX, midY - 46);
 
+      // Electrons visibly cross the contact point (rod tip -> sphere
+      // surface) during the touch phase, then spread out over the
+      // sphere, rather than simply appearing on the sphere with no
+      // visible transfer.
+      if (phaseIdx === 1) {
+        for (let i = 0; i < 4; i++) {
+          const localPhase = (phaseT * 3 + i * 0.5) % 1;
+          const ex = rodTipX + (sphereX - sphereR - rodTipX) * Math.min(1, localPhase * 1.6);
+          drawCharge(ctx, ex, midY - 10 + i * 6, -1, 4.5);
+        }
+      }
       if (phaseIdx >= 1) {
         const n = Math.round((phaseIdx === 1 ? phaseT : 1) * 4);
         for (let i = 0; i < n; i++) {

@@ -51,6 +51,11 @@ export function DoublePendulumCanvas({
   const chartHistoryRef = useRef<Array<{ t: number; e: number }>>([]);
   const dprRef = useRef(1);
 
+  // EMA-smoothed energy values for the bar (alpha = 0.25)
+  const smoothKeRef = useRef(0);
+  const smoothPeRef = useRef(0);
+  const smoothTotalRef = useRef(0);
+
   const stateRef = useRef<PendulumState>({
     theta1: (theta1Deg * Math.PI) / 180,
     omega1: omega1Init,
@@ -80,15 +85,17 @@ export function DoublePendulumCanvas({
       chartHistoryRef.current = [];
       analysisRef.current = { qFactor: 0, bandwidth: 0, decayRate: 0, valid: false };
       lastAnalysisRef.current = 0;
+      smoothKeRef.current = 0;
+      smoothPeRef.current = 0;
+      smoothTotalRef.current = 0;
       initRef.current = { theta1Deg, omega1Init, theta2Deg, omega2Init };
     }
   }, [theta1Deg, omega1Init, theta2Deg, omega2Init]);
 
-  // Resize canvas buffer for devicePixelRatio
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 3); // cap at 3x to save GPU on mobile
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
     dprRef.current = dpr;
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
@@ -114,7 +121,6 @@ export function DoublePendulumCanvas({
     }
 
     if (dt > 0) {
-      // Cap substeps for mobile performance (max 12 to protect low-end devices)
       const subSteps = Math.max(4, Math.min(12, Math.ceil(dt * 200)));
       const subDt = dt / subSteps;
       for (let i = 0; i < subSteps; i++) {
@@ -130,6 +136,12 @@ export function DoublePendulumCanvas({
       const ke = kineticEnergy(stateRef.current, s.params);
       const pe = potentialEnergy(stateRef.current, s.params);
       const total = ke + pe;
+
+      // Smooth energy bar values
+      const alpha = 0.25;
+      smoothKeRef.current += alpha * (ke - smoothKeRef.current);
+      smoothPeRef.current += alpha * (pe - smoothPeRef.current);
+      smoothTotalRef.current += alpha * (total - smoothTotalRef.current);
 
       energyHistoryRef.current.push({
         t: simTimeRef.current,
@@ -176,7 +188,6 @@ export function DoublePendulumCanvas({
     const sx2 = pivotX + pos.x2 * scale;
     const sy2 = pivotY - pos.y2 * scale;
 
-    // Grid circles
     ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
     ctx.lineWidth = 1;
     for (let r = 0.5; r <= totalLen; r += 0.5) {
@@ -185,7 +196,6 @@ export function DoublePendulumCanvas({
       ctx.stroke();
     }
 
-    // Trail
     if (s.showTrail && trailRef.current.length > 1) {
       for (let i = 1; i < trailRef.current.length; i++) {
         const p0 = trailRef.current[i - 1];
@@ -200,19 +210,16 @@ export function DoublePendulumCanvas({
       }
     }
 
-    // Rods
     ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(pivotX, pivotY); ctx.lineTo(sx1, sy1); ctx.stroke();
     ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(sx1, sy1); ctx.lineTo(sx2, sy2); ctx.stroke();
 
-    // Pivot
     ctx.fillStyle = '#f8fafc';
     ctx.beginPath(); ctx.arc(pivotX, pivotY, 5, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(pivotX, pivotY, 5, 0, Math.PI * 2); ctx.stroke();
 
-    // Bob 1
     const r1 = 8 + Math.min(s.params.m1, 3) * 4;
     ctx.fillStyle = '#6366f1';
     ctx.beginPath(); ctx.arc(sx1, sy1, r1, 0, Math.PI * 2); ctx.fill();
@@ -221,7 +228,6 @@ export function DoublePendulumCanvas({
     ctx.fillStyle = 'white'; ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(`${s.params.m1.toFixed(1)}kg`, sx1, sy1 + 3);
 
-    // Bob 2
     const r2 = 8 + Math.min(s.params.m2, 3) * 4;
     ctx.fillStyle = '#f59e0b';
     ctx.beginPath(); ctx.arc(sx2, sy2, r2, 0, Math.PI * 2); ctx.fill();
@@ -230,7 +236,6 @@ export function DoublePendulumCanvas({
     ctx.fillStyle = 'white'; ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(`${s.params.m2.toFixed(1)}kg`, sx2, sy2 + 3);
 
-    // Angle readouts
     ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
     const t1deg = (stateRef.current.theta1 * 180 / Math.PI).toFixed(1);
     const t2deg = (stateRef.current.theta2 * 180 / Math.PI).toFixed(1);
@@ -238,33 +243,76 @@ export function DoublePendulumCanvas({
     ctx.fillText(`θ₂ = ${t2deg}°`, 12, H - 22);
     ctx.fillText(`ω₁ = ${stateRef.current.omega1.toFixed(2)} rad/s`, 12, H - 8);
 
-    // Energy bar
+    // ── Energy bar (smoothed + clamped) ────────────────────────────────────
     if (s.showEnergy) {
-      const ke = kineticEnergy(stateRef.current, s.params);
-      const pe = potentialEnergy(stateRef.current, s.params);
-      const total = ke + pe;
-      const barW = 120; const barH = 8;
-      const barX = W - barW - 16; const barY = H - 40;
-      const keFrac = ke / Math.max(total, 0.001);
-      const peFrac = pe / Math.max(total, 0.001);
+      const ke = smoothKeRef.current;
+      const pe = smoothPeRef.current;
+      const total = smoothTotalRef.current;
+      const safeTotal = Math.max(total, 1e-6);
+      const keFrac = Math.min(1, Math.max(0, ke / safeTotal));
+      const peFrac = Math.min(1, Math.max(0, pe / safeTotal));
 
-      ctx.fillStyle = 'rgba(30, 41, 59, 0.8)';
-      ctx.fillRect(barX - 4, barY - 18, barW + 8, 36);
-      ctx.fillStyle = '#64748b'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText('Energy', barX, barY - 4);
+      const barW = 140;
+      const barH = 10;
+      const barX = W - barW - 18;
+      const barY = H - 48;
+      const r = barH / 2;
 
+      // Background track
+      ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
+      ctx.beginPath();
+      ctx.roundRect(barX - 6, barY - 22, barW + 12, 44, 6);
+      ctx.fill();
+
+      // Label
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '9px system-ui';
+      ctx.textAlign = 'left';
+      ctx.fillText('Energy', barX, barY - 6);
+
+      // Track
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barW, barH, r);
+      ctx.fill();
+
+      // KE segment
+      if (keFrac > 0.005) {
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.roundRect(barX, barY, barW * keFrac, barH, r);
+        ctx.fill();
+      }
+
+      // PE segment
+      if (peFrac > 0.005) {
+        ctx.fillStyle = '#3b82f6';
+        ctx.beginPath();
+        ctx.roundRect(barX + barW * keFrac, barY, barW * peFrac, barH, r);
+        ctx.fill();
+      }
+
+      // Divider line
+      if (keFrac > 0.01 && peFrac > 0.01) {
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(barX + barW * keFrac, barY);
+        ctx.lineTo(barX + barW * keFrac, barY + barH);
+        ctx.stroke();
+      }
+
+      // Legend
+      ctx.font = '8px system-ui';
       ctx.fillStyle = '#ef4444';
-      ctx.fillRect(barX, barY, barW * keFrac, barH);
+      ctx.fillText('KE', barX, barY + barH + 12);
       ctx.fillStyle = '#3b82f6';
-      ctx.fillRect(barX + barW * keFrac, barY, barW * peFrac, barH);
-
-      ctx.fillStyle = '#94a3b8'; ctx.font = '8px system-ui';
-      ctx.fillText(`KE`, barX, barY + barH + 10);
-      ctx.fillText(`PE`, barX + barW * keFrac + 4, barY + barH + 10);
-      ctx.fillText(`${total.toFixed(2)}J`, barX + barW - 30, barY + barH + 10);
+      ctx.fillText('PE', barX + barW * keFrac + 4, barY + barH + 12);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${total.toFixed(2)} J`, barX + barW, barY + barH + 12);
     }
 
-    // Status
     ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
     if (!s.isRunning) {
       ctx.fillStyle = '#94a3b8';

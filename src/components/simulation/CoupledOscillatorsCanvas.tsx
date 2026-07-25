@@ -51,6 +51,11 @@ export function CoupledOscillatorsCanvas({
   const chartHistoryRef = useRef<Array<{ t: number; e: number }>>([]);
   const dprRef = useRef(1);
 
+  // EMA-smoothed energy values for the bar (alpha = 0.25)
+  const smoothKeRef = useRef(0);
+  const smoothPeRef = useRef(0);
+  const smoothTotalRef = useRef(0);
+
   const stateRef = useRef<OscillatorState>({ x1: x1Init, v1: v1Init, x2: x2Init, v2: v2Init });
   const trailRef = useRef<TrailPoint[]>([]);
 
@@ -70,6 +75,9 @@ export function CoupledOscillatorsCanvas({
       chartHistoryRef.current = [];
       analysisRef.current = { qFactor: 0, bandwidth: 0, decayRate: 0, valid: false };
       lastAnalysisRef.current = 0;
+      smoothKeRef.current = 0;
+      smoothPeRef.current = 0;
+      smoothTotalRef.current = 0;
       initRef.current = { x1Init, v1Init, x2Init, v2Init };
     }
   }, [x1Init, v1Init, x2Init, v2Init]);
@@ -117,6 +125,12 @@ export function CoupledOscillatorsCanvas({
       const ke = kineticEnergy(stateRef.current, s.params);
       const pe = potentialEnergy(stateRef.current, s.params);
       const total = ke + pe;
+
+      // Smooth energy bar values
+      const alpha = 0.25;
+      smoothKeRef.current += alpha * (ke - smoothKeRef.current);
+      smoothPeRef.current += alpha * (pe - smoothPeRef.current);
+      smoothTotalRef.current += alpha * (total - smoothTotalRef.current);
 
       energyHistoryRef.current.push({
         t: simTimeRef.current,
@@ -268,29 +282,74 @@ export function CoupledOscillatorsCanvas({
       ctx.fillStyle = '#f59e0b'; ctx.fillRect(chartX + 22, chartY + 17, 8, 3);
     }
 
+    // ── Energy bar (smoothed + clamped) ────────────────────────────────────
     if (s.showEnergy) {
-      const ke = kineticEnergy(stateRef.current, s.params);
-      const pe = potentialEnergy(stateRef.current, s.params);
-      const total = ke + pe;
-      const barW = 120; const barH = 8;
-      const barX = W - barW - 16; const barY = H - 40;
-      const keFrac = ke / Math.max(total, 0.001);
-      const peFrac = pe / Math.max(total, 0.001);
+      const ke = smoothKeRef.current;
+      const pe = smoothPeRef.current;
+      const total = smoothTotalRef.current;
+      const safeTotal = Math.max(total, 1e-6);
+      const keFrac = Math.min(1, Math.max(0, ke / safeTotal));
+      const peFrac = Math.min(1, Math.max(0, pe / safeTotal));
 
-      ctx.fillStyle = 'rgba(30, 41, 59, 0.8)';
-      ctx.fillRect(barX - 4, barY - 18, barW + 8, 36);
-      ctx.fillStyle = '#64748b'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText('Energy', barX, barY - 4);
+      const barW = 140;
+      const barH = 10;
+      const barX = W - barW - 18;
+      const barY = H - 48;
+      const r = barH / 2;
 
+      // Background track
+      ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
+      ctx.beginPath();
+      ctx.roundRect(barX - 6, barY - 22, barW + 12, 44, 6);
+      ctx.fill();
+
+      // Label
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '9px system-ui';
+      ctx.textAlign = 'left';
+      ctx.fillText('Energy', barX, barY - 6);
+
+      // Track
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barW, barH, r);
+      ctx.fill();
+
+      // KE segment
+      if (keFrac > 0.005) {
+        ctx.fillStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.roundRect(barX, barY, barW * keFrac, barH, r);
+        ctx.fill();
+      }
+
+      // PE segment
+      if (peFrac > 0.005) {
+        ctx.fillStyle = '#3b82f6';
+        ctx.beginPath();
+        ctx.roundRect(barX + barW * keFrac, barY, barW * peFrac, barH, r);
+        ctx.fill();
+      }
+
+      // Divider line
+      if (keFrac > 0.01 && peFrac > 0.01) {
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(barX + barW * keFrac, barY);
+        ctx.lineTo(barX + barW * keFrac, barY + barH);
+        ctx.stroke();
+      }
+
+      // Legend
+      ctx.font = '8px system-ui';
       ctx.fillStyle = '#ef4444';
-      ctx.fillRect(barX, barY, barW * keFrac, barH);
+      ctx.fillText('KE', barX, barY + barH + 12);
       ctx.fillStyle = '#3b82f6';
-      ctx.fillRect(barX + barW * keFrac, barY, barW * peFrac, barH);
-
-      ctx.fillStyle = '#94a3b8'; ctx.font = '8px system-ui';
-      ctx.fillText(`KE`, barX, barY + barH + 10);
-      ctx.fillText(`PE`, barX + barW * keFrac + 4, barY + barH + 10);
-      ctx.fillText(`${total.toFixed(3)}J`, barX + barW - 38, barY + barH + 10);
+      ctx.fillText('PE', barX + barW * keFrac + 4, barY + barH + 12);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${total.toFixed(3)} J`, barX + barW, barY + barH + 12);
     }
 
     ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
