@@ -128,14 +128,16 @@ export function PropulsionCanvas({
 
     // HUD
     ctx.textAlign = 'right';
+    const uiScale = Math.max(0.75, Math.min(1, W / 660));
     const hud = [
       `T+${state.t.toFixed(1)}s`,
       `v = ${state.v.toFixed(1)} m/s`,
       `a = ${state.acceleration.toFixed(2)} m/s²`,
       `Thrust = ${state.thrust.toFixed(0)} N`,
     ];
-    ctx.font = 'bold 10px monospace'; ctx.fillStyle = '#e0e7ff';
-    hud.forEach((line, i) => ctx.fillText(line, W - 12, 18 + i * 15));
+    const hudFont = Math.max(8, Math.round(10 * uiScale)), hudLineH = Math.max(12, Math.round(15 * uiScale));
+    ctx.font = `bold ${hudFont}px monospace`; ctx.fillStyle = '#e0e7ff';
+    hud.forEach((line, i) => ctx.fillText(line, W - 12, 18 + i * hudLineH));
 
     if (state.burnedOut) {
       ctx.textAlign = 'center'; ctx.font = 'bold 11px system-ui'; ctx.fillStyle = '#fbbf24';

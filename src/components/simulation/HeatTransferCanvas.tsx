@@ -108,7 +108,7 @@ export function HeatTransferCanvas({ mode, hotTemp, coldTemp, isRunning, isPause
 
     if (s.mode === 'convection') {
       // Beaker of fluid with a circulation loop; heated at bottom-left.
-      const bx = W / 2 - 130, by = 50, bw = 260, bh = H - 130;
+      const bw = Math.min(260, W * 0.72), bx = W / 2 - bw / 2, by = 50, bh = H - 130;
       ctx.fillStyle = 'rgba(186,230,253,0.4)';
       ctx.fillRect(bx, by, bw, bh);
       ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;

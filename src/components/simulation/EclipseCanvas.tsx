@@ -214,7 +214,8 @@ export function EclipseCanvas({ eclipseType, orbitAngleDeg, isRunning, isPaused,
     // actually see. Derived directly from the SAME penumbra/umbra values
     // just used above (not a separate calculation), so it can never show
     // a state that contradicts the main diagram or the classification.
-    const insetX = W - 78, insetY = H - 66, insetR = 30;
+    const insetR = Math.max(18, 30 * scale);
+    const insetX = W - insetR - 48 * scale, insetY = H - insetR - 36 * scale;
     ctx.save();
     ctx.fillStyle = 'rgba(15,23,42,0.9)';
     ctx.beginPath(); ctx.roundRect(insetX - insetR - 10, insetY - insetR - 18, insetR * 2 + 20, insetR * 2 + 30, 8); ctx.fill();

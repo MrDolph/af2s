@@ -45,7 +45,8 @@ export function XrayCanvas({ kV, current, isRunning, isPaused, width = 640, heig
       lastFrameRef.current = timestamp ?? null;
     }
 
-    const cathX = 110, anodeX = W - 170, beamY = 120;
+    const xrayScale = Math.max(0.55, Math.min(1, W / 660));
+    const cathX = Math.round(110 * xrayScale), anodeX = W - Math.round(170 * xrayScale), beamY = 120 * xrayScale;
     const eSpeed = 120 + s.kV * 3; // px/s ∝ ish √V feel, readable
 
     if (dt > 0) {
@@ -73,11 +74,11 @@ export function XrayCanvas({ kV, current, isRunning, isPaused, width = 640, heig
     ctx.save();
     ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.roundRect(70, 60, W - 200, 120, 40);
+    ctx.roundRect(Math.round(70 * xrayScale), Math.round(60 * xrayScale), W - Math.round(200 * xrayScale), Math.round(120 * xrayScale), Math.round(40 * xrayScale));
     ctx.stroke();
     ctx.fillStyle = 'rgba(226,232,240,0.25)'; ctx.fill();
     ctx.fillStyle = '#94a3b8'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
-    ctx.fillText('evacuated tube', 82, 76);
+    ctx.fillText('evacuated tube', Math.round(82 * xrayScale), Math.round(76 * xrayScale));
     ctx.restore();
 
     // Cathode (heated filament)

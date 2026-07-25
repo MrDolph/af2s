@@ -310,23 +310,32 @@ function drawScene(
     );
   }
 
-  // HUD
+  // HUD — scales with canvas width so it never eats a huge fraction of a
+  // small mobile canvas the way a fixed-pixel box would. Desktop-width
+  // canvases (w>=660) get exactly the original size; narrower ones shrink
+  // the box/font and drop the vx/vy breakdown to save space.
   if (toggles.hud && showHUD) {
+    const uiScale = Math.max(0.72, Math.min(1, w / 660));
+    const compact = w < 380;
     const lines = [
       `t  = ${state.time.toFixed(2)}s`,
       `v  = ${speed.toFixed(1)} m/s`,
-      `vx = ${state.vx.toFixed(1)} m/s`,
-      `vy = ${state.vy.toFixed(1)} m/s`,
+      ...(compact ? [] : [`vx = ${state.vx.toFixed(1)} m/s`, `vy = ${state.vy.toFixed(1)} m/s`]),
       `h  = ${Math.max(0, state.y).toFixed(1)}m`,
       `x  = ${state.x.toFixed(1)}m`,
     ];
-    const bx = w - 138, by = 12, bW = 126, bH = lines.length * 18 + 14;
+    const font = Math.max(9, Math.round(11 * uiScale));
+    const lineH = Math.max(14, Math.round(18 * uiScale));
+    const pad = Math.round(10 * uiScale);
+    const bW = Math.round((compact ? 96 : 126) * uiScale);
+    const bH = lines.length * lineH + Math.round(14 * uiScale);
+    const bx = w - bW - Math.round(12 * uiScale), by = Math.round(12 * uiScale);
     ctx.save();
     ctx.fillStyle = 'rgba(255,255,255,0.92)';
     ctx.beginPath(); ctx.roundRect(bx, by, bW, bH, 8); ctx.fill();
     ctx.strokeStyle = 'rgba(99,102,241,0.25)'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.fillStyle = '#1e293b'; ctx.font = '11px monospace'; ctx.textAlign = 'left';
-    lines.forEach((l, i) => ctx.fillText(l, bx + 10, by + 20 + i * 18));
+    ctx.fillStyle = '#1e293b'; ctx.font = `${font}px monospace`; ctx.textAlign = 'left';
+    lines.forEach((l, i) => ctx.fillText(l, bx + pad, by + lineH + 2 + i * lineH));
     ctx.restore();
   }
 }

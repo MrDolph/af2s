@@ -298,24 +298,32 @@ export function ElasticityCanvas({
         }
       }
 
-      // Info card
+      // Info card — scales with canvas width so it never dominates a
+      // small mobile canvas the way a fixed 236x134 box would (that was
+      // roughly 70% of a typical mobile canvas's width).
       ctx.save();
-      const cx0 = W - 250, cy0 = 46;
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.beginPath(); ctx.roundRect(cx0, cy0, 236, 134, 10); ctx.fill();
-      ctx.strokeStyle = '#e2e8f0'; ctx.stroke();
-      ctx.fillStyle = '#334155'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText(`${s.materialName} wire`, cx0 + 12, cy0 + 20);
-      ctx.font = '10px monospace'; ctx.fillStyle = '#475569';
-      const lines = [
+      const uiScale = Math.max(0.6, Math.min(1, W / 660));
+      const compact = W < 420;
+      const cardW = Math.round((compact ? 168 : 236) * uiScale);
+      const cx0 = W - cardW - Math.round(14 * uiScale), cy0 = Math.round(46 * uiScale);
+      const titleFont = Math.max(9, Math.round(11 * uiScale));
+      const bodyFont = Math.max(8, Math.round(10 * uiScale));
+      const lineH = Math.max(12, Math.round(16 * uiScale));
+      const infoLines = [
         `L = ${s.wireLength} m,  d = ${s.wireDiamMm} mm`,
         `A = πd²/4 = ${(A * 1e6).toFixed(4)} mm²`,
         `stress σ = F/A = ${(sg / 1e6).toFixed(1)} MPa`,
-        `strain ε = e/L = ${sn.toExponential(2)}`,
-        `E = σ/ε = ${(s.youngE / 1e9).toFixed(0)} GPa`,
+        ...(compact ? [] : [`strain ε = e/L = ${sn.toExponential(2)}`, `E = σ/ε = ${(s.youngE / 1e9).toFixed(0)} GPa`]),
         `breaks at ${s.breakingStressMPa} MPa`,
       ];
-      lines.forEach((l, i) => ctx.fillText(l, cx0 + 12, cy0 + 40 + i * 16));
+      const cardH = Math.round(40 * uiScale) + infoLines.length * lineH;
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.beginPath(); ctx.roundRect(cx0, cy0, cardW, cardH, 10); ctx.fill();
+      ctx.strokeStyle = '#e2e8f0'; ctx.stroke();
+      ctx.fillStyle = '#334155'; ctx.font = `bold ${titleFont}px system-ui`; ctx.textAlign = 'left';
+      ctx.fillText(`${s.materialName} wire`, cx0 + Math.round(12 * uiScale), cy0 + Math.round(20 * uiScale));
+      ctx.font = `${bodyFont}px monospace`; ctx.fillStyle = '#475569';
+      infoLines.forEach((l, i) => ctx.fillText(l, cx0 + Math.round(12 * uiScale), cy0 + Math.round(40 * uiScale) + i * lineH));
       ctx.restore();
 
       ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';

@@ -302,21 +302,28 @@ function drawAll(
     if (showVec) drawArrowhead(bx, by, exR, eyR, '#f59e0b', 2.5);
   }
 
-  // HUD
+  // HUD — scales with canvas width (unchanged at desktop widths, shrinks
+  // proportionally on mobile) so it never eats a large fraction of a
+  // small canvas the way a fixed-pixel box would.
   if (showHUD && t > 0) {
+    const uiScale = Math.max(0.72, Math.min(1, W / 660));
     const lines = [
       `t  = ${t.toFixed(2)}s`,
       ...(mode !== 'vertical' ? [`x  = ${x.toFixed(1)}m`] : []),
       `y  = ${Math.max(floorAt(x), y).toFixed(1)}m`,
       `v  = ${speed.toFixed(1)} m/s`,
     ];
-    const bw = 118, bh = lines.length * 18 + 14, bhx = W - bw - 8;
+    const font = Math.max(9, Math.round(11 * uiScale));
+    const lineH = Math.max(14, Math.round(18 * uiScale));
+    const pad = Math.round(8 * uiScale);
+    const bw = Math.round(118 * uiScale), bh = lines.length * lineH + Math.round(14 * uiScale);
+    const bhx = W - bw - Math.round(8 * uiScale), bhy = Math.round(8 * uiScale);
     ctx.save();
     ctx.fillStyle = 'rgba(255,255,255,0.92)';
-    ctx.beginPath(); ctx.roundRect(bhx, 8, bw, bh, 8); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(bhx, bhy, bw, bh, 8); ctx.fill();
     ctx.strokeStyle = 'rgba(99,102,241,0.2)'; ctx.lineWidth = 1; ctx.stroke();
-    ctx.fillStyle = '#1e293b'; ctx.font = '11px monospace'; ctx.textAlign = 'left';
-    lines.forEach((l, i) => ctx.fillText(l, bhx + 8, 24 + i * 18));
+    ctx.fillStyle = '#1e293b'; ctx.font = `${font}px monospace`; ctx.textAlign = 'left';
+    lines.forEach((l, i) => ctx.fillText(l, bhx + pad, bhy + lineH + 2 + i * lineH));
     ctx.restore();
   }
 }

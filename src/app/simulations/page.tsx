@@ -17,6 +17,26 @@ const SIMULATIONS = [
     status: 'live',
   },
   {
+    slug: 'double-pendulum',
+    href: '/simulations/double-pendulum',
+    title: 'Double pendulum',
+    description: 'Explore deterministic chaos with a coupled nonlinear oscillator. Trail, energy monitor, and presets included.',
+    icon: '🌀',
+    tags: ['IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'coupled-oscillators',
+    href: '/simulations/coupled-oscillators',
+    title: 'Coupled oscillators',
+    description: 'Explore normal modes, beats, and energy transfer in a linear coupled spring–mass system.',
+    icon: '🔘',
+    tags: ['IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
     slug: 'gas-laws',
     href: '/simulations/gas-laws',
     title: "Gas laws (Boyle & Charles)",
@@ -241,10 +261,10 @@ const SIMULATIONS = [
 const TOPICS = ['All', 'Mechanics', 'Electricity', 'Waves', 'Optics', 'Thermal physics', 'Modern physics'];
 
 const CURRICULUM_COLORS: Record<string, string> = {
-  WAEC:  'bg-indigo-100 text-indigo-700',
-  NECO:  'bg-pink-100 text-pink-700',
+  WAEC: 'bg-indigo-100 text-indigo-700',
+  NECO: 'bg-pink-100 text-pink-700',
   IGCSE: 'bg-emerald-100 text-emerald-700',
-  SAT:   'bg-orange-100 text-orange-700',
+  SAT: 'bg-orange-100 text-orange-700',
   JUPEB: 'bg-purple-100 text-purple-700',
 };
 
@@ -289,11 +309,10 @@ export default function SimulationsPage() {
               const active = selectedTopic === t;
               return (
                 <button key={t} onClick={() => setSelectedTopic(t)}
-                  className={`shrink-0 flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium transition whitespace-nowrap ${
-                    active
+                  className={`shrink-0 flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium transition whitespace-nowrap ${active
                       ? 'border-indigo-600 bg-indigo-600 text-white'
                       : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:text-indigo-700'
-                  }`}>
+                    }`}>
                   {t}
                   <span className={`rounded-full px-1.5 text-[10px] ${active ? 'bg-white/20' : 'bg-gray-100 text-gray-400'}`}>
                     {count}
@@ -309,61 +328,60 @@ export default function SimulationsPage() {
               <p className="text-sm text-gray-400">No simulations in {selectedTopic} yet.</p>
             </div>
           ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {visibleSims.map(sim => (
-              <div key={sim.slug} className={`group relative rounded-2xl border bg-white overflow-hidden transition ${
-                sim.status === 'live'
-                  ? 'border-gray-200 hover:border-indigo-300 hover:shadow-md cursor-pointer'
-                  : 'border-gray-100 opacity-70'
-              }`}>
-                {sim.status === 'coming' && (
-                  <div className="absolute top-3 right-3 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-400">
-                    Coming soon
-                  </div>
-                )}
-                {sim.status === 'live' && (
-                  <div className="absolute top-3 right-3 flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"/>
-                    <span className="text-[10px] font-medium text-emerald-600">Live</span>
-                  </div>
-                )}
-
-                <Link href={sim.status === 'live' ? sim.href : '#'}
-                  className={sim.status !== 'live' ? 'pointer-events-none' : ''}>
-                  <div className="p-5">
-                    {/* Icon + topic */}
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-2xl">{sim.icon}</span>
-                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">{sim.topic}</span>
-                    </div>
-
-                    <h3 className="text-sm font-semibold text-gray-900 mb-1.5 group-hover:text-indigo-700 transition">
-                      {sim.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 leading-relaxed mb-4">{sim.description}</p>
-
-                    {/* Curriculum tags */}
-                    <div className="flex flex-wrap gap-1">
-                      {sim.tags.map(tag => (
-                        <span key={tag} className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${CURRICULUM_COLORS[tag]}`}>
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {sim.status === 'live' && (
-                    <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between">
-                      <span className="text-xs font-medium text-indigo-600">Open simulation</span>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round">
-                        <path d="M2 7h10M8 3l4 4-4 4"/>
-                      </svg>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {visibleSims.map(sim => (
+                <div key={sim.slug} className={`group relative rounded-2xl border bg-white overflow-hidden transition ${sim.status === 'live'
+                    ? 'border-gray-200 hover:border-indigo-300 hover:shadow-md cursor-pointer'
+                    : 'border-gray-100 opacity-70'
+                  }`}>
+                  {sim.status === 'coming' && (
+                    <div className="absolute top-3 right-3 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-400">
+                      Coming soon
                     </div>
                   )}
-                </Link>
-              </div>
-            ))}
-          </div>
+                  {sim.status === 'live' && (
+                    <div className="absolute top-3 right-3 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[10px] font-medium text-emerald-600">Live</span>
+                    </div>
+                  )}
+
+                  <Link href={sim.status === 'live' ? sim.href : '#'}
+                    className={sim.status !== 'live' ? 'pointer-events-none' : ''}>
+                    <div className="p-5">
+                      {/* Icon + topic */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-2xl">{sim.icon}</span>
+                        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">{sim.topic}</span>
+                      </div>
+
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1.5 group-hover:text-indigo-700 transition">
+                        {sim.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 leading-relaxed mb-4">{sim.description}</p>
+
+                      {/* Curriculum tags */}
+                      <div className="flex flex-wrap gap-1">
+                        {sim.tags.map(tag => (
+                          <span key={tag} className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${CURRICULUM_COLORS[tag]}`}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {sim.status === 'live' && (
+                      <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between">
+                        <span className="text-xs font-medium text-indigo-600">Open simulation</span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round">
+                          <path d="M2 7h10M8 3l4 4-4 4" />
+                        </svg>
+                      </div>
+                    )}
+                  </Link>
+                </div>
+              ))}
+            </div>
           )}
 
           {/* Coming soon note */}
