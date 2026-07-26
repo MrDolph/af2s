@@ -94,6 +94,7 @@ export default function QuantumHarmonicOscillatorPage() {
   const [isPaused, setIsPaused] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [openEx, setOpenEx] = useState<number | null>(null);
+  const [selectedPreset, setSelectedPreset] = useState<number | null>(null);
   const [activeCurricula, setActiveCurricula] = useState(['IGCSE', 'SAT', 'JUPEB']);
 
   // Coefficients for n = 0..5
@@ -141,7 +142,7 @@ export default function QuantumHarmonicOscillatorPage() {
     maxProb: 0,
   });
 
-  const applyPreset = useCallback((preset: QHOPreset) => {
+  const applyPreset = useCallback((preset: QHOPreset, index: number) => {
     const [nc0, nc1, nc2, nc3, nc4, nc5] = preset.coeffs;
     setC0(nc0); setC1(nc1); setC2(nc2); setC3(nc3); setC4(nc4); setC5(nc5);
     setSpeed(preset.speed);
@@ -157,6 +158,7 @@ export default function QuantumHarmonicOscillatorPage() {
     setIsRunning(false);
     setIsPaused(false);
     setResetKey((k) => k + 1);
+    setSelectedPreset(null);
     setLiveStats({
       energy: 0, x: 0, x2: 0, p: 0, p2: 0,
       leftTurn: 0, rightTurn: 0, maxProb: 0,
@@ -229,16 +231,30 @@ export default function QuantumHarmonicOscillatorPage() {
 
           {/* Presets */}
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {PRESETS.map((preset, i) => (
-              <button
-                key={i}
-                onClick={() => applyPreset(preset)}
-                className="shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-left hover:border-indigo-300 hover:shadow-sm transition min-w-[200px]"
-              >
-                <p className="text-xs font-medium text-indigo-700">{preset.name}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5 leading-relaxed">{preset.description}</p>
-              </button>
-            ))}
+            {PRESETS.map((preset, i) => {
+              const isActive = selectedPreset === i;
+              return (
+                <button
+                  key={i}
+                  onClick={() => applyPreset(preset, i)}
+                  className={`shrink-0 rounded-xl border-2 px-3 py-2.5 text-left transition min-w-[200px] ${
+                    isActive
+                      ? 'bg-indigo-600 border-white text-white shadow-lg'
+                      : 'bg-white border-gray-200 text-gray-900 hover:border-indigo-300 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className={`text-xs font-bold ${isActive ? 'text-white' : 'text-indigo-700'}`}>
+                      {preset.name}
+                    </p>
+                    {isActive && <span className="text-xs font-bold ml-2">✓</span>}
+                  </div>
+                  <p className={`text-[10px] mt-1 leading-relaxed ${isActive ? 'text-indigo-100' : 'text-gray-500'}`}>
+                    {preset.description}
+                  </p>
+                </button>
+              );
+            })}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">

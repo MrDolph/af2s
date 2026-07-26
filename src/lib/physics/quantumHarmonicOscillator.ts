@@ -24,6 +24,7 @@ export interface QHOParams {
 }
 
 export interface QHOPreset {
+  color: string;
   name: string;
   description: string;
   coeffs: number[];
@@ -165,6 +166,7 @@ function coherentCoeffs(alpha: number): number[] {
 export const PRESETS: QHOPreset[] = [
   {
     name: 'Ground state',
+    color: '#10b981',
     description: 'The n=0 Gaussian — minimum uncertainty, no nodes, probability peaks at the centre.',
     coeffs: [1, 0, 0, 0, 0, 0],
     speed: 1, xMax: 5, eMax: 4.5, nMax: 5,
@@ -173,6 +175,7 @@ export const PRESETS: QHOPreset[] = [
   },
   {
     name: 'First excited',
+    color: '#6366f1',
     description: 'n=1 has a single node at x=0 and odd symmetry. The particle is never found at the centre.',
     coeffs: [0, 1, 0, 0, 0, 0],
     speed: 1, xMax: 5, eMax: 4.5, nMax: 5,
@@ -181,6 +184,7 @@ export const PRESETS: QHOPreset[] = [
   },
   {
     name: 'Second excited',
+    color: '#8b5cf6',
     description: 'n=2 has two nodes and even symmetry. The probability density shows three distinct peaks.',
     coeffs: [0, 0, 1, 0, 0, 0],
     speed: 1, xMax: 6, eMax: 4.5, nMax: 5,
@@ -205,6 +209,7 @@ export const PRESETS: QHOPreset[] = [
   },
   {
     name: 'Coherent state (α=2)',
+    color: '#06b6d4',
     description: 'A minimum-uncertainty wave packet that oscillates back and forth like a classical particle while keeping its shape.',
     coeffs: coherentCoeffs(2),
     speed: 1, xMax: 8, eMax: 5.5, nMax: 6,
@@ -213,6 +218,7 @@ export const PRESETS: QHOPreset[] = [
   },
   {
     name: 'Coherent state (α=3)',
+    color: '#3b82f6',
     description: 'A larger coherent state with higher energy. The wave packet swings further from the centre with greater amplitude.',
     coeffs: coherentCoeffs(3),
     speed: 1, xMax: 10, eMax: 6.5, nMax: 7,
