@@ -77,6 +77,17 @@ const SIMULATIONS = [
     status: 'live',
   },
   {
+    slug: 'quantum-harmonic-oscillator',
+    href: '/simulations/quantum-harmonic-oscillator',
+    title: 'Quantum Harmonic Oscillator',
+    description: 'Visualise quantum wavefunctions, superpositions, and coherent states in the exactly solvable QHO potential.',
+    icon: '⚛️',
+    tags: ['IGCSE', 'SAT', 'JUPEB'],
+    subtopic: 'Quantum Mechanics',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
     slug: 'ohms-law',
     href: '/simulations/ohms-law',
     title: "Ohm's law & circuits",
@@ -113,6 +124,36 @@ const SIMULATIONS = [
     description: 'Potential energy with live KE/PE tracking, equipotential surfaces, and a charging/discharging capacitor.',
     icon: '🔋',
     tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'magnetic-effects',
+    href: '/simulations/magnetic-effects',
+    title: 'Magnetic Effects of Current',
+    description: "Field of a straight wire and solenoid (right-hand rule), plus the motor effect (Fleming's left-hand rule). Secondary to undergraduate level.",
+    icon: '🧲',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'Undergraduate'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'electromagnetic-induction',
+    href: '/simulations/electromagnetic-induction',
+    title: 'Electromagnetic Induction',
+    description: "Faraday's and Lenz's laws with a moving magnet and galvanometer, an AC generator with a live EMF-time graph, and a transformer. Secondary to undergraduate level.",
+    icon: '🔄',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'Undergraduate'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'ac-circuits',
+    href: '/simulations/ac-circuits',
+    title: 'Simple AC Circuits',
+    description: 'AC waveforms and RMS values, inductive/capacitive reactance with phasor diagrams, and a series RLC circuit with impedance triangle and resonance. Secondary to undergraduate level.',
+    icon: '📈',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'Undergraduate'],
     topic: 'Electricity',
     status: 'live',
   },
@@ -161,7 +202,7 @@ const SIMULATIONS = [
     href: '/simulations/reflection',
     title: 'Reflection',
     description: 'The law of reflection, mirror rotation (fixed source, 2θ rule), and concave/convex ray diagrams.',
-    icon: '🪞',
+    icon: '👓',
     tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
     topic: 'Optics',
     status: 'live',
@@ -211,7 +252,7 @@ const SIMULATIONS = [
     href: '/simulations/x-rays',
     title: 'X-rays',
     description: 'Explore X-ray tube production, the continuous spectrum, and the Duane–Hunt limit.',
-    icon: '🩻',
+    icon: '⚡',
     tags: ['WAEC', 'IGCSE', 'JUPEB'],
     topic: 'Modern physics',
     status: 'live',
@@ -241,7 +282,7 @@ const SIMULATIONS = [
     href: '/simulations/elasticity',
     title: 'Elasticity',
     description: "Hooke's law with a loaded spring, and Young's modulus for a stretched wire.",
-    icon: '🪢',
+    icon: '🏉',
     tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
     topic: 'Mechanics',
     status: 'live',
@@ -266,6 +307,7 @@ const CURRICULUM_COLORS: Record<string, string> = {
   IGCSE: 'bg-emerald-100 text-emerald-700',
   SAT: 'bg-orange-100 text-orange-700',
   JUPEB: 'bg-purple-100 text-purple-700',
+  Undergraduate: 'bg-slate-200 text-slate-700',
 };
 
 export default function SimulationsPage() {
@@ -310,8 +352,8 @@ export default function SimulationsPage() {
               return (
                 <button key={t} onClick={() => setSelectedTopic(t)}
                   className={`shrink-0 flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium transition whitespace-nowrap ${active
-                      ? 'border-indigo-600 bg-indigo-600 text-white'
-                      : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:text-indigo-700'
+                    ? 'border-indigo-600 bg-indigo-600 text-white'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:text-indigo-700'
                     }`}>
                   {t}
                   <span className={`rounded-full px-1.5 text-[10px] ${active ? 'bg-white/20' : 'bg-gray-100 text-gray-400'}`}>
@@ -331,8 +373,8 @@ export default function SimulationsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {visibleSims.map(sim => (
                 <div key={sim.slug} className={`group relative rounded-2xl border bg-white overflow-hidden transition ${sim.status === 'live'
-                    ? 'border-gray-200 hover:border-indigo-300 hover:shadow-md cursor-pointer'
-                    : 'border-gray-100 opacity-70'
+                  ? 'border-gray-200 hover:border-indigo-300 hover:shadow-md cursor-pointer'
+                  : 'border-gray-100 opacity-70'
                   }`}>
                   {sim.status === 'coming' && (
                     <div className="absolute top-3 right-3 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-400">

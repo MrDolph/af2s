@@ -4,7 +4,7 @@ import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { HeatTransferCanvas, HeatMode } from '@/components/simulation/HeatTransferCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
-import { celsiusToKelvin, radiatedPower, netRadiation } from '@/lib/physics/heat';
+import { celsiusToKelvin, radiatedPower, netRadiation, conductionRate, MATERIALS } from '@/lib/physics/heat';
 import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'];
@@ -97,13 +97,17 @@ export default function HeatTransferPage() {
 
   const [hotTemp, setHotTemp] = useState(90);
   const [coldTemp, setColdTemp] = useState(20);
+  const [materialIdx, setMaterialIdx] = useState(0); // Copper by default
+  const [areaCm2, setAreaCm2] = useState(20);
+  const [lengthCm, setLengthCm] = useState(50);
+  const material = MATERIALS[materialIdx];
 
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); }, []);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 80);
-  }, [mode, hotTemp, coldTemp, reset]);
+  }, [mode, hotTemp, coldTemp, materialIdx, areaCm2, lengthCm, reset]);
 
   const Thot = celsiusToKelvin(hotTemp), Tcold = celsiusToKelvin(coldTemp);
 
@@ -154,7 +158,7 @@ export default function HeatTransferPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
             <div className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
-                <HeatTransferCanvas mode={mode} hotTemp={hotTemp} coldTemp={coldTemp}
+                <HeatTransferCanvas mode={mode} hotTemp={hotTemp} coldTemp={coldTemp} materialK={material.k}
                   isRunning={isRunning} isPaused={isPaused} width={canvasSize.width} height={canvasSize.height} />
               </div>
 
@@ -171,6 +175,22 @@ export default function HeatTransferPage() {
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <Slider label="Hot temperature" unit="°C" value={hotTemp} min={30} max={120} step={5} set={setHotTemp} color="#ef4444" />
                 <Slider label="Cold / surroundings temperature" unit="°C" value={coldTemp} min={0} max={40} step={5} set={setColdTemp} color="#3b82f6" />
+                {mode === 'conduction' && <>
+                  <div className="pt-2 border-t border-gray-100 space-y-1.5">
+                    <span className="text-xs text-gray-500">Material</span>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {MATERIALS.map((m, i) => (
+                        <button key={m.name} onClick={() => setMaterialIdx(i)}
+                          className={`rounded-lg border px-2 py-2 text-xs font-medium transition ${
+                            materialIdx === i ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                          }`}>{m.name}</button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-gray-400">k = {material.k} W/mK</p>
+                  </div>
+                  <Slider label="Cross-sectional area" unit="cm²" value={areaCm2} min={1} max={100} step={1} set={setAreaCm2} color="#8b5cf6" />
+                  <Slider label="Rod length" unit="cm" value={lengthCm} min={5} max={150} step={5} set={setLengthCm} color="#8b5cf6" />
+                </>}
               </div>
             </div>
 
@@ -179,12 +199,17 @@ export default function HeatTransferPage() {
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Calculated</p>
                 <div className="space-y-2">
                   <StatRow label="ΔT" value={(hotTemp - coldTemp).toFixed(0)} unit="°C" color="text-indigo-600" />
+                  {mode === 'conduction' && <>
+                    <StatRow label="Rate Q/t = kAΔT/L" value={conductionRate(material.k, areaCm2 / 1e4, hotTemp - coldTemp, lengthCm / 100).toFixed(2)} unit="W" color="text-emerald-600" />
+                    <StatRow label="Material" value={material.name} unit="" color="text-purple-600" />
+                    <StatRow label="Direction" value="hot → cold" unit="always" color="text-amber-600" />
+                  </>}
                   {mode === 'radiation' && <>
                     <StatRow label="Hot object radiates" value={radiatedPower(1, 0.01, Thot).toFixed(2)} unit="W" color="text-emerald-600" />
                     <StatRow label="Net transfer" value={netRadiation(1, 0.01, Thot, Tcold).toFixed(2)} unit="W" color="text-amber-600" />
                     <StatRow label="T⁴ ratio" value={Math.pow(Thot / Tcold, 4).toFixed(1)} unit="×" color="text-rose-500" />
                   </>}
-                  {mode !== 'radiation' && (
+                  {mode === 'convection' && (
                     <StatRow label="Direction" value="hot → cold" unit="always" color="text-emerald-600" />
                   )}
                 </div>

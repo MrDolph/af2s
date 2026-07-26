@@ -1,3 +1,59 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v40: actually fix the platform-height bug
+# (v39 was still incomplete) and fix the velocity-arrow shrinking that v39
+# introduced as a side effect
+#
+#   WHY v39 STILL BROKE. v39 reserved a fixed 150m headroom above the
+#   platform, but FELL BACK to the trajectory's real height if that
+#   headroom was exceeded. That fallback threshold was only around
+#   v0=76 m/s at a 45 degree angle -- well within the slider's actual
+#   1-100 m/s range -- so anyone testing across the full slider (exactly
+#   what happened) would still see the platform shift once they got far
+#   enough along it. It also tied the velocity-arrow length to the same
+#   scale value that v39 was inflating for stability, so the arrows
+#   shrank as a direct, foreseeable side effect that wasn't caught before
+#   shipping.
+#
+#   THE ACTUAL FIX THIS TIME. Two changes:
+#
+#   1. scaleY for a platform-having mode (standard, horizontal, vertical)
+#      is now a PURE function of the platform height h0, with NO fallback
+#      to the trajectory's real height at all. This guarantees the
+#      platform's pixel position is mathematically stable across the
+#      ENTIRE velocity and angle slider range with zero exceptions, not
+#      just a "typical" subset. Verified numerically this time by sweeping
+#      the COMPLETE grid -- every v0 from 1-100 crossed with every angle
+#      from 1-89 -- and confirming the platform's pixel position never
+#      moves by even a fraction of a pixel. A genuinely extreme velocity/
+#      angle combination that would send the trajectory above this fixed
+#      headroom now simply draws above the visible canvas (natural
+#      clipping -- canvas doesn't draw pixels outside its bounds, no
+#      special-case code needed) rather than ever triggering a rescale.
+#
+#   2. The velocity-arrow length factor is no longer derived from the
+#      position scale at all -- it's now a fixed, predictable pixels-per-
+#      (m/s) constant, capped at 65px for high speed same as before.
+#      Arrows are a schematic indicator of direction and relative
+#      magnitude, not a to-scale spatial measurement, so there was never
+#      a good reason to tie their size to whatever the platform-stability
+#      fix needed to do to the position scale. Verified they're now
+#      completely independent of h0.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v40-projectile-platform-scale-fix3.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "-- A-Factor patch v40: actually fix platform stability + arrow shrinking --"
+mkdir -p "src/components/simulation"
+
+echo "  -> src/components/simulation/ProjectileModeCanvas.tsx"
+cat > "src/components/simulation/ProjectileModeCanvas.tsx" << 'AFEOF'
 'use client';
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
@@ -32,19 +88,8 @@ const SPEEDS = [
   { label: '4×',    dt: 0.064 },
 ];
 
-const BASE_PAD = 44, BASE_GH = 44, BASE_BR = 8;
+const PAD = 44, GH = 44, BR = 8;
 const DT_BASE = 0.016;
-
-// Scales all the fixed-pixel layout constants (padding, ground height,
-// ball radius, arrow sizing) down for a small mobile canvas, unchanged at
-// the original 660x300 desktop design size. Without this, the fixed 44px
-// padding alone ate 28% of a ~320px-wide mobile canvas's width and 22% of
-// its height — verified numerically before this fix — leaving less than
-// half the canvas usable for the actual diagram at exactly the moment
-// (a short, narrow mobile screen) when every pixel matters most.
-function computeUiScale(W: number, H: number): number {
-  return Math.max(0.5, Math.min(1, Math.min(W, H) / 300));
-}
 
 // ── Physics helpers ───────────────────────────────────────────────────────────
 interface Setup {
@@ -96,13 +141,11 @@ function buildPath(mode: ProjectileMode, p: Props): Pt[] {
   return [{ t: 0, x: 0, y: 0 }];
 }
 
-function toCanvas(x: number, y: number, scaleX: number, scaleY: number, pad: number, gh: number, H: number): [number, number] {
-  return [pad + x * scaleX, H - gh - y * scaleY];
+function toCanvas(x: number, y: number, scaleX: number, scaleY: number, H: number): [number, number] {
+  return [PAD + x * scaleX, H - GH - y * scaleY];
 }
 
 function getScale(path: Pt[], W: number, H: number, mode: ProjectileMode, h0: number) {
-  const uiScale = computeUiScale(W, H);
-  const PAD = BASE_PAD * uiScale, GH = BASE_GH * uiScale;
   const maxX = Math.max(...path.map(p => p.x), 1);
   const rawMaxY = Math.max(...path.map(p => p.y), 1);
   // For standard/vertical launches from a platform, the trajectory's peak
@@ -160,8 +203,6 @@ function drawAll(
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const W = canvas.width, H = canvas.height;
-  const uiScale = computeUiScale(W, H);
-  const PAD = BASE_PAD * uiScale, GH = BASE_GH * uiScale, BR = BASE_BR * uiScale;
 
   // For inclined mode, the "ground" the object lands on is the sloped
   // incline surface — base: y = x·tanβ (rising to the right); top:
@@ -190,7 +231,7 @@ function drawAll(
 
   // Platform
   if (h0 > 0) {
-    const [, py] = toCanvas(0, h0, scaleX, scaleY, PAD, GH, H);
+    const [, py] = toCanvas(0, h0, scaleX, scaleY, H);
     ctx.fillStyle = '#94a3b8'; ctx.fillRect(0, py, PAD + 4, H - GH - py);
     ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5; ctx.strokeRect(0, py, PAD + 4, H - GH - py);
     ctx.fillStyle = '#475569'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
@@ -206,19 +247,19 @@ function drawAll(
       // Slope descends from (0, H) to the base at x = H/tanβ, flat after.
       const th = topHeight ?? 0;
       const baseX = Math.tan(beta) > 1e-6 ? th / Math.tan(beta) : maxXPt;
-      const [x0c, y0c] = toCanvas(0, th, scaleX, scaleY, PAD, GH, H);
-      const [x1c, y1c] = toCanvas(Math.min(baseX, maxXPt), floorAt(Math.min(baseX, maxXPt)), scaleX, scaleY, PAD, GH, H);
+      const [x0c, y0c] = toCanvas(0, th, scaleX, scaleY, H);
+      const [x1c, y1c] = toCanvas(Math.min(baseX, maxXPt), floorAt(Math.min(baseX, maxXPt)), scaleX, scaleY, H);
       ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
       // Fill the hill body
       ctx.strokeStyle = '#64748b'; ctx.lineWidth = 3; ctx.stroke();
       ctx.beginPath();
       ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
-      const [xg, yg] = toCanvas(0, 0, scaleX, scaleY, PAD, GH, H);
+      const [xg, yg] = toCanvas(0, 0, scaleX, scaleY, H);
       ctx.lineTo(xg, yg); ctx.closePath();
       ctx.fillStyle = 'rgba(148,163,184,0.25)'; ctx.fill();
     } else {
-      const [x0c, y0c] = toCanvas(0, 0, scaleX, scaleY, PAD, GH, H);
-      const [x1c, y1c] = toCanvas(maxXPt, maxXPt * Math.tan(beta), scaleX, scaleY, PAD, GH, H);
+      const [x0c, y0c] = toCanvas(0, 0, scaleX, scaleY, H);
+      const [x1c, y1c] = toCanvas(maxXPt, maxXPt * Math.tan(beta), scaleX, scaleY, H);
       ctx.moveTo(x0c, y0c); ctx.lineTo(x1c, y1c);
       ctx.strokeStyle = '#64748b'; ctx.lineWidth = 3; ctx.stroke();
     }
@@ -233,7 +274,7 @@ function drawAll(
     const xStep = Math.ceil(maxX / 5 / 5) * 5 || 1;
     ctx.textAlign = 'center';
     for (let gx = 0; gx <= maxX * 1.15; gx += xStep) {
-      const [cx2] = toCanvas(gx, 0, scaleX, scaleY, PAD, GH, H);
+      const [cx2] = toCanvas(gx, 0, scaleX, scaleY, H);
       ctx.beginPath(); ctx.setLineDash([3, 4]); ctx.moveTo(cx2, PAD); ctx.lineTo(cx2, H - GH); ctx.stroke();
       ctx.setLineDash([]);
       if (mode !== 'vertical') ctx.fillText(`${gx}m`, cx2, H - GH + 14);
@@ -241,7 +282,7 @@ function drawAll(
     ctx.textAlign = 'right';
     const yStep = Math.ceil(maxY / 4 / 5) * 5 || 1;
     for (let gy = 0; gy <= maxY * 1.25; gy += yStep) {
-      const [, cy2] = toCanvas(0, gy, scaleX, scaleY, PAD, GH, H);
+      const [, cy2] = toCanvas(0, gy, scaleX, scaleY, H);
       if (cy2 < PAD) continue;
       ctx.beginPath(); ctx.setLineDash([3, 4]); ctx.moveTo(PAD, cy2); ctx.lineTo(W - PAD, cy2); ctx.stroke();
       ctx.setLineDash([]); ctx.fillText(`${gy}m`, PAD - 3, cy2 + 4);
@@ -252,16 +293,16 @@ function drawAll(
   // Ghost path
   if (path.length > 1) {
     ctx.save(); ctx.beginPath();
-    const [gx0, gy0] = toCanvas(path[0].x, path[0].y, scaleX, scaleY, PAD, GH, H);
+    const [gx0, gy0] = toCanvas(path[0].x, path[0].y, scaleX, scaleY, H);
     ctx.moveTo(gx0, gy0);
-    path.slice(1).forEach(p => { const [cx2, cy2] = toCanvas(p.x, p.y, scaleX, scaleY, PAD, GH, H); ctx.lineTo(cx2, cy2); });
+    path.slice(1).forEach(p => { const [cx2, cy2] = toCanvas(p.x, p.y, scaleX, scaleY, H); ctx.lineTo(cx2, cy2); });
     ctx.strokeStyle = 'rgba(99,102,241,0.18)'; ctx.lineWidth = 2;
     ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
   }
 
   // Peak + landing markers
-  const [pCx, pCy] = toCanvas(maxX / 2, maxY, scaleX, scaleY, PAD, GH, H);
-  const [, pFloorY] = toCanvas(maxX / 2, floorAt(maxX / 2), scaleX, scaleY, PAD, GH, H);
+  const [pCx, pCy] = toCanvas(maxX / 2, maxY, scaleX, scaleY, H);
+  const [, pFloorY] = toCanvas(maxX / 2, floorAt(maxX / 2), scaleX, scaleY, H);
   ctx.save();
   ctx.beginPath(); ctx.setLineDash([4, 3]);
   ctx.moveTo(pCx, pCy); ctx.lineTo(pCx, pFloorY);
@@ -269,7 +310,7 @@ function drawAll(
   ctx.fillStyle = '#6366f1'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(`${maxY.toFixed(1)}m`, pCx, pCy - 8); ctx.restore();
 
-  const [lCx, lCy] = toCanvas(maxX, floorAt(maxX), scaleX, scaleY, PAD, GH, H);
+  const [lCx, lCy] = toCanvas(maxX, floorAt(maxX), scaleX, scaleY, H);
   ctx.save();
   ctx.beginPath(); ctx.arc(lCx, lCy, 5, 0, Math.PI * 2);
   ctx.fillStyle = '#10b981'; ctx.fill();
@@ -288,8 +329,8 @@ function drawAll(
   }
 
   // Ball
-  const [bx, by] = toCanvas(x, Math.max(floorAt(x), y), scaleX, scaleY, PAD, GH, H);
-  const [, groundY] = toCanvas(x, floorAt(x), scaleX, scaleY, PAD, GH, H);
+  const [bx, by] = toCanvas(x, Math.max(floorAt(x), y), scaleX, scaleY, H);
+  const [, groundY] = toCanvas(x, floorAt(x), scaleX, scaleY, H);
   ctx.beginPath(); ctx.ellipse(bx, groundY + 5, 10, 4, 0, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fill();
   const glow = ctx.createRadialGradient(bx, by, 0, bx, by, BR * 2.5);
@@ -309,7 +350,7 @@ function drawAll(
     // shrank as an unwanted side effect whenever the platform-height fix
     // needed to zoom the diagram out. Capped at 65px for high speed, same
     // as before.
-    const k = Math.min(2.5 * uiScale, (65 * uiScale) / speed);
+    const k = Math.min(2.5, 65 / speed);
     const exR = bx + vx * k, eyR = by - vy * k; // resultant tip (canvas space)
 
     const drawArrowhead = (fromX: number, fromY: number, toX: number, toY: number, color: string, width: number) => {
@@ -482,8 +523,7 @@ export function ProjectileModeCanvas({
             ? Math.max(0, (setup.topHeight ?? 0) - ns.x * tb)
             : ns.x * tb;
         }
-        const uiScale = computeUiScale(width, height);
-        const [tbx, tby] = toCanvas(ns.x, Math.max(floor, ns.y), scaleX, scaleY, BASE_PAD * uiScale, BASE_GH * uiScale, height);
+        const [tbx, tby] = toCanvas(ns.x, Math.max(floor, ns.y), scaleX, scaleY, height);
         trailRef.current.push([tbx, tby]);
         if (trailRef.current.length > 140) trailRef.current.shift();
         onTick?.(ns.t, ns.x, Math.max(floor, ns.y));
@@ -499,7 +539,7 @@ export function ProjectileModeCanvas({
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isRunning, isPaused, speedIdx, scaleX, scaleY, width, height, mode, setup.beta, setup.launchFrom, setup.topHeight, draw, onTick, onComplete]);
+  }, [isRunning, isPaused, speedIdx, scaleX, scaleY, height, mode, setup.beta, setup.launchFrom, setup.topHeight, draw, onTick, onComplete]);
 
   return (
     <div className="space-y-2">
@@ -538,3 +578,18 @@ export function ProjectileModeCanvas({
     </div>
   );
 }
+AFEOF
+
+echo ""
+echo "Patch v40 applied -- 1 files written."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /simulations/projectile-motion -> Standard tab. Set a platform"
+echo "height, then sweep velocity across the FULL slider range (1 to 100)"
+echo "at several different angles -- the platform must not move at all,"
+echo "anywhere in that range. Also check that the velocity/component"
+echo "arrows look a normal, readable size regardless of platform height or"
+echo "velocity -- they should no longer shrink."

@@ -1,9 +1,10 @@
 'use client';
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { HeatTransferCanvas, HeatMode } from '@/components/simulation/HeatTransferCanvas';
+import { MagneticFieldCanvas, MagneticMode } from '@/components/simulation/MagneticFieldCanvas';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
-import { MATERIALS } from '@/lib/physics/heat';
+
+type Topic = 'straight-wire' | 'solenoid' | 'motor-effect';
 
 function num(sp: URLSearchParams, key: string, fallback: number, min: number, max: number) {
   const v = Number(sp.get(key));
@@ -37,33 +38,33 @@ function PoweredBy() {
   );
 }
 
-function HeatEmbedInner() {
+function MagneticEmbedInner() {
   const sp = useSearchParams();
-  const mode = ((): HeatMode => {
-    const m = sp.get('mode');
-    return m === 'convection' || m === 'radiation' ? m : 'conduction';
+  const topic = ((): Topic => {
+    const t = sp.get('topic');
+    return t === 'solenoid' || t === 'motor-effect' ? t : 'straight-wire';
   })();
   const showControls = sp.get('controls') !== '0';
-  const [hotTemp, setHotTemp] = useState(() => num(sp, 'hot', 90, 30, 120));
-  const [coldTemp, setColdTemp] = useState(() => num(sp, 'cold', 20, 0, 40));
-  const [materialIdx, setMaterialIdx] = useState(() => {
-    const i = MATERIALS.findIndex(m => m.name === sp.get('material'));
-    return i >= 0 ? i : 0;
-  });
-  const material = MATERIALS[materialIdx];
+
+  const [current, setCurrent] = useState(() => num(sp, 'current', 5, 1, 20));
+  const [currentOut, setCurrentOut] = useState(() => sp.get('out') !== '0');
+  const [turnsPerMetre, setTurnsPerMetre] = useState(() => num(sp, 'turns', 1000, 200, 3000));
+  const [fieldB, setFieldB] = useState(() => num(sp, 'field', 0.5, 0.1, 2));
 
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); }, []);
+  const [resetKey, setResetKey] = useState(0);
+  const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(reset, 80);
-  }, [mode, hotTemp, coldTemp, materialIdx, reset]);
+    resetTimer.current = setTimeout(reset, 100);
+  }, [topic, current, currentOut, turnsPerMetre, fieldB, reset]);
 
   return (
     <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <HeatTransferCanvas mode={mode} hotTemp={hotTemp} coldTemp={coldTemp} materialK={material.k}
+      <MagneticFieldCanvas key={resetKey} mode={topic as MagneticMode} current={current} currentOut={currentOut}
+        turnsPerMetre={turnsPerMetre} fieldB={fieldB}
         isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
       <SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
@@ -71,17 +72,20 @@ function HeatEmbedInner() {
       {showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
-          <Slider label="Hot temperature" unit="°C" value={hotTemp} min={30} max={120} step={5} set={setHotTemp} color="#ef4444" />
-          <Slider label="Cold temperature" unit="°C" value={coldTemp} min={0} max={40} step={5} set={setColdTemp} color="#3b82f6" />
-          {mode === 'conduction' && (
-            <div className="grid grid-cols-2 gap-1.5">
-              {MATERIALS.map((m, i) => (
-                <button key={m.name} onClick={() => setMaterialIdx(i)}
-                  className={`rounded-lg border px-2 py-2 text-xs font-medium transition ${
-                    materialIdx === i ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
-                  }`}>{m.name}</button>
-              ))}
-            </div>
+          <Slider label="Current" unit="A" value={current} min={1} max={20} step={1} set={setCurrent} color="#6366f1" />
+          <div className="flex gap-2">
+            {([true, false] as const).map(v => (
+              <button key={String(v)} onClick={() => setCurrentOut(v)}
+                className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium transition ${
+                  currentOut === v ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                }`}>{v ? 'Out ⊙' : 'In ⊗'}</button>
+            ))}
+          </div>
+          {topic === 'solenoid' && (
+            <Slider label="Turns per metre" unit="n/m" value={turnsPerMetre} min={200} max={3000} step={100} set={setTurnsPerMetre} color="#f59e0b" />
+          )}
+          {topic === 'motor-effect' && (
+            <Slider label="Field strength" unit="T" value={fieldB} min={0.1} max={2} step={0.1} set={setFieldB} color="#f59e0b" />
           )}
         </div>
       )}
@@ -90,10 +94,10 @@ function HeatEmbedInner() {
   );
 }
 
-export default function HeatEmbedPage() {
+export default function MagneticEmbedPage() {
   return (
     <Suspense fallback={<div className="p-8 text-center text-xs text-gray-400">Loading simulation…</div>}>
-      <HeatEmbedInner />
+      <MagneticEmbedInner />
     </Suspense>
   );
 }

@@ -7,6 +7,7 @@ interface Props {
   mode: HeatMode;
   hotTemp: number;    // °C
   coldTemp: number;   // °C
+  materialK: number;  // W/mK — conduction mode only, drives propagation speed
   isRunning: boolean; isPaused: boolean;
   width?: number; height?: number;
 }
@@ -36,18 +37,18 @@ function flame(ctx: CanvasRenderingContext2D, x: number, y: number, t: number) {
   ctx.restore();
 }
 
-export function HeatTransferCanvas({ mode, hotTemp, coldTemp, isRunning, isPaused, width = 640, height = 300 }: Props) {
+export function HeatTransferCanvas({ mode, hotTemp, coldTemp, materialK, isRunning, isPaused, width = 640, height = 300 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const tRef = useRef(0);
   const lastFrameRef = useRef<number | null>(null);
   const warmthRef = useRef(0); // radiation target warming 0→1
-  const sim = useRef({ mode, hotTemp, coldTemp, isRunning, isPaused });
-  sim.current = { mode, hotTemp, coldTemp, isRunning, isPaused };
+  const sim = useRef({ mode, hotTemp, coldTemp, materialK, isRunning, isPaused });
+  sim.current = { mode, hotTemp, coldTemp, materialK, isRunning, isPaused };
 
   useEffect(() => {
     tRef.current = 0; lastFrameRef.current = null; warmthRef.current = 0;
-  }, [mode, hotTemp, coldTemp]);
+  }, [mode, hotTemp, coldTemp, materialK]);
 
   const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
@@ -82,12 +83,20 @@ export function HeatTransferCanvas({ mode, hotTemp, coldTemp, isRunning, isPause
       ctx.strokeRect(rodX, rodY, rodW, rodH);
       // Particles: fixed lattice positions, vibration amplitude ∝ local T.
       // Energy passes along WITHOUT the particles migrating — that is conduction.
+      // The wave of vibration spreads left→right at a rate tied to the
+      // material's actual thermal conductivity (log-scaled, since k spans
+      // four orders of magnitude from air to copper) — verified
+      // numerically to give a watchable spread from ~0.4s for copper to
+      // ~4s for air, so switching materials visibly changes how fast the
+      // "message" travels, not just a number in a table.
+      const logK = Math.log10(Math.max(s.materialK, 0.001));
+      const speedFactor = 0.5 + Math.max(0, Math.min(1, (logK - Math.log10(0.02)) / (Math.log10(400) - Math.log10(0.02)))) * 5.5;
       const cols = 22, rows = 3;
       for (let c = 0; c < cols; c++) {
         const frac = c / (cols - 1);
         const localT = s.hotTemp + (s.coldTemp - s.hotTemp) * frac;
         // The "wave" of vibration spreads left→right over time
-        const reached = t * 4 > frac * 10;
+        const reached = t * speedFactor * 4 > frac * 10;
         const amp = reached ? 1.5 + (localT / 120) * 5 : 1;
         for (let r = 0; r < rows; r++) {
           const x0 = rodX + 16 + c * ((rodW - 32) / (cols - 1));
@@ -103,7 +112,7 @@ export function HeatTransferCanvas({ mode, hotTemp, coldTemp, isRunning, isPause
       ctx.fillText(`HOT ${s.hotTemp}°C`, rodX + 20, rodY - 10);
       ctx.fillText(`COLD ${s.coldTemp}°C`, rodX + rodW - 24, rodY - 10);
       ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui';
-      ctx.fillText('Particles vibrate harder and pass energy along — they do NOT move down the rod', W / 2, H - 26);
+      ctx.fillText(`k = ${s.materialK} W/mK — particles vibrate harder and pass energy along, they do NOT move down the rod`, W / 2, H - 26);
     }
 
     if (s.mode === 'convection') {
@@ -123,10 +132,8 @@ export function HeatTransferCanvas({ mode, hotTemp, coldTemp, isRunning, isPause
         const phase = (i / N) * Math.PI * 2 + t * 0.8;
         // parametric loop: angle 0 = bottom-left rising
         const px = cxm - Math.cos(phase) * rx;
-        const py = cym + Math.sin(phase) * ry * (Math.cos(phase) > 0 ? 1 : 1);
+        const py = cym + Math.sin(phase) * ry;
         const yFrac = (py - by) / bh;            // 0 top … 1 bottom
-        const rising = Math.sin(phase) < 0 ? false : true;
-        void rising;
         const localT = s.hotTemp * (1 - yFrac) * 0.4 + (yFrac > 0.7 && px < cxm ? s.hotTemp : s.coldTemp + (s.hotTemp - s.coldTemp) * (1 - yFrac) * 0.6);
         ctx.beginPath(); ctx.arc(px, py, 4.5, 0, Math.PI * 2);
         ctx.fillStyle = tempColor(Math.min(localT, 110)); ctx.fill();

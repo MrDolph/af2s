@@ -1,3 +1,57 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio — patch v41: mobile responsiveness for Projectile
+# Motion's layout constants — the platform-stability fix (v40) didn't
+# account for a small mobile canvas
+#
+#   DIAGNOSIS. The canvas's padding, ground-strip height, and ball radius
+#   were fixed pixel constants (44px, 44px, 8px) sized for the ~660px
+#   desktop design width, never adjusted for a smaller mobile canvas.
+#   Quantified before touching any code: on a ~320x200 mobile canvas,
+#   that fixed padding alone ate 28% of the width and 22% of the height,
+#   leaving barely half the canvas usable for the actual diagram — at
+#   exactly the moment (a small screen, parameters pushed toward their
+#   maximum) when every pixel matters most. The velocity-arrow sizing
+#   introduced in v40 had the same issue: a fixed 65px cap that was a
+#   reasonable size on desktop but oversized relative to a small mobile
+#   canvas.
+#
+#   FIX. All the fixed layout constants (padding, ground height, ball
+#   radius, arrow length) now scale down together via a single canvas-
+#   size-derived factor, unchanged at the original 660x300 design size
+#   and shrinking gracefully below it — the same pattern already used
+#   elsewhere in the app for mobile responsiveness. Verified numerically
+#   before shipping:
+#     - At the original 660x300 desktop size, every scaled value comes
+#       out EXACTLY the same as before (uiScale=1, padding=44px,
+#       ground=44px) — zero visual change on desktop.
+#     - On a 320x200 mobile canvas, usable drawing area improves from
+#       72%x56% of the canvas up to 82%x71%.
+#     - Re-verified the platform-height stability fix from the previous
+#       patch STILL holds exactly with the new mobile-scaled constants —
+#       swept the full velocity range (1 to 100 m/s) on a mobile-sized
+#       canvas with maximum platform height and confirmed the platform's
+#       pixel position stays bit-for-bit identical throughout, exactly as
+#       it does on desktop.
+#     - Velocity arrows now scale down proportionally on mobile (33px for
+#       20m/s on a 320px canvas vs 50px on the 660px desktop canvas)
+#       instead of using the same absolute pixel size regardless of
+#       screen size.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v41-projectile-mobile-scaling.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "-- A-Factor patch v41: mobile-scale Projectile Motion's layout constants --"
+mkdir -p "src/components/simulation"
+
+echo "  -> src/components/simulation/ProjectileModeCanvas.tsx"
+cat > "src/components/simulation/ProjectileModeCanvas.tsx" << 'AFEOF'
 'use client';
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
@@ -538,3 +592,18 @@ export function ProjectileModeCanvas({
     </div>
   );
 }
+AFEOF
+
+echo ""
+echo "Patch v41 applied -- 1 files written."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /simulations/projectile-motion on a narrow mobile-width browser"
+echo "window. Set a platform height near the slider maximum and sweep"
+echo "velocity across its full range -- the platform should stay"
+echo "completely fixed, exactly as on desktop, and the diagram should use"
+echo "noticeably more of the available canvas space instead of most of it"
+echo "being eaten by padding. Desktop should look completely unchanged."
