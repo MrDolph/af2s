@@ -193,6 +193,7 @@ export const PRESETS: QHOPreset[] = [
   },
   {
     name: '0+1 superposition',
+    color: '#f97316',
     description: 'An equal mix of ground and first excited states. Watch the probability "slosh" left and right — the quantum analogue of classical oscillation.',
     coeffs: [0.7071, 0.7071, 0, 0, 0, 0],
     speed: 1, xMax: 6, eMax: 4.5, nMax: 5,
@@ -201,6 +202,7 @@ export const PRESETS: QHOPreset[] = [
   },
   {
     name: '0+2 superposition',
+    color: '#f43f5e',
     description: 'Ground plus second excited. The probability "breathes" in place — expanding and contracting while staying centred.',
     coeffs: [0.7071, 0, 0.7071, 0, 0, 0],
     speed: 1, xMax: 6, eMax: 4.5, nMax: 5,
