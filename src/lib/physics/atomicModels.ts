@@ -82,24 +82,59 @@ export function updateThomsonElectrons(electrons: ThomsonElectron[], dt: number,
 }
 
 export function createAlphaParticle(b: number, E: number): ScatteringParticle {
-  return { x: -600, y: b, vx: Math.sqrt(2 * E / 4) * 60, vy: 0, energy: E, active: true, trail: [] };
+  return { x: -600, y: b, vx: Math.sqrt(2 * E / 4) * 28, vy: 0, energy: E, active: true, trail: [] };
 }
 
-export function updateAlphaParticle(p: ScatteringParticle, dt: number, Z: number): ScatteringParticle {
+export function updateAlphaParticle(
+  p: ScatteringParticle,
+  dt: number,
+  Z: number
+): ScatteringParticle {
   if (!p.active) return p;
-  const k = 1.44, mAlpha = 4;
-  const r2 = p.x * p.x + p.y * p.y;
-  const r = Math.sqrt(r2);
-  if (r < 2 || Math.abs(p.x) > 700) return { ...p, active: false };
-  const a = (2 * Z * k) / (mAlpha * r2);
-  const ax = (a * p.x) / r, ay = (a * p.y) / r;
-  const newVx = p.vx + ax * dt * 120;
-  const newVy = p.vy + ay * dt * 120;
-  const newX = p.x + newVx * dt * 12;
-  const newY = p.y + newVy * dt * 12;
-  const trail = [...p.trail, { x: newX, y: newY }];
-  if (trail.length > 80) trail.shift();
-  return { ...p, x: newX, y: newY, vx: newVx, vy: newVy, trail, active: true };
+
+  // Tuned for visible, physically intuitive Rutherford scattering:
+  // k is increased so Coulomb repulsion dominates for close approaches.
+  const k = 18.0;        // effective Coulomb constant (tuned for visual clarity)
+  const mAlpha = 4;
+  const softening = 2.0; // prevents 1/r² singularity; simulates finite nuclear size
+
+  // Only deactivate when the particle is far off-screen.
+  // CRITICAL FIX: removed the old `r < 2` check that killed particles
+  // before they could rebound.
+  if (Math.abs(p.x) > 750 || Math.abs(p.y) > 500) {
+    return { ...p, active: false };
+  }
+
+  // Sub-step integration: prevents high-velocity particles from
+  // "jumping" through the nucleus in a single frame.
+  const steps = 4;
+  const sdt = dt / steps;
+  let x = p.x,
+    y = p.y,
+    vx = p.vx,
+    vy = p.vy;
+
+  for (let i = 0; i < steps; i++) {
+    const r2 = x * x + y * y;
+    const r = Math.sqrt(r2 + softening * softening);
+
+    // Coulomb repulsion: both alpha (+2e) and nucleus (+Ze) are positive.
+    const a = (2 * Z * k) / (mAlpha * r * r);
+
+    // Acceleration vector points radially outward (repulsive).
+    const ax = (a * x) / r;
+    const ay = (a * y) / r;
+
+    vx += ax * sdt * 120;
+    vy += ay * sdt * 120;
+    x += vx * sdt * 12;
+    y += vy * sdt * 12;
+  }
+
+  const trail = [...p.trail, { x, y }];
+  if (trail.length > 120) trail.shift(); // longer trails to show full rebound arc
+
+  return { ...p, x, y, vx, vy, trail, active: true };
 }
 
 export function bohrEnergy(n: number, Z: number = 1): number {

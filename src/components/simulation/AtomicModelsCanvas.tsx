@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useEffect, useCallback } from 'react';
 import {
-  AtomicParams, BOHR_RADIUS, SPEED_OF_LIGHT,
+  AtomicParams, AtomicModel,
   generateThomsonElectrons, updateThomsonElectrons,
   createAlphaParticle, updateAlphaParticle,
   bohrEnergy, bohrRadius, bohrVelocity, transitionWavelength,
@@ -117,33 +117,102 @@ export function AtomicModelsCanvas({ params, isRunning, isPaused, onTick }: Prop
 
   const drawRutherford = useCallback((ctx: CanvasRenderingContext2D, cx: number, cy: number, w: number, h: number, dt: number, p: AtomicParams) => {
     const scale = Math.min(w, h) * 0.42 * p.zoom;
+    const Z = p.protonCount || 79;
+    const A = Z + (p.neutronCount || 0);
+
     if (p.showNucleus) {
-      const nr = Math.max(5, scale * 0.045);
-      const ng = ctx.createRadialGradient(cx, cy, 0, cx, cy, nr * 4);
-      ng.addColorStop(0, 'rgba(251,191,36,1)');
-      ng.addColorStop(0.4, 'rgba(251,191,36,0.5)');
-      ng.addColorStop(1, 'rgba(251,191,36,0)');
-      ctx.fillStyle = ng; ctx.beginPath(); ctx.arc(cx, cy, nr * 4, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fbbf24'; ctx.beginPath(); ctx.arc(cx, cy, nr, 0, Math.PI * 2); ctx.fill();
-      if (p.showLabels) { ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 13px ' + getFont(); ctx.textAlign = 'center'; ctx.fillText(`Nucleus (Z=${p.protonCount})`, cx, cy + nr + 20); }
+      const nuclearFm = 1.2 * Math.pow(A, 1 / 3);
+      const nr = Math.max(6, scale * 0.018 * Math.pow(A, 1 / 3));
+
+      // Coulomb field halo
+      const fieldR = nr * (3 + Math.log10(Math.max(Z, 1)));
+      const fieldGrad = ctx.createRadialGradient(cx, cy, nr, cx, cy, fieldR);
+      fieldGrad.addColorStop(0, `rgba(251,191,36,${0.08 + Z / 2000})`);
+      fieldGrad.addColorStop(0.6, 'rgba(251,191,36,0.03)');
+      fieldGrad.addColorStop(1, 'rgba(251,191,36,0)');
+      ctx.fillStyle = fieldGrad;
+      ctx.beginPath(); ctx.arc(cx, cy, fieldR, 0, Math.PI * 2); ctx.fill();
+
+      // Dense core
+      const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, nr * 2.5);
+      coreGlow.addColorStop(0, 'rgba(255,255,255,0.95)');
+      coreGlow.addColorStop(0.25, 'rgba(251,191,36,0.85)');
+      coreGlow.addColorStop(0.7, 'rgba(245,158,11,0.35)');
+      coreGlow.addColorStop(1, 'rgba(245,158,11,0)');
+      ctx.fillStyle = coreGlow;
+      ctx.beginPath(); ctx.arc(cx, cy, nr * 2.5, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath(); ctx.arc(cx, cy, nr, 0, Math.PI * 2); ctx.fill();
+
+      // Hard-sphere rim
+      ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(cx, cy, nr, 0, Math.PI * 2); ctx.stroke();
+
+      if (p.showLabels) {
+        ctx.fillStyle = '#fbbf24'; ctx.font = 'bold 13px ' + getFont(); ctx.textAlign = 'center';
+        ctx.fillText(`Nucleus  (${A}, ${Z})`, cx, cy + nr + 20);
+        ctx.fillStyle = 'rgba(251,191,36,0.7)'; ctx.font = '11px ' + getFont();
+        ctx.fillText(`r ≈ ${nuclearFm.toFixed(1)} fm`, cx, cy + nr + 36);
+      }
     }
-    if (dt > 0) {
-      if (Math.random() < 0.04 * p.speed) { const b = (Math.random() - 0.5) * 400; scatterRef.current.push(createAlphaParticle(b, p.alphaEnergy || 5)); }
-      scatterRef.current = scatterRef.current.map(part => updateAlphaParticle(part, dt, p.protonCount)).filter(part => part.active);
+
+    // Alpha spawn / update
+    if (dt > 0 && propsRef.current.isRunning && !propsRef.current.isPaused) {
+      if (Math.random() < 0.04 * p.speed) {
+        const b = (Math.random() - 0.5) * 400;
+        scatterRef.current.push(createAlphaParticle(b, p.alphaEnergy || 5));
+      }
+      scatterRef.current = scatterRef.current
+        .map(part => updateAlphaParticle(part, dt, p.protonCount))
+        .filter(part => part.active);
     }
-    scatterRef.current.forEach(p => {
-      if (p.trail.length > 1) {
+
+    let recoilIntensity = 0;
+
+    scatterRef.current.forEach(part => {
+      const px = cx + part.x * scale * 0.0018;
+      const py = cy + part.y * scale * 0.0018;
+      const dx = px - cx;
+      const dy = py - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (part.active && dist < scale * 0.08) {
+        recoilIntensity = Math.max(recoilIntensity, 1 - dist / (scale * 0.08));
+      }
+
+      if (part.trail.length > 1) {
         ctx.strokeStyle = 'rgba(244,63,94,0.4)'; ctx.lineWidth = 1.5; ctx.beginPath();
-        p.trail.forEach((pt, i) => { const px = cx + pt.x * scale * 0.0018, py = cy + pt.y * scale * 0.0018; if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py); });
+        part.trail.forEach((pt, i) => {
+          const tx = cx + pt.x * scale * 0.0018;
+          const ty = cy + pt.y * scale * 0.0018;
+          if (i === 0) ctx.moveTo(tx, ty); else ctx.lineTo(tx, ty);
+        });
         ctx.stroke();
       }
-      const px = cx + p.x * scale * 0.0018, py = cy + p.y * scale * 0.0018;
+
       const glow = ctx.createRadialGradient(px, py, 0, px, py, 10);
       glow.addColorStop(0, 'rgba(244,63,94,0.6)'); glow.addColorStop(1, 'rgba(244,63,94,0)');
       ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
     });
-    if (p.showLabels) drawInfoBox(ctx, w, h, ['Ernest Rutherford (1911)', '• Most α pass through → atom is EMPTY', '• Some bounce back → nucleus is TINY', '• Classical problem: orbiting e⁻ radiates']);
+
+    // Recoil flash
+    if (recoilIntensity > 0) {
+      const flashNr = Math.max(6, scale * 0.018 * Math.pow(A, 1 / 3));
+      const flashR = flashNr * 5;
+      const flashGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, flashR);
+      flashGrad.addColorStop(0, `rgba(255,255,255,${recoilIntensity * 0.35})`);
+      flashGrad.addColorStop(0.4, `rgba(251,191,36,${recoilIntensity * 0.2})`);
+      flashGrad.addColorStop(1, 'rgba(251,191,36,0)');
+      ctx.fillStyle = flashGrad;
+      ctx.globalCompositeOperation = 'screen';
+      ctx.beginPath(); ctx.arc(cx, cy, flashR, 0, Math.PI * 2); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    if (p.showLabels) drawInfoBox(ctx, w, h, ['Ernest Rutherford (1911)', '• Most α pass through → atom is EMPTY', '• Some bend → nucleus is charged', '• Rare rebound → nucleus is TINY & DENSE', '• Classical problem: orbiting e⁻ radiates']);
   }, [drawInfoBox]);
 
   const drawBohr = useCallback((ctx: CanvasRenderingContext2D, cx: number, cy: number, w: number, h: number, dt: number, p: AtomicParams) => {
@@ -176,7 +245,7 @@ export function AtomicModelsCanvas({ params, isRunning, isPaused, onTick }: Prop
       }
     }
     if (p.showElectrons) {
-      if (dt > 0) {
+      if (dt > 0 && propsRef.current.isRunning && !propsRef.current.isPaused) {
         bohrPhaseRef.current += dt * p.speed * (2.2 / bohrNRef.current);
         if (!transitionRef.current && Math.random() < 0.01 * p.speed) {
           const fromN = bohrNRef.current, delta = Math.random() < 0.5 ? -1 : 1;
@@ -212,7 +281,7 @@ export function AtomicModelsCanvas({ params, isRunning, isPaused, onTick }: Prop
       if (p.showSpin) { ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(ex - 5, ey - 12); ctx.lineTo(ex + 5, ey - 12); ctx.stroke(); ctx.beginPath(); ctx.moveTo(ex, ey - 12); ctx.lineTo(ex, ey - 18); ctx.stroke(); ctx.beginPath(); ctx.moveTo(ex - 4, ey - 16); ctx.lineTo(ex, ey - 18); ctx.lineTo(ex + 4, ey - 16); ctx.stroke(); }
       if (p.showLabels) { ctx.fillStyle = '#cbd5e1'; ctx.font = '12px ' + getFont(); ctx.textAlign = 'center'; ctx.fillText(`e⁻ n=${Math.round(curN + (tgtN - curN) * prog)}`, ex, ey - 18); }
     }
-    if (dt > 0) { for (let i = photonsRef.current.length - 1; i >= 0; i--) { const p = photonsRef.current[i]; p.x += Math.cos(p.angle) * 220 * dt * params.speed; p.y += Math.sin(p.angle) * 220 * dt * params.speed; p.life -= dt * params.speed * 0.55; if (p.life <= 0) photonsRef.current.splice(i, 1); } }
+    if (dt > 0 && p.isRunning && !p.isPaused) { for (let i = photonsRef.current.length - 1; i >= 0; i--) { const p = photonsRef.current[i]; p.x += Math.cos(p.angle) * 220 * dt * params.speed; p.y += Math.sin(p.angle) * 220 * dt * params.speed; p.life -= dt * params.speed * 0.55; if (p.life <= 0) photonsRef.current.splice(i, 1); } }
     photonsRef.current.forEach(p => { const col = wavelengthToRGB(p.wavelength); ctx.globalAlpha = Math.max(0, p.life); ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(p.x - Math.cos(p.angle) * 12, p.y - Math.sin(p.angle) * 12); ctx.lineTo(p.x + Math.cos(p.angle) * 12, p.y + Math.sin(p.angle) * 12); ctx.stroke(); ctx.globalAlpha = 1; });
     if (p.showSpectrum) {
       const bY = h - 28, bW = w - 140, bX = 120;
@@ -223,7 +292,7 @@ export function AtomicModelsCanvas({ params, isRunning, isPaused, onTick }: Prop
       photonsRef.current.forEach(p => { if (p.wavelength >= 380 && p.wavelength <= 780) { const xx = bX + ((p.wavelength - 380) / 400) * bW; ctx.fillStyle = wavelengthToRGB(p.wavelength); ctx.globalAlpha = Math.max(0, p.life); ctx.fillRect(xx - 2, bY - 14, 5, 24); ctx.globalAlpha = 1; } });
     }
     if (p.showLabels) drawInfoBox(ctx, w, h, ['Niels Bohr (1913)', '• Stationary states: no radiation', '• L = nℏ (quantized angular momentum)', '• Eₙ = -13.6 Z²/n² eV', '• ΔE = hν (photon emission/absorption)']);
-    if (onTick) { const now = performance.now(); if (now - lastTickRef.current > 80) { lastTickRef.current = now; const n = bohrNRef.current; onTick({ energy: bohrEnergy(n, Z), radius: bohrRadius(n, Z), velocity: bohrVelocity(n, Z) / SPEED_OF_LIGHT, n, wavelength: transitionRef.current ? transitionWavelength(transitionRef.current.fromN, transitionRef.current.toN, Z) : 0, shellConfig: '' }); } }
+    if (onTick) { const now = performance.now(); if (now - lastTickRef.current > 80) { lastTickRef.current = now; const n = bohrNRef.current; onTick({ energy: bohrEnergy(n, Z), radius: bohrRadius(n, Z), velocity: bohrVelocity(n, Z) / 2.998e8, n, wavelength: transitionRef.current ? transitionWavelength(transitionRef.current.fromN, transitionRef.current.toN, Z) : 0, shellConfig: '' }); } }
   }, [drawInfoBox, onTick, params.speed]);
 
   const drawQuantum = useCallback((ctx: CanvasRenderingContext2D, cx: number, cy: number, w: number, h: number, dt: number, p: AtomicParams) => {
@@ -260,7 +329,7 @@ export function AtomicModelsCanvas({ params, isRunning, isPaused, onTick }: Prop
       ctx.strokeStyle = 'rgba(99,102,241,0.85)'; ctx.lineWidth = 2; ctx.beginPath();
       samples.forEach((s, i) => { const xx = px + (s.r / rMax) * pw, yy = py + ph - (s.d / (maxD || 1)) * ph; if (i === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy); });
       ctx.stroke();
-      const a0x = px + (n * n * BOHR_RADIUS / rMax) * pw;
+      const a0x = px + (n * n * 0.529 / rMax) * pw;
       ctx.strokeStyle = 'rgba(244,63,94,0.5)'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(a0x, py); ctx.lineTo(a0x, py + ph); ctx.stroke(); ctx.setLineDash([]);
     }
     if (p.showLabels) { const labels = ['s', 'p', 'd', 'f']; drawInfoBox(ctx, w, h, ['Schrödinger (1926)', '• Ψ = probability amplitude', '• |Ψ|² = probability density', '• No orbit — only probability cloud', `• n=${n} l=${l} (${labels[l]}) m=${m}`]); }
