@@ -258,6 +258,17 @@ const SIMULATIONS = [
     status: 'live',
   },
   {
+    slug: 'atomic-models',
+    href: '/simulations/atomic-models',
+    title: 'Atomic Models',
+    description: 'Explore the evolution of atomic theory from Thomson to quantum mechanics, with interactive scattering, quantized orbits, fine structure, Zeeman effect, and quantum orbitals.',
+    icon: '⚛️',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'A-Level'],
+    subtopic: 'Atomic Physics',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
     slug: 'friction',
     href: '/simulations/friction',
     title: 'Friction',
