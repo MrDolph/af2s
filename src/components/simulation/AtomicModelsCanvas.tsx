@@ -75,18 +75,25 @@ export function AtomicModelsCanvas({ params, isRunning, isPaused, onTick }: Prop
   }, []);
 
   const drawInfoBox = useCallback((ctx: CanvasRenderingContext2D, w: number, h: number, lines: string[]) => {
-    const bw = Math.min(300, w * 0.42);
-    const bh = lines.length * 17 + 18;
+    const isMobile = w < 520;
+    const bw = isMobile ? Math.min(w - 24, 260) : Math.min(300, w * 0.42);
+    const lineHeight = isMobile ? 13 : 17;
+    const fontSize = isMobile ? 10 : 12;
+    const pad = isMobile ? 8 : 10;
+    const bh = lines.length * lineHeight + pad * 2 + 4;
     const bx = w - bw - 12;
-    const by = h - bh - 12;
-    ctx.fillStyle = 'rgba(15,23,42,0.65)';
+    // Mobile: pin to top-right so it never overlaps the central nucleus / particles
+    // Desktop: keep at bottom-right
+    const by = isMobile ? 12 : h - bh - 12;
+
+    ctx.fillStyle = isMobile ? 'rgba(15,23,42,0.82)' : 'rgba(15,23,42,0.65)';
     ctx.fillRect(bx, by, bw, bh);
-    ctx.strokeStyle = 'rgba(148,163,184,0.18)';
+    ctx.strokeStyle = 'rgba(148,163,184,0.25)';
     ctx.strokeRect(bx, by, bw, bh);
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '12px ' + getFont();
+    ctx.font = `${fontSize}px ` + getFont();
     ctx.textAlign = 'left';
-    lines.forEach((line, i) => ctx.fillText(line, bx + 10, by + 18 + i * 17));
+    lines.forEach((line, i) => ctx.fillText(line, bx + pad, by + pad + 4 + i * lineHeight));
   }, []);
 
   const drawThomson = useCallback((ctx: CanvasRenderingContext2D, cx: number, cy: number, w: number, h: number, dt: number, p: AtomicParams) => {
@@ -182,7 +189,7 @@ export function AtomicModelsCanvas({ params, isRunning, isPaused, onTick }: Prop
       ctx.arc(cx, cy, nr, 0, Math.PI * 2); 
       ctx.stroke();
 
-      if (p.showLabels) {
+      if (p.showLabels && w >= 520) {
         ctx.fillStyle = '#fbbf24'; 
         ctx.font = 'bold 13px ' + getFont(); 
         ctx.textAlign = 'center';
