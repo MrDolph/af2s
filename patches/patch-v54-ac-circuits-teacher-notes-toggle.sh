@@ -1,3 +1,38 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio -- patch v54: AC Circuits -- collapsible Teacher
+# notes card, collapsed by default for a cleaner first impression
+#
+#   Does NOT touch simulations/page.tsx (the hub) -- only the AC Circuits
+#   page itself.
+#
+#   Added a Hide/Show toggle to the Teacher notes card, matching the
+#   existing Parameters panel's toggle exactly in style and behaviour.
+#   Defaults to COLLAPSED (unlike Parameters, which defaults open) --
+#   the teacher notes are genuinely useful reference material, but five
+#   dense bullet points of exam-level detail is the wrong thing to greet
+#   someone with the moment the page loads. Collapsing it by default lets
+#   the page open on just the simulation and its controls, with the
+#   notes one click away whenever they're wanted.
+#
+#   The toggle state persists as the user switches between the five
+#   topic tabs (same behaviour as the Parameters panel) -- once shown or
+#   hidden, it stays that way rather than resetting on every tab change.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v54-ac-circuits-teacher-notes-toggle.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "-- A-Factor patch v54: AC Circuits -- collapsible Teacher notes (no hub file changes) --"
+mkdir -p "src/app/simulations/ac-circuits"
+
+echo "  -> src/app/simulations/ac-circuits/page.tsx"
+cat > "src/app/simulations/ac-circuits/page.tsx" << 'AFEOF'
 'use client';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -431,3 +466,15 @@ export default function ACCircuitsPage() {
     </>
   );
 }
+AFEOF
+
+echo ""
+echo "Patch v54 applied -- 1 file(s) written. simulations/page.tsx was NOT touched."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /simulations/ac-circuits -- the Teacher notes card should"
+echo "now open collapsed, with a Show/Hide toggle matching the"
+echo "Parameters panel's style."
