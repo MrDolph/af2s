@@ -3,21 +3,117 @@ import { useRef, useEffect, useCallback } from 'react';
 import {
   angularFrequency, rmsFromPeak, inductiveReactance, capacitiveReactance,
   seriesRLCImpedance, seriesRLCPhaseAngleDeg,
+  parallelRLCBranchCurrents, parallelRLCTotalCurrent, parallelRLCImpedance, parallelRLCPhaseAngleDeg,
+  qFactorSeries, qFactorParallel, bandwidthHz, resonantAngularFrequency,
 } from '@/lib/physics/electromagnetism';
 
-export type ACMode = 'waveform' | 'reactance' | 'rlc-circuit';
+export type ACMode = 'waveform' | 'reactance' | 'series-rlc' | 'parallel-rlc' | 'resonance';
 
 interface Props {
   mode: ACMode;
-  vPeak: number;         // V
-  frequency: number;     // Hz
-  resistance: number;    // ohm — waveform & rlc-circuit
-  component: 'inductor' | 'capacitor'; // reactance mode
-  inductance: number;    // H — reactance & rlc-circuit
-  capacitance: number;   // F — reactance & rlc-circuit
+  vPeak: number;
+  frequency: number;
+  resistance: number;
+  component: 'inductor' | 'capacitor';
+  inductance: number;
+  capacitance: number;
+  resonanceCircuit: 'series' | 'parallel';
+  speedMultiplier: number;
+  phasorZoom: boolean;
   isRunning: boolean; isPaused: boolean;
   onTick?: (value: number) => void;
   width?: number; height?: number;
+}
+
+// ── Reusable circuit-symbol drawing helpers ─────────────────────────────────
+// The animated phasor/waveform reference (wt) uses a FIXED visual angular
+// rate, independent of the circuit's actual frequency — the RLC modes
+// default to 10-200Hz, and even at the slowest speed setting that's
+// 12-200+ cycles per second, an unwatchable blur no reasonable speed
+// slider range could bring back to a perceivable rate. All the PHYSICS
+// (XL, XC, Z, phase angles) still uses the real frequency-based omega —
+// only the on-screen animation rate is decoupled from it. One cycle every
+// 2 seconds at 1x speed, scaled by the speed slider from there.
+const VISUAL_OMEGA = 2 * Math.PI * 0.5;
+
+function drawResistor(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number) {
+  const n = 6, dx = (x1 - x0) / (n + 2), dy = (y1 - y0) / (n + 2);
+  const perp = { x: -dy, y: dx };
+  const len = Math.hypot(perp.x, perp.y) || 1;
+  const px = (perp.x / len) * 7, py = (perp.y / len) * 7;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0 + dx, y0 + dy);
+  for (let i = 0; i < n; i++) {
+    const sign = i % 2 === 0 ? 1 : -1;
+    const cx = x0 + dx * (i + 1.5), cy = y0 + dy * (i + 1.5);
+    ctx.lineTo(cx + px * sign, cy + py * sign);
+  }
+  ctx.lineTo(x1 - dx, y1 - dy); ctx.lineTo(x1, y1);
+  ctx.stroke();
+}
+function drawInductor(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number) {
+  const n = 5, dx = (x1 - x0) / n, dy = (y1 - y0) / n;
+  const r = Math.hypot(dx, dy) / 2;
+  const angBase = Math.atan2(dy, dx);
+  ctx.beginPath(); ctx.moveTo(x0, y0);
+  for (let i = 0; i < n; i++) {
+    const cx = x0 + dx * (i + 0.5), cy = y0 + dy * (i + 0.5);
+    ctx.arc(cx, cy, r * 0.85, angBase + Math.PI, angBase, false);
+  }
+  ctx.stroke();
+}
+function drawCapacitor(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, s: number) {
+  const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+  const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len;
+  const px = -uy * 10 * s, py = ux * 10 * s;
+  const gap = 5 * s;
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(mx - ux * gap, my - uy * gap); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(mx - ux * gap - px, my - uy * gap - py); ctx.lineTo(mx - ux * gap + px, my - uy * gap + py); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(mx + ux * gap - px, my + uy * gap - py); ctx.lineTo(mx + ux * gap + px, my + uy * gap + py); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(mx + ux * gap, my + uy * gap); ctx.lineTo(x1, y1); ctx.stroke();
+}
+function drawACSource(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, phase: number) {
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath();
+  for (let i = 0; i <= 20; i++) {
+    const f = i / 20;
+    const x = cx - r * 0.6 + f * r * 1.2;
+    const y = cy - Math.sin(f * Math.PI * 2 + phase) * r * 0.4;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+function drawFlowDots(ctx: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, flowFrac: number, color: string, s: number, count = 3) {
+  const dx = x1 - x0, dy = y1 - y0;
+  for (let i = 0; i < count; i++) {
+    const base = (i + 0.5) / count;
+    const local = Math.max(0.05, Math.min(0.95, base + flowFrac * (0.5 / count)));
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(x0 + dx * local, y0 + dy * local, 2.6 * s, 0, Math.PI * 2); ctx.fill();
+  }
+}
+// A single-component series loop (source -> component -> back), reused by
+// the pure-R, pure-L and pure-C circuit diagrams.
+function drawSingleComponentLoop(
+  ctx: CanvasRenderingContext2D, x0: number, y0: number, w: number, h: number,
+  kind: 'R' | 'L' | 'C', flowFrac: number, phase: number, uiScale: number, label: string,
+) {
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.6;
+  const topY = y0, botY = y0 + h;
+  ctx.beginPath(); ctx.moveTo(x0, topY); ctx.lineTo(x0 + w * 0.2, topY); ctx.stroke();
+  const compColor = 'rgba(79,70,229,0.85)';
+  if (kind === 'R') drawResistor(ctx, x0 + w * 0.2, topY, x0 + w * 0.8, topY);
+  else if (kind === 'L') drawInductor(ctx, x0 + w * 0.2, topY, x0 + w * 0.8, topY);
+  else drawCapacitor(ctx, x0 + w * 0.2, topY, x0 + w * 0.8, topY, uiScale);
+  drawFlowDots(ctx, x0 + w * 0.2, topY, x0 + w * 0.8, topY, flowFrac, compColor, uiScale);
+  ctx.beginPath();
+  ctx.moveTo(x0 + w * 0.8, topY); ctx.lineTo(x0 + w, topY); ctx.lineTo(x0 + w, botY);
+  ctx.lineTo(x0, botY); ctx.lineTo(x0, topY);
+  ctx.stroke();
+  drawACSource(ctx, x0, (topY + botY) / 2, 15 * uiScale, phase);
+  ctx.fillStyle = '#475569'; ctx.font = `${9.5 * uiScale}px system-ui`; ctx.textAlign = 'center';
+  ctx.fillText(label, x0 + w * 0.5, topY - 10 * uiScale);
 }
 
 function drawAxes(ctx: CanvasRenderingContext2D, gx: number, gy: number, gw: number, gh: number) {
@@ -26,42 +122,87 @@ function drawAxes(ctx: CanvasRenderingContext2D, gx: number, gy: number, gw: num
   ctx.strokeStyle = '#cbd5e1';
   ctx.strokeRect(gx, gy, gw, gh);
 }
-
-function traceWave(ctx: CanvasRenderingContext2D, gx: number, gy: number, gw: number, gh: number, phaseOffsetDeg: number, cycles: number, color: string, lineWidth: number) {
+function traceWave(ctx: CanvasRenderingContext2D, gx: number, gy: number, gw: number, gh: number, phaseOffsetDeg: number, ampFrac: number, cycles: number, color: string, lineWidth: number) {
   ctx.beginPath();
-  const n = 200;
+  const n = 160;
   for (let i = 0; i <= n; i++) {
     const frac = i / n;
     const angle = frac * cycles * 2 * Math.PI + (phaseOffsetDeg * Math.PI) / 180;
-    const y = gy + gh / 2 - Math.sin(angle) * (gh / 2 - 4);
+    const y = gy + gh / 2 - Math.sin(angle) * ampFrac * (gh / 2 - 4);
     const x = gx + frac * gw;
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
   ctx.strokeStyle = color; ctx.lineWidth = lineWidth; ctx.stroke();
 }
 
+// ── Clean, reusable phasor diagram ──────────────────────────────────────────
+// A shared, consistent style for every phasor plot in this canvas: faint
+// circular grid at thirds, 0/90/180/270 axis lines, proper triangular
+// arrowheads (not just bare lines), and labels placed just past each tip
+// with a small leader offset so they don't overlap the arrow itself.
+interface PhasorSpec { angleRad: number; magFrac: number; color: string; label: string; width?: number }
+function drawPhasorDiagram(
+  ctx: CanvasRenderingContext2D, cx: number, cy: number, maxR: number,
+  phasors: PhasorSpec[], uiScale: number, title?: string,
+) {
+  ctx.save();
+  ctx.strokeStyle = '#f1f5f9'; ctx.lineWidth = 1;
+  [0.33, 0.66, 1].forEach(f => { ctx.beginPath(); ctx.arc(cx, cy, maxR * f, 0, Math.PI * 2); ctx.stroke(); });
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.beginPath(); ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR); ctx.stroke();
+
+  phasors.forEach(({ angleRad, magFrac, color, label, width }) => {
+    const r = Math.max(0.04, Math.min(1, magFrac)) * maxR;
+    const ex = cx + Math.cos(angleRad) * r, ey = cy + Math.sin(angleRad) * r;
+    ctx.strokeStyle = color; ctx.lineWidth = width ?? 2.2;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ex, ey); ctx.stroke();
+    // Proper arrowhead
+    const headLen = 7 * uiScale, headAngle = 0.45;
+    ctx.save(); ctx.translate(ex, ey); ctx.rotate(angleRad);
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.moveTo(0, 0);
+    ctx.lineTo(-headLen * Math.cos(headAngle), -headLen * Math.sin(headAngle));
+    ctx.lineTo(-headLen * Math.cos(headAngle), headLen * Math.sin(headAngle));
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+    // Label with a short leader in the same radial direction, clear of the head
+    const lx = ex + Math.cos(angleRad) * 12 * uiScale, ly = ey + Math.sin(angleRad) * 12 * uiScale;
+    ctx.fillStyle = color; ctx.font = `bold ${9 * uiScale}px system-ui`;
+    ctx.textAlign = Math.cos(angleRad) >= 0 ? 'left' : 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, lx, ly);
+  });
+  ctx.textBaseline = 'alphabetic';
+  if (title) {
+    ctx.fillStyle = '#94a3b8'; ctx.font = `${8.5 * uiScale}px system-ui`; ctx.textAlign = 'center';
+    ctx.fillText(title, cx, cy + maxR + 22 * uiScale);
+  }
+  ctx.restore();
+}
+
 export function ACCircuitCanvas({
-  mode, vPeak, frequency, resistance, component, inductance, capacitance,
-  isRunning, isPaused, onTick, width = 660, height = 320,
+  mode, vPeak, frequency, resistance, component, inductance, capacitance, resonanceCircuit, speedMultiplier, phasorZoom,
+  isRunning, isPaused, onTick, width = 660, height = 380,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const t = useRef(0);
   const lastFrameRef = useRef<number | null>(null);
-  const sim = useRef({ mode, vPeak, frequency, resistance, component, inductance, capacitance, isRunning, isPaused, onTick });
-  sim.current = { mode, vPeak, frequency, resistance, component, inductance, capacitance, isRunning, isPaused, onTick };
+  const sim = useRef({ mode, vPeak, frequency, resistance, component, inductance, capacitance, resonanceCircuit, speedMultiplier, phasorZoom, isRunning, isPaused, onTick });
+  sim.current = { mode, vPeak, frequency, resistance, component, inductance, capacitance, resonanceCircuit, speedMultiplier, phasorZoom, isRunning, isPaused, onTick };
 
-  useEffect(() => { t.current = 0; lastFrameRef.current = null; }, [mode, vPeak, frequency, resistance, component, inductance, capacitance]);
+  useEffect(() => { t.current = 0; lastFrameRef.current = null; }, [mode, vPeak, frequency, resistance, component, inductance, capacitance, resonanceCircuit]);
 
   const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const s = sim.current;
     const W = canvas.width, H = canvas.height;
-    const uiScale = Math.max(0.55, Math.min(1, Math.min(W, H) / 300));
+    const uiScale = Math.max(0.55, Math.min(1, Math.min(W, H) / 340));
 
     if (s.isRunning && !s.isPaused && timestamp !== undefined) {
-      if (lastFrameRef.current !== null) t.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+      if (lastFrameRef.current !== null) t.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1) * s.speedMultiplier;
       lastFrameRef.current = timestamp;
     } else {
       lastFrameRef.current = timestamp ?? null;
@@ -73,78 +214,87 @@ export function ACCircuitCanvas({
     const omega = angularFrequency(s.frequency);
 
     if (s.mode === 'waveform') {
-      // Simple resistive AC circuit: V and I in phase.
       const iPeak = s.vPeak / s.resistance;
-      const wt = omega * t.current;
+      const wt = VISUAL_OMEGA * t.current;
       const vNow = s.vPeak * Math.sin(wt);
       const iNow = iPeak * Math.sin(wt);
       s.onTick?.(vNow);
 
-      // Phasor (rotating vector) on the left — its vertical projection is
-      // exactly the instantaneous value traced on the graph to the right,
-      // making the link between "rotating phasor" and "sine wave" explicit.
-      const pcx = W * 0.16, pcy = H / 2, pr = 55 * uiScale;
-      ctx.strokeStyle = '#e2e8f0'; ctx.beginPath(); ctx.arc(pcx, pcy, pr, 0, Math.PI * 2); ctx.stroke();
-      const angle = -wt; // canvas angle: negative so increasing wt rotates counterclockwise, matching sin(wt) rising
-      ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 2.5;
-      ctx.beginPath(); ctx.moveTo(pcx, pcy); ctx.lineTo(pcx + Math.cos(angle) * pr, pcy + Math.sin(angle) * pr); ctx.stroke();
-      ctx.setLineDash([3, 3]); ctx.strokeStyle = '#c7d2fe';
-      ctx.beginPath(); ctx.moveTo(pcx + Math.cos(angle) * pr, pcy + Math.sin(angle) * pr); ctx.lineTo(pcx, pcy + Math.sin(angle) * pr); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = '#64748b'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'center';
-      ctx.fillText('V, I phasor', pcx, pcy + pr + 16 * uiScale);
-      ctx.fillText('(in phase)', pcx, pcy + pr + 28 * uiScale);
+      if (s.phasorZoom) {
+        const pcx = W / 2, pcy = H * 0.48, pr = Math.min(W, H) * 0.36;
+        drawPhasorDiagram(ctx, pcx, pcy, pr, [
+          { angleRad: -wt, magFrac: 1, color: '#4f46e5', label: 'V, I', width: 3 },
+        ], uiScale, 'in phase — zoomed');
+        ctx.fillStyle = '#334155'; ctx.font = `bold ${11 * uiScale}px system-ui`; ctx.textAlign = 'center';
+        ctx.fillText(`v = ${vNow.toFixed(1)}V, i = ${iNow.toFixed(2)}A`, W / 2, H - 8);
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
 
-      const gx = W * 0.38, gy = H * 0.15, gw = W * 0.56, gh = H * 0.7;
+      drawSingleComponentLoop(ctx, W * 0.05, H * 0.08, W * 0.42, H * 0.3, 'R', iNow / iPeak, wt, uiScale, `R = ${s.resistance}Ω`);
+
+      const pcx = W * 0.17, pcy = H * 0.72, pr = 46 * uiScale;
+      drawPhasorDiagram(ctx, pcx, pcy, pr, [
+        { angleRad: -wt, magFrac: 1, color: '#4f46e5', label: 'V, I' },
+      ], uiScale, 'in phase');
+
+      const gx = W * 0.42, gy = H * 0.12, gw = W * 0.53, gh = H * 0.42;
       drawAxes(ctx, gx, gy, gw, gh);
-      const cycles = 2.5;
-      traceWave(ctx, gx, gy, gw, gh, -((wt * 180) / Math.PI) % 360, cycles, 'rgba(79,70,229,0.85)', 2);
-      // I trace, scaled to share the same visual amplitude but tagged separately
-      ctx.save(); ctx.globalAlpha = 0.7;
-      traceWave(ctx, gx, gy, gw, gh, -((wt * 180) / Math.PI) % 360, cycles, '#f59e0b', 1.6);
-      ctx.restore();
-      // RMS reference line
+      const wtDeg = -((wt * 180) / Math.PI) % 360;
+      traceWave(ctx, gx, gy, gw, gh, wtDeg, 1, 2.5, 'rgba(79,70,229,0.85)', 2);
+      traceWave(ctx, gx, gy, gw, gh, wtDeg, 1, 2.5, '#f59e0b', 1.5);
+      ctx.fillStyle = '#4f46e5'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'left';
+      ctx.fillText('— V(t)', gx + gw - 90 * uiScale, gy + 12 * uiScale);
+      ctx.fillStyle = '#f59e0b'; ctx.fillText('— I(t) (in phase)', gx + gw - 90 * uiScale, gy + 24 * uiScale);
       const rmsFracY = rmsFromPeak(1);
       ctx.strokeStyle = 'rgba(100,116,139,0.4)'; ctx.setLineDash([4, 4]);
       ctx.beginPath(); ctx.moveTo(gx, gy + gh / 2 - rmsFracY * (gh / 2 - 4)); ctx.lineTo(gx + gw, gy + gh / 2 - rmsFracY * (gh / 2 - 4)); ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#64748b'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'left';
-      ctx.fillText('RMS level', gx + 4, gy + gh / 2 - rmsFracY * (gh / 2 - 4) - 4);
-      ctx.fillStyle = '#4f46e5'; ctx.fillText('— V(t)', gx + gw - 90 * uiScale, gy + 12 * uiScale);
-      ctx.fillStyle = '#f59e0b'; ctx.fillText('— I(t) (in phase)', gx + gw - 90 * uiScale, gy + 24 * uiScale);
+      ctx.fillStyle = '#64748b'; ctx.fillText('RMS level', gx + 4, gy + gh / 2 - rmsFracY * (gh / 2 - 4) - 4);
 
       ctx.fillStyle = '#334155'; ctx.font = `bold ${10 * uiScale}px system-ui`; ctx.textAlign = 'center';
-      ctx.fillText(`v = ${vNow.toFixed(1)}V, i = ${iNow.toFixed(2)}A — resistor: current and voltage always in phase`, W / 2, H - 8);
+      ctx.fillText(`v = ${vNow.toFixed(1)}V, i = ${iNow.toFixed(2)}A — pure resistor: current and voltage always in phase`, W / 2, H - 8);
     } else if (s.mode === 'reactance') {
       const isInductor = s.component === 'inductor';
       const X = isInductor ? inductiveReactance(omega, s.inductance) : capacitiveReactance(omega, s.capacitance);
       const iPeak = X > 0 ? s.vPeak / X : 0;
-      // Verified: inductor -> current LAGS voltage by 90 (i = sin(wt-90));
-      // capacitor -> current LEADS voltage by 90 (i = sin(wt+90)).
       const phaseShiftDeg = isInductor ? 90 : -90;
-      const wt = omega * t.current;
+      const wt = VISUAL_OMEGA * t.current;
       const vNow = s.vPeak * Math.sin(wt);
       const iNow = iPeak * Math.sin(wt - (phaseShiftDeg * Math.PI) / 180);
       s.onTick?.(X);
 
-      const pcx = W * 0.16, pcy = H / 2, pr = 55 * uiScale;
-      ctx.strokeStyle = '#e2e8f0'; ctx.beginPath(); ctx.arc(pcx, pcy, pr, 0, Math.PI * 2); ctx.stroke();
-      const vAngle = -wt;
-      const iAngle = -wt + (phaseShiftDeg * Math.PI) / 180;
-      ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 2.5;
-      ctx.beginPath(); ctx.moveTo(pcx, pcy); ctx.lineTo(pcx + Math.cos(vAngle) * pr, pcy + Math.sin(vAngle) * pr); ctx.stroke();
-      ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.5;
-      ctx.beginPath(); ctx.moveTo(pcx, pcy); ctx.lineTo(pcx + Math.cos(iAngle) * pr * 0.75, pcy + Math.sin(iAngle) * pr * 0.75); ctx.stroke();
-      ctx.fillStyle = '#64748b'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'center';
-      ctx.fillText(isInductor ? 'ELI: V leads I' : 'ICE: I leads V', pcx, pcy + pr + 16 * uiScale);
-      ctx.fillText('by 90°', pcx, pcy + pr + 28 * uiScale);
+      if (s.phasorZoom) {
+        const pcx = W / 2, pcy = H * 0.48, pr = Math.min(W, H) * 0.36;
+        const iAngleZoom = -wt + (phaseShiftDeg * Math.PI) / 180;
+        drawPhasorDiagram(ctx, pcx, pcy, pr, [
+          { angleRad: -wt, magFrac: 1, color: '#4f46e5', label: 'V', width: 3 },
+          { angleRad: iAngleZoom, magFrac: 0.78, color: '#f59e0b', label: 'I', width: 3 },
+        ], uiScale, isInductor ? 'ELI: V leads I by 90° — zoomed' : 'ICE: I leads V by 90° — zoomed');
+        ctx.fillStyle = '#334155'; ctx.font = `bold ${11 * uiScale}px system-ui`; ctx.textAlign = 'center';
+        ctx.fillText(`v = ${vNow.toFixed(1)}V, i = ${iNow.toFixed(3)}A`, W / 2, H - 8);
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
 
-      const gx = W * 0.38, gy = H * 0.15, gw = W * 0.56, gh = H * 0.7;
+      drawSingleComponentLoop(
+        ctx, W * 0.05, H * 0.08, W * 0.42, H * 0.3, isInductor ? 'L' : 'C',
+        iNow / Math.max(iPeak, 0.0001), wt, uiScale,
+        isInductor ? `L = ${s.inductance}H` : `C = ${(s.capacitance * 1e6).toFixed(0)}µF`,
+      );
+
+      const pcx = W * 0.17, pcy = H * 0.72, pr = 46 * uiScale;
+      const iAngle = -wt + (phaseShiftDeg * Math.PI) / 180;
+      drawPhasorDiagram(ctx, pcx, pcy, pr, [
+        { angleRad: -wt, magFrac: 1, color: '#4f46e5', label: 'V' },
+        { angleRad: iAngle, magFrac: 0.78, color: '#f59e0b', label: 'I' },
+      ], uiScale, isInductor ? 'ELI: V leads I by 90°' : 'ICE: I leads V by 90°');
+
+      const gx = W * 0.42, gy = H * 0.12, gw = W * 0.53, gh = H * 0.42;
       drawAxes(ctx, gx, gy, gw, gh);
-      const cycles = 2.5;
       const wtDeg = -((wt * 180) / Math.PI) % 360;
-      traceWave(ctx, gx, gy, gw, gh, wtDeg, cycles, 'rgba(79,70,229,0.85)', 2);
-      traceWave(ctx, gx, gy, gw, gh, wtDeg - phaseShiftDeg, cycles, 'rgba(245,158,11,0.85)', 1.8);
+      traceWave(ctx, gx, gy, gw, gh, wtDeg, 1, 2.5, 'rgba(79,70,229,0.85)', 2);
+      traceWave(ctx, gx, gy, gw, gh, wtDeg - phaseShiftDeg, 1, 2.5, 'rgba(245,158,11,0.85)', 1.8);
       ctx.fillStyle = '#4f46e5'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'left';
       ctx.fillText('— V(t)', gx + gw - 90 * uiScale, gy + 12 * uiScale);
       ctx.fillStyle = '#f59e0b'; ctx.fillText(isInductor ? '— I(t) (lags)' : '— I(t) (leads)', gx + gw - 90 * uiScale, gy + 24 * uiScale);
@@ -154,61 +304,257 @@ export function ACCircuitCanvas({
         `${isInductor ? 'XL = ωL' : 'XC = 1/ωC'} = ${X.toFixed(1)} Ω — v = ${vNow.toFixed(1)}V, i = ${iNow.toFixed(3)}A`,
         W / 2, H - 8,
       );
-    } else {
-      // rlc-circuit: phasor diagram + impedance triangle + resonance readout
+    } else if (s.mode === 'series-rlc') {
       const XL = inductiveReactance(omega, s.inductance);
       const XC = capacitiveReactance(omega, s.capacitance);
       const Z = seriesRLCImpedance(s.resistance, XL, XC);
       const phaseDeg = seriesRLCPhaseAngleDeg(s.resistance, XL, XC);
       s.onTick?.(Z);
-
       const iPeak = Z > 0 ? s.vPeak / Z : 0;
-      const wt = omega * t.current;
+      const wt = VISUAL_OMEGA * t.current;
       const iNow = iPeak * Math.sin(wt - (phaseDeg * Math.PI) / 180);
+      const vNow = s.vPeak * Math.sin(wt);
+      const vrPeak = s.resistance * iPeak, vlPeak = XL * iPeak, vcPeak = XC * iPeak;
+      const maxCompV = Math.max(vrPeak, vlPeak, vcPeak, 0.001);
+      const wtDeg = -((wt * 180) / Math.PI) % 360;
+      const iOffsetDeg = wtDeg - phaseDeg;
+      const iAngleRad = -wt + (phaseDeg * Math.PI) / 180;
+      // Component colours are chosen to stay visually distinct from V
+      // (indigo) and I (amber) — VC was previously blue, too close to
+      // indigo at a glance; fuchsia reads clearly differently.
+      const colR = '#059669', colL = '#dc2626', colC = '#c026d3', colV = '#4f46e5', colI = '#f59e0b';
 
-      // Phasor diagram: VR along the current axis (reference), VL leading
-      // 90°, VC lagging 90°, resultant V is their vector sum.
-      const pcx = W * 0.22, pcy = H * 0.55, scale = Math.min(60, 55 / Math.max(s.resistance, XL, XC, 1)) * uiScale;
-      const vr = s.resistance * iPeak, vl = XL * iPeak, vc = XC * iPeak;
-      ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(pcx - 70 * uiScale, pcy); ctx.lineTo(pcx + 70 * uiScale, pcy); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(pcx, pcy - 70 * uiScale); ctx.lineTo(pcx, pcy + 70 * uiScale); ctx.stroke();
-
-      const c = ctx;
-      function arrow(dx: number, dy: number, color: string, label: string) {
-        c.strokeStyle = color; c.lineWidth = 2.2;
-        c.beginPath(); c.moveTo(pcx, pcy); c.lineTo(pcx + dx, pcy + dy); c.stroke();
-        c.fillStyle = color; c.font = `${9 * uiScale}px system-ui`; c.textAlign = 'left';
-        c.fillText(label, pcx + dx + 4, pcy + dy);
+      if (s.phasorZoom) {
+        // Zoomed view: the phasor diagram alone, using most of the canvas.
+        const pcx = W / 2, pcy = H * 0.48, pr = Math.min(W, H) * 0.36;
+        drawPhasorDiagram(ctx, pcx, pcy, pr, [
+          { angleRad: iAngleRad, magFrac: vrPeak / maxCompV, color: colR, label: 'VR' },
+          { angleRad: iAngleRad - Math.PI / 2, magFrac: vlPeak / maxCompV, color: colL, label: 'VL' },
+          { angleRad: iAngleRad + Math.PI / 2, magFrac: vcPeak / maxCompV, color: colC, label: 'VC' },
+          { angleRad: -wt, magFrac: s.vPeak / maxCompV, color: colV, label: 'V', width: 3 },
+        ], uiScale, 'VR, VL, VC & resultant V — zoomed');
+        ctx.fillStyle = '#334155'; ctx.font = `bold ${11 * uiScale}px system-ui`; ctx.textAlign = 'center';
+        ctx.fillText(`φ = ${phaseDeg.toFixed(1)}° — ${phaseDeg > 0 ? 'current lags (inductive)' : phaseDeg < 0 ? 'current leads (capacitive)' : 'in phase (resonance)'}`, W / 2, H - 8);
+        rafRef.current = requestAnimationFrame(draw);
+        return;
       }
-      arrow(vr * scale, 0, '#059669', 'VR');
-      arrow(0, -vl * scale, '#dc2626', 'VL');
-      arrow(0, vc * scale, '#2563eb', 'VC');
-      const resDx = vr * scale, resDy = -(vl - vc) * scale;
-      ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 2.8;
-      ctx.beginPath(); ctx.moveTo(pcx, pcy); ctx.lineTo(pcx + resDx, pcy + resDy); ctx.stroke();
-      ctx.fillStyle = '#4f46e5'; ctx.font = `bold ${9 * uiScale}px system-ui`;
-      ctx.fillText('V', pcx + resDx + 4, pcy + resDy);
 
-      // Impedance triangle
-      const tx = W * 0.62, ty = H * 0.3, tscale = Math.min(1.4, 90 / Math.max(s.resistance, Math.abs(XL - XC), 1)) * uiScale;
-      ctx.strokeStyle = '#059669'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx + s.resistance * tscale, ty); ctx.stroke();
-      ctx.strokeStyle = (XL - XC) >= 0 ? '#dc2626' : '#2563eb'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(tx + s.resistance * tscale, ty); ctx.lineTo(tx + s.resistance * tscale, ty - (XL - XC) * tscale); ctx.stroke();
-      ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 2.4;
-      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx + s.resistance * tscale, ty - (XL - XC) * tscale); ctx.stroke();
-      ctx.fillStyle = '#334155'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'left';
-      ctx.fillText('R', tx + (s.resistance * tscale) / 2 - 4, ty + 12 * uiScale);
-      ctx.fillText('Z', tx + (s.resistance * tscale) / 2, ty - ((XL - XC) * tscale) / 2 - 4);
-      ctx.fillText('X', tx + s.resistance * tscale + 4, ty - ((XL - XC) * tscale) / 2);
+      const cx0 = W * 0.04, cy0 = H * 0.1, cw = W * 0.5, ch = H * 0.28;
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.6;
+      const flowFrac = iNow / Math.max(iPeak, 0.0001);
+      const segColor = 'rgba(79,70,229,0.85)';
+      ctx.beginPath(); ctx.moveTo(cx0, cy0); ctx.lineTo(cx0, cy0 - 26 * uiScale); ctx.lineTo(cx0 + cw * 0.15, cy0 - 26 * uiScale); ctx.stroke();
+      drawResistor(ctx, cx0 + cw * 0.15, cy0 - 26 * uiScale, cx0 + cw * 0.42, cy0 - 26 * uiScale);
+      drawFlowDots(ctx, cx0 + cw * 0.15, cy0 - 26 * uiScale, cx0 + cw * 0.42, cy0 - 26 * uiScale, flowFrac, segColor, uiScale);
+      ctx.beginPath(); ctx.moveTo(cx0 + cw * 0.42, cy0 - 26 * uiScale); ctx.lineTo(cx0 + cw * 0.55, cy0 - 26 * uiScale); ctx.stroke();
+      drawInductor(ctx, cx0 + cw * 0.55, cy0 - 26 * uiScale, cx0 + cw * 0.78, cy0 - 26 * uiScale);
+      drawFlowDots(ctx, cx0 + cw * 0.55, cy0 - 26 * uiScale, cx0 + cw * 0.78, cy0 - 26 * uiScale, flowFrac, segColor, uiScale);
+      ctx.beginPath(); ctx.moveTo(cx0 + cw * 0.78, cy0 - 26 * uiScale); ctx.lineTo(cx0 + cw, cy0 - 26 * uiScale); ctx.lineTo(cx0 + cw, cy0); ctx.stroke();
+      drawCapacitor(ctx, cx0 + cw, cy0, cx0 + cw, cy0 + ch, uiScale);
+      drawFlowDots(ctx, cx0 + cw, cy0, cx0 + cw, cy0 + ch, flowFrac, segColor, uiScale);
+      ctx.beginPath(); ctx.moveTo(cx0 + cw, cy0 + ch); ctx.lineTo(cx0, cy0 + ch); ctx.lineTo(cx0, cy0); ctx.stroke();
+      drawACSource(ctx, cx0, (cy0 + cy0 + ch) / 2, 14 * uiScale, wt);
+      ctx.fillStyle = '#475569'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'center';
+      ctx.fillText('R', cx0 + cw * 0.285, cy0 - 34 * uiScale);
+      ctx.fillText('L', cx0 + cw * 0.665, cy0 - 34 * uiScale);
+      ctx.fillText('C', cx0 + cw + 12 * uiScale, cy0 + ch / 2);
+
+      const pcx = W * 0.15, pcy = H * 0.68, pr = 42 * uiScale;
+      // VR, VL, VC are all referenced to the CURRENT's phase (iAngleRad),
+      // not the raw source-voltage angle — VR is in phase with i, VL
+      // leads i by 90°, VC lags i by 90°. Verified numerically that
+      // vR(t)+vL(t)+vC(t) reconstructs v(t) exactly at every instant only
+      // when referenced this way (KVL), not when anchored to v(t) directly.
+      drawPhasorDiagram(ctx, pcx, pcy, pr, [
+        { angleRad: iAngleRad, magFrac: vrPeak / maxCompV, color: colR, label: 'VR' },
+        { angleRad: iAngleRad - Math.PI / 2, magFrac: vlPeak / maxCompV, color: colL, label: 'VL' },
+        { angleRad: iAngleRad + Math.PI / 2, magFrac: vcPeak / maxCompV, color: colC, label: 'VC' },
+        { angleRad: -wt, magFrac: s.vPeak / maxCompV, color: colV, label: 'V', width: 2.8 },
+      ], uiScale, 'VR, VL, VC & resultant V');
+
+      // Graph 1 (primary): total V and total I together — the headline
+      // relationship between the circuit's overall voltage and current.
+      const gx = W * 0.56, gy = H * 0.08, gw = W * 0.4, gh = H * 0.22;
+      drawAxes(ctx, gx, gy, gw, gh);
+      traceWave(ctx, gx, gy, gw, gh, wtDeg, 1, 2, colV, 1.8);
+      traceWave(ctx, gx, gy, gw, gh, iOffsetDeg, iPeak > 0 ? 1 : 0, 2, colI, 1.6);
+      ctx.font = `${8 * uiScale}px system-ui`; ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8'; ctx.fillText('Total V(t) and I(t)', gx, gy - 4);
+      ctx.fillStyle = colV; ctx.fillText('— V', gx + gw - 46 * uiScale, gy + 10 * uiScale);
+      ctx.fillStyle = colI; ctx.fillText('— I', gx + gw - 22 * uiScale, gy + 10 * uiScale);
+
+      // Graph 2 (secondary): the component voltage breakdown, in the
+      // same colours as the phasor diagram above.
+      const gx2 = W * 0.56, gy2 = H * 0.35, gw2 = W * 0.4, gh2 = H * 0.22;
+      drawAxes(ctx, gx2, gy2, gw2, gh2);
+      traceWave(ctx, gx2, gy2, gw2, gh2, iOffsetDeg, vrPeak / maxCompV, 2, colR, 1.4);
+      traceWave(ctx, gx2, gy2, gw2, gh2, iOffsetDeg + 90, vlPeak / maxCompV, 2, colL, 1.4);
+      traceWave(ctx, gx2, gy2, gw2, gh2, iOffsetDeg - 90, vcPeak / maxCompV, 2, colC, 1.4);
+      ctx.font = `${8 * uiScale}px system-ui`; ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8'; ctx.fillText('Component voltages', gx2, gy2 - 4);
+      ctx.fillStyle = colR; ctx.fillText('VR', gx2 + gw2 - 60 * uiScale, gy2 + 10 * uiScale);
+      ctx.fillStyle = colL; ctx.fillText('VL', gx2 + gw2 - 40 * uiScale, gy2 + 10 * uiScale);
+      ctx.fillStyle = colC; ctx.fillText('VC', gx2 + gw2 - 20 * uiScale, gy2 + 10 * uiScale);
 
       const nearResonance = Math.abs(XL - XC) < Math.max(s.resistance * 0.05, 0.5);
       ctx.fillStyle = '#334155'; ctx.font = `bold ${10 * uiScale}px system-ui`; ctx.textAlign = 'center';
       ctx.fillText(
         nearResonance
-          ? `RESONANCE: XL ≈ XC, Z ≈ R (minimum) = ${Z.toFixed(1)}Ω, current is MAXIMUM, phase ≈ 0°`
-          : `Z = ${Z.toFixed(1)}Ω, phase = ${phaseDeg.toFixed(0)}° (${phaseDeg > 0 ? 'current lags — inductive' : 'current leads — capacitive'}), i(t) = ${iNow.toFixed(3)}A`,
+          ? `RESONANCE: Z ≈ R (minimum) = ${Z.toFixed(1)}Ω — current is MAXIMUM, phase ≈ 0°`
+          : `Z=${Z.toFixed(1)}Ω, φ=${phaseDeg.toFixed(0)}° — v=${vNow.toFixed(1)}V, i=${iNow.toFixed(3)}A`,
+        W / 2, H - 8,
+      );
+    } else if (s.mode === 'parallel-rlc') {
+      const XL = inductiveReactance(omega, s.inductance);
+      const XC = capacitiveReactance(omega, s.capacitance);
+      const { iR, iL, iC } = parallelRLCBranchCurrents(s.vPeak, s.resistance, XL, XC);
+      const iTotal = parallelRLCTotalCurrent(s.vPeak, s.resistance, XL, XC);
+      const Z = parallelRLCImpedance(s.vPeak, s.resistance, XL, XC);
+      const phaseDeg = parallelRLCPhaseAngleDeg(s.resistance, XL, XC);
+      s.onTick?.(Z);
+      const wt = VISUAL_OMEGA * t.current;
+      const vNow = s.vPeak * Math.sin(wt);
+      const iRNow = iR * Math.sin(wt);
+      const iLNow = iL * Math.sin(wt - Math.PI / 2);
+      const iCNow = iC * Math.sin(wt + Math.PI / 2);
+      const maxCompI = Math.max(iR, iL, iC, 0.0001);
+      const wtDeg = -((wt * 180) / Math.PI) % 360;
+      const colR = '#059669', colL = '#dc2626', colC = '#c026d3', colV = '#4f46e5', colI = '#f59e0b';
+
+      if (s.phasorZoom) {
+        const pcx = W / 2, pcy = H * 0.48, pr = Math.min(W, H) * 0.36;
+        drawPhasorDiagram(ctx, pcx, pcy, pr, [
+          { angleRad: -wt, magFrac: iR / maxCompI, color: colR, label: 'IR' },
+          { angleRad: -wt + Math.PI / 2, magFrac: iL / maxCompI, color: colL, label: 'IL' },
+          { angleRad: -wt - Math.PI / 2, magFrac: iC / maxCompI, color: colC, label: 'IC' },
+          { angleRad: -wt - (phaseDeg * Math.PI) / 180, magFrac: iTotal / maxCompI, color: colV, label: 'I', width: 3 },
+        ], uiScale, 'IR, IL, IC & resultant I — zoomed');
+        ctx.fillStyle = '#334155'; ctx.font = `bold ${11 * uiScale}px system-ui`; ctx.textAlign = 'center';
+        ctx.fillText(`φ = ${phaseDeg.toFixed(1)}° — ${phaseDeg > 0 ? 'current leads (capacitive)' : phaseDeg < 0 ? 'current lags (inductive)' : 'in phase (resonance)'}`, W / 2, H - 8);
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
+
+      const cx0 = W * 0.04, cx1 = W * 0.5, cyTop = H * 0.1, cyBot = H * 0.4;
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(cx0, cyTop); ctx.lineTo(cx1, cyTop); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx0, cyBot); ctx.lineTo(cx1, cyBot); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx0, cyTop); ctx.lineTo(cx0, cyBot); ctx.stroke();
+      drawACSource(ctx, cx0, (cyTop + cyBot) / 2, 13 * uiScale, wt);
+
+      const branchXs = [cx1 - (cx1 - cx0) * 0.62, cx1 - (cx1 - cx0) * 0.36, cx1 - (cx1 - cx0) * 0.1];
+      const iPeakMax = Math.max(iR, iL, iC, 0.0001);
+      ([
+        { x: branchXs[0], kind: 'R' as const, flow: iRNow / iPeakMax, label: 'R' },
+        { x: branchXs[1], kind: 'L' as const, flow: iLNow / iPeakMax, label: 'L' },
+        { x: branchXs[2], kind: 'C' as const, flow: iCNow / iPeakMax, label: 'C' },
+      ]).forEach(({ x, kind, flow, label }) => {
+        ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(x, cyTop); ctx.lineTo(x, cyTop + 12 * uiScale); ctx.stroke();
+        if (kind === 'R') drawResistor(ctx, x, cyTop + 12 * uiScale, x, cyBot - 12 * uiScale);
+        else if (kind === 'L') drawInductor(ctx, x, cyTop + 12 * uiScale, x, cyBot - 12 * uiScale);
+        else drawCapacitor(ctx, x, cyTop + 12 * uiScale, x, cyBot - 12 * uiScale, uiScale);
+        drawFlowDots(ctx, x, cyTop + 12 * uiScale, x, cyBot - 12 * uiScale, flow, 'rgba(79,70,229,0.85)', uiScale, 2);
+        ctx.beginPath(); ctx.moveTo(x, cyBot - 12 * uiScale); ctx.lineTo(x, cyBot); ctx.stroke();
+        ctx.fillStyle = '#475569'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'center';
+        ctx.fillText(label, x, cyTop + 8 * uiScale);
+      });
+
+      const pcx = W * 0.15, pcy = H * 0.68, pr = 42 * uiScale;
+      drawPhasorDiagram(ctx, pcx, pcy, pr, [
+        { angleRad: -wt, magFrac: iR / maxCompI, color: colR, label: 'IR' },
+        { angleRad: -wt + Math.PI / 2, magFrac: iL / maxCompI, color: colL, label: 'IL' },
+        { angleRad: -wt - Math.PI / 2, magFrac: iC / maxCompI, color: colC, label: 'IC' },
+        { angleRad: -wt - (phaseDeg * Math.PI) / 180, magFrac: iTotal / maxCompI, color: colV, label: 'I', width: 2.8 },
+      ], uiScale, 'IR, IL, IC & resultant I');
+
+      // Graph 1 (primary): total V and total I together.
+      const gx = W * 0.56, gy = H * 0.08, gw = W * 0.4, gh = H * 0.22;
+      drawAxes(ctx, gx, gy, gw, gh);
+      traceWave(ctx, gx, gy, gw, gh, wtDeg, 1, 2, colV, 1.8);
+      traceWave(ctx, gx, gy, gw, gh, wtDeg + phaseDeg, iTotal > 0 ? 1 : 0, 2, colI, 1.6);
+      ctx.font = `${8 * uiScale}px system-ui`; ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8'; ctx.fillText('Total V(t) and I(t)', gx, gy - 4);
+      ctx.fillStyle = colV; ctx.fillText('— V', gx + gw - 46 * uiScale, gy + 10 * uiScale);
+      ctx.fillStyle = colI; ctx.fillText('— I', gx + gw - 22 * uiScale, gy + 10 * uiScale);
+
+      // Graph 2 (secondary): the branch-current breakdown, same colours
+      // as the phasor diagram above.
+      const gx2 = W * 0.56, gy2 = H * 0.35, gw2 = W * 0.4, gh2 = H * 0.22;
+      drawAxes(ctx, gx2, gy2, gw2, gh2);
+      traceWave(ctx, gx2, gy2, gw2, gh2, wtDeg, iR / maxCompI, 2, colR, 1.4);
+      traceWave(ctx, gx2, gy2, gw2, gh2, wtDeg - 90, iL / maxCompI, 2, colL, 1.4);
+      traceWave(ctx, gx2, gy2, gw2, gh2, wtDeg + 90, iC / maxCompI, 2, colC, 1.4);
+      ctx.font = `${8 * uiScale}px system-ui`; ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8'; ctx.fillText('Branch currents', gx2, gy2 - 4);
+      ctx.fillStyle = colR; ctx.fillText('IR', gx2 + gw2 - 60 * uiScale, gy2 + 10 * uiScale);
+      ctx.fillStyle = colL; ctx.fillText('IL', gx2 + gw2 - 40 * uiScale, gy2 + 10 * uiScale);
+      ctx.fillStyle = colC; ctx.fillText('IC', gx2 + gw2 - 20 * uiScale, gy2 + 10 * uiScale);
+
+      const nearResonance = Math.abs(iL - iC) < Math.max(iR * 0.05, 0.001);
+      ctx.fillStyle = '#334155'; ctx.font = `bold ${10 * uiScale}px system-ui`; ctx.textAlign = 'center';
+      ctx.fillText(
+        nearResonance
+          ? `RESONANCE: IL ≈ IC (cancel) — line current is MINIMUM, Z ≈ R (maximum) = ${Z.toFixed(0)}Ω`
+          : `Z=${Z.toFixed(0)}Ω, φ=${phaseDeg.toFixed(0)}° — v=${vNow.toFixed(1)}V, I_total=${iTotal.toFixed(3)}A`,
+        W / 2, H - 8,
+      );
+    } else {
+      const isSeries = s.resonanceCircuit === 'series';
+      const omega0 = resonantAngularFrequency(s.inductance, s.capacitance);
+      const f0 = omega0 / (2 * Math.PI);
+      const Q = isSeries ? qFactorSeries(s.resistance, s.inductance, s.capacitance) : qFactorParallel(s.resistance, s.inductance, s.capacitance);
+      const bw = bandwidthHz(f0, Q);
+      s.onTick?.(Q);
+
+      const fMin = Math.max(0.5, f0 - bw * 2.2), fMax = f0 + bw * 2.2;
+      const gx = W * 0.1, gy = H * 0.14, gw = W * 0.8, gh = H * 0.56;
+      drawAxes(ctx, gx, gy, gw, gh);
+
+      function responseAt(f: number) {
+        const om = angularFrequency(f);
+        const xl = inductiveReactance(om, s.inductance), xc = capacitiveReactance(om, s.capacitance);
+        if (isSeries) {
+          const z = seriesRLCImpedance(s.resistance, xl, xc);
+          return z > 0 ? s.vPeak / z : 0;
+        }
+        return parallelRLCImpedance(s.vPeak, s.resistance, xl, xc);
+      }
+      const peakVal = responseAt(f0);
+      const n = 160;
+      ctx.beginPath();
+      for (let i = 0; i <= n; i++) {
+        const f = fMin + (i / n) * (fMax - fMin);
+        const val = responseAt(f) / peakVal;
+        const x = gx + (i / n) * gw;
+        const y = gy + gh - val * (gh - 6);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 2.2; ctx.stroke();
+
+      const halfY = gy + gh - (1 / Math.SQRT2) * (gh - 6);
+      ctx.strokeStyle = 'rgba(100,116,139,0.5)'; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(gx, halfY); ctx.lineTo(gx + gw, halfY); ctx.stroke();
+      ctx.setLineDash([]);
+      [f0 - bw / 2, f0 + bw / 2].forEach(f => {
+        const x = gx + ((f - fMin) / (fMax - fMin)) * gw;
+        ctx.strokeStyle = '#f59e0b'; ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x, gy + gh); ctx.stroke();
+        ctx.setLineDash([]);
+      });
+      const x0x = gx + ((f0 - fMin) / (fMax - fMin)) * gw;
+      ctx.strokeStyle = 'rgba(220,38,38,0.5)'; ctx.setLineDash([2, 3]);
+      ctx.beginPath(); ctx.moveTo(x0x, gy); ctx.lineTo(x0x, gy + gh); ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#64748b'; ctx.font = `${9 * uiScale}px system-ui`; ctx.textAlign = 'center';
+      ctx.fillText(isSeries ? 'Current I (normalised)' : 'Impedance Z (normalised)', gx + gw / 2, gy - 6);
+      ctx.fillStyle = '#dc2626'; ctx.textAlign = 'left'; ctx.fillText(`f₀=${f0.toFixed(1)}Hz`, x0x + 4, gy + 12 * uiScale);
+      ctx.fillStyle = '#f59e0b'; ctx.fillText(`half-power (1/√2)`, gx + 6, halfY - 4);
+
+      ctx.fillStyle = '#334155'; ctx.font = `bold ${10 * uiScale}px system-ui`; ctx.textAlign = 'center';
+      ctx.fillText(
+        `${isSeries ? 'Series' : 'Parallel'} RLC — Q = ${Q.toFixed(2)}, bandwidth = ${bw.toFixed(1)}Hz (f₁=${(f0 - bw / 2).toFixed(1)}Hz, f₂=${(f0 + bw / 2).toFixed(1)}Hz)`,
         W / 2, H - 8,
       );
     }

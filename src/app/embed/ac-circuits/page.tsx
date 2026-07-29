@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { ACCircuitCanvas, ACMode } from '@/components/simulation/ACCircuitCanvas';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 
-type Topic = 'waveform' | 'reactance' | 'rlc-circuit';
+type Topic = 'waveform' | 'reactance' | 'series-rlc' | 'parallel-rlc' | 'resonance';
 
 function num(sp: URLSearchParams, key: string, fallback: number, min: number, max: number) {
   const v = Number(sp.get(key));
@@ -42,7 +42,7 @@ function ACEmbedInner() {
   const sp = useSearchParams();
   const topic = ((): Topic => {
     const t = sp.get('topic');
-    return t === 'reactance' || t === 'rlc-circuit' ? t : 'waveform';
+    return t === 'reactance' || t === 'series-rlc' || t === 'parallel-rlc' || t === 'resonance' ? t : 'waveform';
   })();
   const showControls = sp.get('controls') !== '0';
 
@@ -53,7 +53,11 @@ function ACEmbedInner() {
   const [inductance] = useState(0.5);
   const [capacitance] = useState(10);
   const [rlcFrequency, setRlcFrequency] = useState(50);
+  const [parallelResistance, setParallelResistance] = useState(1000);
+  const [resonanceCircuit, setResonanceCircuit] = useState<'series' | 'parallel'>('series');
 
+  const [speedMultiplier, setSpeedMultiplier] = useState(1);
+  const [phasorZoom, setPhasorZoom] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -62,22 +66,35 @@ function ACEmbedInner() {
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 100);
-  }, [topic, vPeak, frequency, resistance, component, inductance, capacitance, rlcFrequency, reset]);
+  }, [topic, vPeak, frequency, resistance, component, inductance, capacitance, rlcFrequency, parallelResistance, resonanceCircuit, reset]);
 
-  const effFrequency = topic === 'rlc-circuit' ? rlcFrequency : frequency;
+  const isSeriesTopic = topic === 'series-rlc';
+  const isParallelTopic = topic === 'parallel-rlc';
+  const effFrequency = isSeriesTopic || isParallelTopic ? rlcFrequency : frequency;
+  const activeResistance = isParallelTopic ? parallelResistance : resistance;
 
   return (
     <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
       <ACCircuitCanvas key={resetKey} mode={topic as ACMode}
-        vPeak={vPeak} frequency={effFrequency} resistance={resistance}
+        vPeak={vPeak} frequency={effFrequency} resistance={activeResistance}
         component={component} inductance={inductance} capacitance={capacitance * 1e-6}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
-        onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
+        resonanceCircuit={resonanceCircuit} speedMultiplier={speedMultiplier} phasorZoom={phasorZoom}
+        isRunning={isRunning} isPaused={isPaused} width={640} height={320} />
+      <div className="flex items-center gap-2 flex-wrap">
+        <SimulationControls isRunning={isRunning} isPaused={isPaused}
+          onRun={() => { setIsRunning(true); setIsPaused(false); }}
+          onPause={() => setIsPaused(p => !p)} onReset={reset} />
+        {topic !== 'resonance' && (
+          <button onClick={() => setPhasorZoom(z => !z)}
+            className={`rounded-lg border px-3 py-2 text-xs font-medium transition ${
+              phasorZoom ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-600'
+            }`}>{phasorZoom ? '🔍 Zoomed' : '🔍 Zoom'}</button>
+        )}
+      </div>
       {showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
+          <Slider label="Animation speed" unit="×" value={speedMultiplier} min={0.25} max={3} step={0.25} set={setSpeedMultiplier} color="#94a3b8" />
           <Slider label="Peak voltage" unit="V" value={vPeak} min={5} max={50} step={5} set={setVPeak} color="#6366f1" />
           {topic === 'waveform' && (
             <Slider label="Resistance" unit="Ω" value={resistance} min={10} max={500} step={10} set={setResistance} color="#8b5cf6" />
@@ -93,10 +110,24 @@ function ACEmbedInner() {
             </div>
             <Slider label="Frequency" unit="Hz" value={frequency} min={0.5} max={5} step={0.5} set={setFrequency} color="#f59e0b" />
           </>}
-          {topic === 'rlc-circuit' && <>
+          {topic === 'series-rlc' && <>
             <Slider label="Frequency" unit="Hz" value={rlcFrequency} min={10} max={200} step={1} set={setRlcFrequency} color="#f59e0b" />
             <Slider label="Resistance" unit="Ω" value={resistance} min={10} max={300} step={10} set={setResistance} color="#059669" />
           </>}
+          {topic === 'parallel-rlc' && <>
+            <Slider label="Frequency" unit="Hz" value={rlcFrequency} min={10} max={200} step={1} set={setRlcFrequency} color="#f59e0b" />
+            <Slider label="Resistance" unit="Ω" value={parallelResistance} min={100} max={3000} step={100} set={setParallelResistance} color="#059669" />
+          </>}
+          {topic === 'resonance' && (
+            <div className="flex gap-2">
+              {(['series', 'parallel'] as const).map(c => (
+                <button key={c} onClick={() => setResonanceCircuit(c)}
+                  className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium capitalize transition ${
+                    resonanceCircuit === c ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                  }`}>{c}</button>
+              ))}
+            </div>
+          )}
         </div>
       )}
       <PoweredBy />

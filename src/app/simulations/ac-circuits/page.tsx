@@ -7,10 +7,12 @@ import { EmbedButton } from '@/components/ui/EmbedButton';
 import {
   angularFrequency, rmsFromPeak, inductiveReactance, capacitiveReactance,
   seriesRLCImpedance, seriesRLCPhaseAngleDeg, resonantAngularFrequency,
+  parallelRLCImpedance, parallelRLCTotalCurrent, parallelRLCPhaseAngleDeg,
+  qFactorSeries, qFactorParallel, bandwidthHz,
 } from '@/lib/physics/electromagnetism';
 import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 
-type Topic = 'waveform' | 'reactance' | 'rlc-circuit';
+type Topic = 'waveform' | 'reactance' | 'series-rlc' | 'parallel-rlc' | 'resonance';
 
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'Undergraduate'];
 const CC: Record<string, string> = {
@@ -20,9 +22,11 @@ const CC: Record<string, string> = {
 };
 
 const TOPIC_META: Record<Topic, { title: string; icon: string; sub: string; eq: string }> = {
-  waveform:      { title: 'AC Waveform & RMS',      icon: '〰️', sub: 'Peak vs RMS values',        eq: 'Vrms = Vpeak/√2' },
-  reactance:     { title: 'Inductive & Capacitive Reactance', icon: '⏱️', sub: "'ELI the ICE man'", eq: 'XL=ωL, XC=1/ωC' },
-  'rlc-circuit': { title: 'Series RLC Circuit',      icon: '📈', sub: 'Impedance & resonance',      eq: 'Z=√(R²+(XL-XC)²)' },
+  waveform:       { title: 'AC Waveform & RMS',      icon: '〰️', sub: 'Peak vs RMS values',        eq: 'Vrms = Vpeak/√2' },
+  reactance:      { title: 'Inductive & Capacitive Reactance', icon: '⏱️', sub: "'ELI the ICE man'", eq: 'XL=ωL, XC=1/ωC' },
+  'series-rlc':   { title: 'Series RLC Circuit',      icon: '📈', sub: 'Impedance & resonance',      eq: 'Z=√(R²+(XL-XC)²)' },
+  'parallel-rlc': { title: 'Parallel RLC Circuit',    icon: '🔀', sub: 'Branch currents & resonance', eq: 'I=√(IR²+(IC-IL)²)' },
+  resonance:      { title: 'Q-Factor & Bandwidth',    icon: '🎯', sub: 'How sharp is the tuning?',   eq: 'Q=f₀/BW' },
 };
 
 const TEACHER_NOTES: Record<Topic, string[]> = {
@@ -40,12 +44,27 @@ const TEACHER_NOTES: Record<Topic, string[]> = {
     'Capacitive reactance XC = 1/ωC DECREASES with frequency — a capacitor charges and discharges more freely as the current reverses faster, offering less opposition.',
     'Undergraduate note: reactance doesn\u2019t dissipate energy the way resistance does — a pure inductor or capacitor stores and returns energy every half-cycle rather than converting it to heat, which is why reactance and resistance combine as a right-angled (vector) sum rather than a simple addition.',
   ],
-  'rlc-circuit': [
-    'A series RLC circuit combines a resistor, inductor, and capacitor — their opposition to current (R, XL, XC) combines as impedance Z = √(R² + (XL-XC)²), not a simple sum, because XL and XC act in OPPOSITE directions.',
+  'series-rlc': [
+    'A series RLC circuit combines a resistor, inductor, and capacitor in one loop, carrying a SINGLE shared current — their opposition to that current (R, XL, XC) combines as impedance Z = √(R² + (XL-XC)²), not a simple sum, because XL and XC act in OPPOSITE directions.',
     'The phasor diagram shows why: VR is in phase with the current (reference direction), VL leads by 90°, VC lags by 90° — so VL and VC directly cancel each other, and only their DIFFERENCE combines with VR.',
     'RESONANCE occurs when XL = XC (they cancel completely) — at this frequency, impedance is at its MINIMUM (Z = R exactly), current is at its MAXIMUM, and the circuit behaves as if it were purely resistive (phase angle = 0°).',
     'Resonant angular frequency ω₀ = 1/√(LC) — this is the exact frequency an RLC circuit "prefers", the basis of tuning a radio receiver to a specific station by adjusting L or C.',
     'Undergraduate note: away from resonance, the phase angle φ = arctan((XL-XC)/R) tells you whether the circuit is net inductive (current lags, φ>0) or net capacitive (current leads, φ<0) — and the power factor cos(φ) determines how much of VrmsIrms is actually real (usable) power versus reactive power that sloshes back and forth without doing net work.',
+  ],
+  'parallel-rlc': [
+    'In a PARALLEL RLC circuit, R, L, and C all share the same voltage (since they\u2019re connected across the same two nodes) — each branch draws its own current, and the branch currents add as phasors: I = √(IR² + (IC-IL)²).',
+    "The same 90° phase relationships apply per branch: IR is in phase with V, IL lags V by 90°, IC leads V by 90° — so IL and IC directly cancel in the phasor sum, exactly mirroring how VL and VC cancel in the series case.",
+    'RESONANCE still occurs when XL = XC — but the behaviour is the OPPOSITE of series resonance: IL and IC cancel completely, leaving only IR, so the TOTAL LINE CURRENT is at its MINIMUM and the impedance seen by the source is at its MAXIMUM (equal to R).',
+    'This is why parallel resonant circuits are sometimes called "rejector" circuits (they reject/minimise current at resonance) while series resonant circuits are called "acceptor" circuits (they accept/maximise current at resonance) — the same LC combination, wired differently, does the opposite job.',
+    'Undergraduate note: the resonant frequency formula ω₀ = 1/√(LC) is the SAME for both series and parallel ideal RLC circuits — what differs between them is which quantity (current for series, impedance for parallel) peaks there, and how R affects the sharpness of that peak.',
+  ],
+  resonance: [
+    'The QUALITY FACTOR (Q) measures how "sharp" or selective a resonant circuit is — a high-Q circuit responds strongly only to a narrow band of frequencies near resonance; a low-Q circuit responds broadly across a wide range.',
+    'Series RLC: Q = (1/R)√(L/C) — LOWER resistance gives a HIGHER, sharper Q (less energy lost to R each cycle, so the resonance "rings" more before dying out).',
+    'Parallel RLC: Q = R√(C/L) — here it is the OPPOSITE dependence: HIGHER resistance gives a HIGHER Q, because in parallel, resistance provides a leak path for current that damps the resonance; more resistance means less of that damping path.',
+    'BANDWIDTH is the range of frequencies (in Hz) between the two "half-power points" either side of resonance — the frequencies where the power delivered has dropped to half its peak value. Bandwidth = f₀/Q: a sharper (higher-Q) resonance has a NARROWER bandwidth.',
+    'This is exactly how a radio tuner works: a high-Q circuit lets you pick out one station\u2019s narrow frequency band while rejecting neighbouring stations; a low-Q circuit would let several stations through at once, overlapping and unusable.',
+    'Undergraduate note: the "half-power" points are where the response has fallen to 1/√2 (≈70.7%) of its peak — power depends on the square of voltage or current, so a 1/√2 drop in amplitude corresponds to exactly a 1/2 drop in power, which is where the name comes from. Bandwidth=f₀/Q is the standard high-Q approximation, increasingly exact as Q grows — for a low-Q circuit (broad, gentle peak) it is only approximate.',
   ],
 };
 
@@ -60,10 +79,20 @@ const EXERCISES: Record<Topic, { q: string; a: string }[]> = {
     { q: 'Find the reactance of a 20µF capacitor at 50Hz.', a: 'XC = 1/(ωC) = 1/(2π×50×20×10⁻⁶) ≈ 159.2 Ω.' },
     { q: 'As frequency increases, what happens to XL and XC, and how does that explain why a capacitor "blocks DC but passes AC"?', a: 'XL increases and XC decreases with frequency. At f=0 (DC), XC = 1/(0) → infinite — a capacitor completely blocks steady current. At high frequency, XC → 0, offering almost no opposition, so a capacitor lets rapidly alternating current pass relatively freely.' },
   ],
-  'rlc-circuit': [
+  'series-rlc': [
     { q: 'A series RLC circuit has R=50Ω, XL=120Ω, XC=40Ω. Find the impedance.', a: 'Z = √(R² + (XL-XC)²) = √(50² + 80²) = √(2500+6400) = √8900 ≈ 94.3 Ω.' },
     { q: 'For the same circuit, find the phase angle and state whether current leads or lags voltage.', a: 'φ = arctan((XL-XC)/R) = arctan(80/50) ≈ 58°. Since XL>XC, the circuit is net inductive, so CURRENT LAGS voltage by about 58°.' },
     { q: 'A series circuit has L=0.2H and C=50µF. Find the resonant frequency.', a: 'ω₀ = 1/√(LC) = 1/√(0.2×50×10⁻⁶) = 1/√(1×10⁻⁵) ≈ 316.2 rad/s. f₀ = ω₀/2π ≈ 50.3 Hz.' },
+  ],
+  'parallel-rlc': [
+    { q: 'A parallel RLC circuit has IR=2A, IL=5A, IC=1.5A (all peak). Find the total line current.', a: 'I = √(IR² + (IC-IL)²) = √(2² + (1.5-5)²) = √(4+12.25) = √16.25 ≈ 4.03A.' },
+    { q: 'In the same circuit, is the total current more or less than IR alone, and what does that tell you about the phase?', a: 'More (4.03A > 2A) — since IL and IC do not cancel, there is a net reactive current, so the total current does not simply equal IR; it leads or lags voltage depending on whether IC or IL dominates (here IL>IC, so the circuit is net inductive and the line current lags voltage).' },
+    { q: 'Why does total line current DROP to a minimum at resonance in a parallel RLC circuit, when current in a series circuit RISES to a maximum?', a: 'At resonance IL=IC in both cases, so they cancel. In series, that cancellation leaves only R limiting current, so impedance is minimum and current is maximum. In parallel, cancelling IL and IC leaves only the small IR branch contributing to the LINE current, so the total current drawn from the source is minimum — even though current is still circulating between L and C internally.' },
+  ],
+  resonance: [
+    { q: 'A series RLC circuit has f₀=1000Hz and Q=50. Find the bandwidth and the two half-power frequencies.', a: 'BW = f₀/Q = 1000/50 = 20Hz. Half-power points ≈ f₀ ± BW/2 = 990Hz and 1010Hz.' },
+    { q: 'Two series RLC circuits have the same L and C but different R. Which one has the higher Q, and why?', a: 'The circuit with the SMALLER R has the higher Q, since Q=(1/R)√(L/C) — less resistance means less energy dissipated each cycle, so the resonance is sharper and rings longer.' },
+    { q: 'A radio tuner needs to separate two stations broadcasting just 10kHz apart, centred near 100MHz. Would a high-Q or low-Q circuit be more suitable, and why?', a: 'A HIGH-Q circuit — it produces a narrow bandwidth, letting through only a thin slice of frequencies around the tuned station while strongly rejecting a neighbouring station only 10kHz away. A low-Q (broad) circuit would let both stations through at once, overlapping and unusable.' },
   ],
 };
 
@@ -107,25 +136,36 @@ export default function ACCircuitsPage() {
 
   const [component, setComponent] = useState<'inductor' | 'capacitor'>('inductor');
   const [inductance, setInductance] = useState(0.5);
-  const [capacitance, setCapacitance] = useState(10); // µF, converted below
+  const [capacitance, setCapacitance] = useState(10); // µF
 
   const [rlcFrequency, setRlcFrequency] = useState(50);
+  const [parallelResistance, setParallelResistance] = useState(1000);
+
+  const [resonanceCircuit, setResonanceCircuit] = useState<'series' | 'parallel'>('series');
+  const [resR, setResR] = useState(100);
+  const [resL, setResL] = useState(0.5);
+  const [resC, setResC] = useState(10);
 
   const [liveValue, setLiveValue] = useState(0);
+  const [speedMultiplier, setSpeedMultiplier] = useState(1);
+  const [showParams, setShowParams] = useState(true);
+  const [phasorZoom, setPhasorZoom] = useState(false);
 
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 100);
-  }, [topic, vPeak, frequency, resistance, component, inductance, capacitance, rlcFrequency, reset]);
+  }, [topic, vPeak, frequency, resistance, component, inductance, capacitance, rlcFrequency, parallelResistance, resonanceCircuit, resR, resL, resC, reset]);
 
   const canvasBoxRef = useRef<HTMLDivElement>(null);
-  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 320, 980);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 340, 980);
 
   const capF = capacitance * 1e-6;
-  const effFrequency = topic === 'rlc-circuit' ? rlcFrequency : frequency;
-  const omega = angularFrequency(effFrequency);
+  const isSeriesTopic = topic === 'series-rlc';
+  const isParallelTopic = topic === 'parallel-rlc';
+  const effFrequency = isSeriesTopic || isParallelTopic ? rlcFrequency : topic === 'resonance' ? 0 : frequency;
+  const omega = angularFrequency(isSeriesTopic || isParallelTopic ? rlcFrequency : frequency);
   const XL = inductiveReactance(omega, inductance);
   const XC = capacitiveReactance(omega, capF);
   const Z = seriesRLCImpedance(resistance, XL, XC);
@@ -133,6 +173,16 @@ export default function ACCircuitsPage() {
   const omegaRes = resonantAngularFrequency(inductance, capF);
   const fRes = omegaRes / (2 * Math.PI);
   const reactanceX = component === 'inductor' ? XL : XC;
+
+  const parZ = parallelRLCImpedance(vPeak, parallelResistance, XL, XC);
+  const parI = parallelRLCTotalCurrent(vPeak, parallelResistance, XL, XC);
+  const parPhase = parallelRLCPhaseAngleDeg(parallelResistance, XL, XC);
+
+  const resCapF = resC * 1e-6;
+  const resOmega0 = resonantAngularFrequency(resL, resCapF);
+  const resF0 = resOmega0 / (2 * Math.PI);
+  const resQ = resonanceCircuit === 'series' ? qFactorSeries(resR, resL, resCapF) : qFactorParallel(resR, resL, resCapF);
+  const resBW = bandwidthHz(resF0, resQ);
 
   return (
     <>
@@ -179,23 +229,47 @@ export default function ACCircuitsPage() {
             <div className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <ACCircuitCanvas key={resetKey} mode={topic as ACMode}
-                  vPeak={vPeak} frequency={effFrequency} resistance={resistance}
-                  component={component} inductance={inductance} capacitance={capF}
+                  vPeak={vPeak} frequency={topic === 'resonance' ? resF0 : effFrequency}
+                  resistance={isParallelTopic ? parallelResistance : topic === 'resonance' ? resR : resistance}
+                  component={component}
+                  inductance={topic === 'resonance' ? resL : inductance}
+                  capacitance={topic === 'resonance' ? resCapF : capF}
+                  resonanceCircuit={resonanceCircuit} speedMultiplier={speedMultiplier} phasorZoom={phasorZoom}
                   isRunning={isRunning} isPaused={isPaused} onTick={setLiveValue}
                   width={canvasSize.width} height={canvasSize.height} />
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <SimulationControls isRunning={isRunning} isPaused={isPaused}
-                  onRun={() => { setIsRunning(true); setIsPaused(false); }}
-                  onPause={() => setIsPaused(p => !p)} onReset={reset} />
+                <div className="flex items-center gap-2 flex-wrap">
+                  <SimulationControls isRunning={isRunning} isPaused={isPaused}
+                    onRun={() => { setIsRunning(true); setIsPaused(false); }}
+                    onPause={() => setIsPaused(p => !p)} onReset={reset} />
+                  {topic !== 'resonance' && (
+                    <button onClick={() => setPhasorZoom(z => !z)}
+                      className={`rounded-lg border px-3 py-2 text-xs font-medium transition flex items-center gap-1 ${
+                        phasorZoom ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                      }`}>
+                      {phasorZoom ? '🔍 Zoomed — click to restore' : '🔍 Zoom phasor'}
+                    </button>
+                  )}
+                </div>
                 <EmbedButton path="/embed/ac-circuits"
                   title={`${TOPIC_META[topic].title} — A-Factor STEM Studio`}
                   params={{ topic }} />
               </div>
 
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
-                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
+                  <button onClick={() => setShowParams(p => !p)}
+                    className="text-xs font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                    {showParams ? 'Hide' : 'Show'}
+                    <span className={`transition-transform ${showParams ? 'rotate-180' : ''}`}>▾</span>
+                  </button>
+                </div>
+
+                {showParams && <>
+                <Slider label="Animation speed" unit="×" value={speedMultiplier} min={0.25} max={3} step={0.25} set={setSpeedMultiplier} color="#94a3b8" />
 
                 {topic === 'waveform' && <>
                   <Slider label="Peak voltage" unit="V" value={vPeak} min={5} max={50} step={5} set={setVPeak} color="#6366f1" />
@@ -219,13 +293,40 @@ export default function ACCircuitsPage() {
                     : <Slider label="Capacitance" unit="µF" value={capacitance} min={1} max={50} step={1} set={setCapacitance} color="#8b5cf6" />}
                 </>}
 
-                {topic === 'rlc-circuit' && <>
+                {topic === 'series-rlc' && <>
                   <Slider label="Peak voltage" unit="V" value={vPeak} min={5} max={50} step={5} set={setVPeak} color="#6366f1" />
                   <Slider label="Frequency" unit="Hz" value={rlcFrequency} min={10} max={200} step={1} set={setRlcFrequency} color="#f59e0b"
                     note={`Resonance at ≈ ${fRes.toFixed(1)} Hz`} />
                   <Slider label="Resistance" unit="Ω" value={resistance} min={10} max={300} step={10} set={setResistance} color="#059669" />
                   <Slider label="Inductance" unit="H" value={inductance} min={0.1} max={2} step={0.1} set={setInductance} color="#dc2626" />
                   <Slider label="Capacitance" unit="µF" value={capacitance} min={1} max={50} step={1} set={setCapacitance} color="#2563eb" />
+                </>}
+
+                {topic === 'parallel-rlc' && <>
+                  <Slider label="Peak voltage" unit="V" value={vPeak} min={5} max={50} step={5} set={setVPeak} color="#6366f1" />
+                  <Slider label="Frequency" unit="Hz" value={rlcFrequency} min={10} max={200} step={1} set={setRlcFrequency} color="#f59e0b"
+                    note={`Resonance at ≈ ${fRes.toFixed(1)} Hz`} />
+                  <Slider label="Resistance" unit="Ω" value={parallelResistance} min={100} max={3000} step={100} set={setParallelResistance} color="#059669" />
+                  <Slider label="Inductance" unit="H" value={inductance} min={0.1} max={2} step={0.1} set={setInductance} color="#dc2626" />
+                  <Slider label="Capacitance" unit="µF" value={capacitance} min={1} max={50} step={1} set={setCapacitance} color="#2563eb" />
+                </>}
+
+                {topic === 'resonance' && <>
+                  <div className="flex gap-2">
+                    {(['series', 'parallel'] as const).map(c => (
+                      <button key={c} onClick={() => setResonanceCircuit(c)}
+                        className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium capitalize transition ${
+                          resonanceCircuit === c ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                        }`}>{c}</button>
+                    ))}
+                  </div>
+                  <Slider label="Peak voltage" unit="V" value={vPeak} min={5} max={50} step={5} set={setVPeak} color="#6366f1" />
+                  <Slider label="Resistance" unit="Ω" value={resR} min={resonanceCircuit === 'series' ? 5 : 200} max={resonanceCircuit === 'series' ? 200 : 3000}
+                    step={resonanceCircuit === 'series' ? 5 : 100} set={setResR} color="#059669"
+                    note={resonanceCircuit === 'series' ? 'Lower R → sharper (higher Q) peak' : 'Higher R → sharper (higher Q) peak'} />
+                  <Slider label="Inductance" unit="H" value={resL} min={0.1} max={2} step={0.1} set={setResL} color="#dc2626" />
+                  <Slider label="Capacitance" unit="µF" value={resC} min={1} max={50} step={1} set={setResC} color="#2563eb" />
+                </>}
                 </>}
               </div>
             </div>
@@ -245,12 +346,27 @@ export default function ACCircuitsPage() {
                     <StatRow label="Peak current" value={(vPeak / reactanceX).toFixed(3)} unit="A" color="text-emerald-600" />
                     <StatRow label="Phase" value={component === 'inductor' ? 'I lags V by 90°' : 'I leads V by 90°'} unit="" color="text-amber-600" />
                   </>}
-                  {topic === 'rlc-circuit' && <>
+                  {topic === 'series-rlc' && <>
                     <StatRow label="XL" value={XL.toFixed(1)} unit="Ω" color="text-red-600" />
-                    <StatRow label="XC" value={XC.toFixed(1)} unit="Ω" color="text-blue-600" />
-                    <StatRow label="Impedance Z" value={Z.toFixed(1)} unit="Ω" color="text-indigo-600" />
+                    <StatRow label="XC" value={XC.toFixed(1)} unit="Ω" color="text-fuchsia-600" />
+                    <StatRow label="Impedance Z" value={Z.toFixed(1)} unit="Ω" color="text-teal-600" />
                     <StatRow label="Phase angle" value={phaseDeg.toFixed(1)} unit="°" color="text-emerald-600" />
                     <StatRow label="Resonant f₀" value={fRes.toFixed(1)} unit="Hz" color="text-purple-600" />
+                  </>}
+                  {topic === 'parallel-rlc' && <>
+                    <StatRow label="XL" value={XL.toFixed(1)} unit="Ω" color="text-red-600" />
+                    <StatRow label="XC" value={XC.toFixed(1)} unit="Ω" color="text-fuchsia-600" />
+                    <StatRow label="Impedance Z" value={parZ.toFixed(0)} unit="Ω" color="text-teal-600" />
+                    <StatRow label="Line current" value={parI.toFixed(3)} unit="A" color="text-emerald-600" />
+                    <StatRow label="Phase angle" value={parPhase.toFixed(1)} unit="°" color="text-amber-600" />
+                    <StatRow label="Resonant f₀" value={fRes.toFixed(1)} unit="Hz" color="text-purple-600" />
+                  </>}
+                  {topic === 'resonance' && <>
+                    <StatRow label="Resonant f₀" value={resF0.toFixed(1)} unit="Hz" color="text-purple-600" />
+                    <StatRow label="Q factor" value={resQ.toFixed(2)} unit="" color="text-indigo-600" />
+                    <StatRow label="Bandwidth" value={resBW.toFixed(1)} unit="Hz" color="text-emerald-600" />
+                    <StatRow label="f₁ (lower)" value={(resF0 - resBW / 2).toFixed(1)} unit="Hz" color="text-amber-600" />
+                    <StatRow label="f₂ (upper)" value={(resF0 + resBW / 2).toFixed(1)} unit="Hz" color="text-amber-600" />
                   </>}
                 </div>
               </div>

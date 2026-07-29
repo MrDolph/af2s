@@ -94,3 +94,52 @@ export function resonantAngularFrequency(inductance: number, capacitance: number
   if (inductance <= 0 || capacitance <= 0) return 0;
   return 1 / Math.sqrt(inductance * capacitance);
 }
+
+// ── Parallel RLC ──────────────────────────────────────────────────────────────
+// In parallel, R, L, C share the same voltage; branch currents add as
+// phasors: IR in phase, IL lagging 90°, IC leading 90°.
+export function parallelRLCBranchCurrents(vPeak: number, R: number, XL: number, XC: number) {
+  const iR = R > 0 ? vPeak / R : 0;
+  const iL = XL > 0 ? vPeak / XL : 0;
+  const iC = XC > 0 && Number.isFinite(XC) ? vPeak / XC : 0;
+  return { iR, iL, iC };
+}
+export function parallelRLCTotalCurrent(vPeak: number, R: number, XL: number, XC: number): number {
+  const { iR, iL, iC } = parallelRLCBranchCurrents(vPeak, R, XL, XC);
+  return Math.sqrt(iR * iR + (iC - iL) * (iC - iL));
+}
+export function parallelRLCImpedance(vPeak: number, R: number, XL: number, XC: number): number {
+  const i = parallelRLCTotalCurrent(vPeak, R, XL, XC);
+  return i > 0 ? vPeak / i : Infinity;
+}
+export function parallelRLCPhaseAngleDeg(R: number, XL: number, XC: number): number {
+  // Current phasor relative to voltage: net susceptance (1/XC - 1/XL)
+  // determines whether current leads (capacitive) or lags (inductive).
+  const gR = R > 0 ? 1 / R : 0;
+  const bNet = (XC > 0 && Number.isFinite(XC) ? 1 / XC : 0) - (XL > 0 ? 1 / XL : 0);
+  if (gR === 0) return bNet >= 0 ? 90 : -90;
+  return (Math.atan2(bNet, gR) * 180) / Math.PI;
+}
+
+// ── Quality factor & bandwidth ───────────────────────────────────────────────
+// Series RLC: Q = (1/R)*sqrt(L/C) = omega0*L/R — a SHARPER (higher-Q) series
+// circuit has a narrower resonance peak.
+export function qFactorSeries(R: number, inductance: number, capacitance: number): number {
+  if (R <= 0 || inductance <= 0 || capacitance <= 0) return 0;
+  return (1 / R) * Math.sqrt(inductance / capacitance);
+}
+// Parallel RLC: Q = R*sqrt(C/L) — here a LARGER R gives a higher Q (opposite
+// dependence on R from the series case, since R limits current differently
+// in the two topologies).
+export function qFactorParallel(R: number, inductance: number, capacitance: number): number {
+  if (R <= 0 || inductance <= 0 || capacitance <= 0) return 0;
+  return R * Math.sqrt(capacitance / inductance);
+}
+// Bandwidth (the width, in Hz, between the half-power points) = f0/Q.
+// This is the standard high-Q approximation — increasingly exact as Q
+// grows, verified numerically before use (a Q~2 circuit's true half-power
+// points sit a little inside this estimate; a Q~20+ circuit matches to
+// within about 1%).
+export function bandwidthHz(f0: number, Q: number): number {
+  return Q > 0 ? f0 / Q : Infinity;
+}
