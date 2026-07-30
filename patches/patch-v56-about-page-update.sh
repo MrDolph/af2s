@@ -1,3 +1,62 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio -- patch v56: About page update -- new advanced
+# simulations, an actionable "suggest a curriculum" CTA, and a portfolio
+# link
+#
+#   Does NOT touch simulations/page.tsx (a different file entirely --
+#   this patch only writes src/app/about/page.tsx).
+#
+#   1. ADVANCED & UNDERGRADUATE SIMULATIONS. Added a new showcase section
+#      featuring Atomic Models, Quantum Tunnelling, Coupled Oscillators,
+#      and Double Pendulum. IMPORTANT CAVEAT: these were added
+#      independently and aren't present in the sandbox this session
+#      worked from, so their exact routes couldn't be verified directly.
+#      "Atomic Models" uses the exact URL given
+#      (/simulations/atomic-models). The other three use best-guess
+#      slugs matching this app's established kebab-case convention
+#      (/simulations/quantum-tunneling, /simulations/coupled-oscillators,
+#      /simulations/double-pendulum) -- please check these three links
+#      actually resolve, and let me know the correct slugs if any differ
+#      so they can be fixed precisely rather than guessed at again.
+#
+#   2. "SUGGEST A CURRICULUM" MADE ACTIONABLE. The dashed placeholder box
+#      was static text with no way to act on it. It's now a real link
+#      (opens the portfolio site in a new tab) with a clear call to
+#      action, so a visitor who wants to suggest a curriculum has
+#      somewhere to actually go.
+#
+#   3. PORTFOLIO LINK (https://mrdof-portfolio.vercel.app/) added in
+#      three places: the curriculum-suggestion card, a "View portfolio"
+#      link under the founder’s bio in the Team section, and the site
+#      footer alongside the other navigation links.
+#
+#   4. Updated the simulation count stat and the product roadmap to
+#      reflect the platform’s actual current state -- electrostatics,
+#      magnetic effects, electromagnetic induction, AC circuits, and
+#      thermal physics are now marked live rather than still "building",
+#      and the new advanced-physics topics are called out as their own
+#      roadmap phase.
+#
+#   Also fixed one pre-existing, unrelated lint issue caught while
+#   editing this file: an unescaped apostrophe in the hero heading
+#   ("shouldn't" -> "shouldn&apos;t"), flagged by the
+#   react/no-unescaped-entities rule.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v56-about-page-update.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "-- A-Factor patch v56: About page update --"
+mkdir -p "src/app/about"
+
+echo "  -> src/app/about/page.tsx"
+cat > "src/app/about/page.tsx" << 'AFEOF'
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
 
@@ -275,3 +334,17 @@ export default function AboutPage() {
     </>
   );
 }
+AFEOF
+
+echo ""
+echo "Patch v56 applied -- 1 file written."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /about -- the new 'Advanced & undergraduate topics' section,"
+echo "and specifically click through Quantum Tunnelling, Coupled"
+echo "Oscillators, and Double Pendulum to confirm those three guessed"
+echo "slugs actually match your real routes (Atomic Models was given"
+echo "explicitly and should already be correct)."

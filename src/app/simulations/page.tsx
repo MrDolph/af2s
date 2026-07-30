@@ -88,6 +88,16 @@ const SIMULATIONS = [
     status: 'live',
   },
   {
+    slug: 'quantum-tunneling',
+    href: '/simulations/quantum-tunneling',
+    title: '1D Quantum Tunneling',
+    description: 'Interactive wave packet scattering through barriers, wells, and steps. Split-step Fourier evolution with real-time transmission/reflection measurement, WKB analysis, and classical comparison.',
+    icon: '🌊',
+    tags: ['IGCSE', 'SAT', 'JUPEB', 'A-Level', 'Undergrad'],
+    topic: 'Quantum Mechanics',
+    status: 'live',
+  },
+  {
     slug: 'ohms-law',
     href: '/simulations/ohms-law',
     title: "Ohm's law & circuits",

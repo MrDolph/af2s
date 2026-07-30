@@ -1,3 +1,44 @@
+#!/usr/bin/env bash
+# ══════════════════════════════════════════════════════════════════════════════
+# A-Factor STEM Studio -- patch v57: fix a genuinely backwards direction
+# in the Ohm's Law & Circuits electron-flow / conventional-current toggle
+#
+#   ROOT CAUSE, TRACED AND VERIFIED NUMERICALLY. The battery symbol draws
+#   its + terminal (the long plate) on the LEFT and its - terminal (the
+#   short plate) on the RIGHT. Traced the actual wire-loop path
+#   coordinates against these terminal positions: the path's own natural
+#   drawing order starts near the + terminal, goes the LONG way around
+#   the external circuit (through the resistor, left to right), and
+#   arrives back near the - terminal. That is exactly CONVENTIONAL
+#   CURRENT's direction (+ -> external circuit -> -) -- but the code had
+#   this direction labelled "electron flow", and the reversed direction
+#   labelled "conventional current". The two were swapped everywhere:
+#   Ohm's law, Series, Parallel (every branch), and Non-ohmic modes all
+#   used the same shared drawing function, so all of them had this
+#   backwards in the same way.
+#
+#   FIXED and reverified: conventional current (dir=+1) now traces
+#   + terminal -> external circuit -> - terminal, moving LEFT-TO-RIGHT
+#   through the resistor -- correct. Electron flow (dir=-1) now traces
+#   - terminal -> external circuit -> + terminal, moving RIGHT-TO-LEFT
+#   through the resistor -- correct, and a genuine mirror image of the
+#   conventional-current path, exactly matching "electrons flow opposite
+#   to conventional current" without exception.
+#
+# Run from the af2s project root (Git Bash):   bash patches/patch-v57-circuits-flow-direction-fix.sh
+# ══════════════════════════════════════════════════════════════════════════════
+set -euo pipefail
+
+if [ ! -f "package.json" ]; then
+  echo "Run this from the af2s project root (package.json not found)." >&2
+  exit 1
+fi
+
+echo "-- A-Factor patch v57: fix backwards electron/conventional current direction --"
+mkdir -p "src/components/simulation"
+
+echo "  -> src/components/simulation/CircuitCanvas.tsx"
+cat > "src/components/simulation/CircuitCanvas.tsx" << 'AFEOF'
 'use client';
 import { useRef, useEffect, useCallback } from 'react';
 import {
@@ -326,3 +367,18 @@ export function CircuitCanvas({
       className="w-full rounded-xl border border-gray-200 bg-white" style={{ display: 'block' }} />
   );
 }
+AFEOF
+
+echo ""
+echo "Patch v57 applied -- 1 file written."
+echo ""
+echo "Next steps:"
+echo "  rm -rf .next"
+echo "  npm run dev"
+echo ""
+echo "Check: /simulations/ohms-law -- on the Ohm's law tab, switch to"
+echo "'Conventional I' and confirm the arrows move from the + terminal"
+echo "(left plate) around through the resistor to the - terminal (right"
+echo "plate). Switch to 'Electron flow' and confirm the dots move the"
+echo "exact opposite way, starting from the - terminal. Check this on"
+echo "Series and Parallel too."
