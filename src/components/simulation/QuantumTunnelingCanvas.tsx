@@ -55,7 +55,18 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
     timeRef.current = 0;
   }, []);
 
-  useEffect(() => { initSim(); }, [initSim]);
+  useEffect(() => {
+    initSim();
+  }, [
+    initSim,
+    params.potentialType,
+    params.particleEnergy,
+    params.barrierHeight,
+    params.barrierWidth,
+    params.barrierPosition,
+    params.packetWidth,
+    params.particleMass,
+  ]);
 
   const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current;
@@ -113,13 +124,20 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
     ctx.fillStyle = '#0b1021';
     ctx.fillRect(0, 0, displayW, displayH);
 
-    drawGrid(ctx, displayW, displayH);
+    drawGrid(ctx, displayW, displayH, s.params.zoom);
 
     const axisY = displayH * 0.82;
-    const xScale = displayW / L_BOX;
+    /* ═══════════════════════════════════════════════════════════════════
+       ZOOM applied to horizontal scale.  Higher zoom = larger pixels
+       per Å, showing a magnified view of the barrier region.
+       ═══════════════════════════════════════════════════════════════════ */
+    const xScale = (displayW / L_BOX) * s.params.zoom;
+    const viewOffset = s.params.zoom > 1
+      ? -(s.params.barrierPosition - L_BOX / 2) * (displayW / L_BOX) * (s.params.zoom - 1)
+      : 0;
 
-    const maxV = Math.max(1, s.params.barrierHeight * 1.2, Math.max(...sim.V) * 1.2);
-    const vScale = (axisY - 40) / maxV;
+    const FIXED_MAX_V = 12;
+    const vScale = (axisY - 40) / FIXED_MAX_V;
 
     let maxProb = 0, maxPsi = 0;
     for (let i = 0; i < N_GRID; i++) {
@@ -135,55 +153,72 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
 
     const barStart = s.params.barrierPosition;
     const barEnd = s.params.potentialType === 'step' ? L_BOX : s.params.barrierPosition + s.params.barrierWidth;
-    const pxStart = barStart * xScale;
-    const pxEnd = barEnd * xScale;
+    const pxStart = barStart * xScale + viewOffset;
+    const pxEnd = barEnd * xScale + viewOffset;
+
+    // Helper to map simulation x to screen x with zoom & offset
+    const toPx = (x: number) => x * xScale + viewOffset;
 
     // Region tints
     ctx.fillStyle = 'rgba(59, 130, 246, 0.03)';
-    ctx.fillRect(0, 0, pxStart, displayH);
+    ctx.fillRect(0, 0, Math.max(0, pxStart), displayH);
     ctx.fillStyle = 'rgba(16, 185, 129, 0.03)';
-    ctx.fillRect(pxEnd, 0, displayW - pxEnd, displayH);
+    ctx.fillRect(Math.max(0, pxEnd), 0, displayW - Math.max(0, pxEnd), displayH);
     if (s.params.potentialType !== 'step') {
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.03)';
-      ctx.fillRect(pxStart, 0, pxEnd - pxStart, displayH);
+      const isWell = s.params.potentialType === 'well';
+      ctx.fillStyle = isWell ? 'rgba(6, 182, 212, 0.04)' : 'rgba(251, 191, 36, 0.03)';
+      ctx.fillRect(Math.max(0, pxStart), 0, Math.max(0, pxEnd - pxStart), displayH);
     }
 
     // Potential
     if (s.params.showPotential) {
+      const isWell = s.params.potentialType === 'well';
+      const potColor = isWell ? '6, 182, 212' : '251, 191, 36';
+
       ctx.beginPath();
-      ctx.moveTo(0, axisY);
-      for (let i = 0; i < N_GRID; i++) ctx.lineTo(sim.x[i] * xScale, axisY - sim.V[i] * vScale);
-      ctx.lineTo(displayW, axisY);
+      ctx.moveTo(toPx(0), axisY);
+      for (let i = 0; i < N_GRID; i++) ctx.lineTo(toPx(sim.x[i]), axisY - sim.V[i] * vScale);
+      ctx.lineTo(toPx(L_BOX), axisY);
       ctx.closePath();
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.12)';
+      ctx.fillStyle = `rgba(${potColor}, 0.15)`;
       ctx.fill();
-      ctx.strokeStyle = 'rgba(251, 191, 36, 0.55)';
+      ctx.strokeStyle = `rgba(${potColor}, 0.7)`;
       ctx.lineWidth = 2;
       ctx.stroke();
+
+      if (s.params.potentialType !== 'step') {
+        ctx.fillStyle = `rgba(${potColor}, 0.5)`;
+        ctx.font = 'bold 9px system-ui';
+        ctx.textAlign = 'center';
+        const label = isWell
+          ? `Well  V = −${s.params.barrierHeight.toFixed(1)} eV`
+          : `Barrier  V₀ = ${s.params.barrierHeight.toFixed(1)} eV`;
+        ctx.fillText(label, (pxStart + pxEnd) / 2, axisY - s.params.barrierHeight * vScale - 6);
+      }
     }
 
     // Energy line
     if (s.params.showEnergyLine) {
       const eY = axisY - s.params.particleEnergy * vScale;
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
       ctx.setLineDash([4, 4]);
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(0, eY); ctx.lineTo(displayW, eY); ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.font = '10px system-ui'; ctx.textAlign = 'right';
-      ctx.fillText(`E = ${s.params.particleEnergy.toFixed(2)} eV`, displayW - 10, eY - 4);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'right';
+      ctx.fillText(`E = ${s.params.particleEnergy.toFixed(2)} eV`, displayW - 10, eY - 5);
     }
 
     // |ψ|²
     if (s.params.showProbability) {
       ctx.beginPath();
-      ctx.moveTo(0, axisY);
+      ctx.moveTo(toPx(0), axisY);
       for (let i = 0; i < N_GRID; i++) {
         const prob = sim.psi[i].re * sim.psi[i].re + sim.psi[i].im * sim.psi[i].im;
-        ctx.lineTo(sim.x[i] * xScale, axisY - prob * probScale);
+        ctx.lineTo(toPx(sim.x[i]), axisY - prob * probScale);
       }
-      ctx.lineTo(displayW, axisY);
+      ctx.lineTo(toPx(L_BOX), axisY);
       ctx.closePath();
       const grad = ctx.createLinearGradient(0, axisY, 0, axisY - displayH * 0.5);
       grad.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
@@ -200,7 +235,7 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
         const phase = Math.atan2(sim.psi[i].im, sim.psi[i].re);
         const hue = ((phase + Math.PI) / (2 * Math.PI)) * 360;
         ctx.fillStyle = `hsla(${hue}, 85%, 60%, ${Math.min(0.5, (prob / maxProb) * 1.5)})`;
-        ctx.fillRect(sim.x[i] * xScale - 1, axisY - prob * probScale, 3, prob * probScale + 1);
+        ctx.fillRect(toPx(sim.x[i]) - 1, axisY - prob * probScale, 3, prob * probScale + 1);
       }
     }
 
@@ -209,7 +244,7 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
       ctx.beginPath();
       for (let i = 0; i < N_GRID; i++) {
         const y = axisY - 28 - sim.psi[i].re * psiScale;
-        if (i === 0) ctx.moveTo(sim.x[i] * xScale, y); else ctx.lineTo(sim.x[i] * xScale, y);
+        if (i === 0) ctx.moveTo(toPx(sim.x[i]), y); else ctx.lineTo(toPx(sim.x[i]), y);
       }
       ctx.strokeStyle = 'rgba(16, 185, 129, 0.55)';
       ctx.lineWidth = 1.5;
@@ -221,7 +256,7 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
       ctx.beginPath();
       for (let i = 0; i < N_GRID; i++) {
         const y = axisY - 28 - sim.psi[i].im * psiScale;
-        if (i === 0) ctx.moveTo(sim.x[i] * xScale, y); else ctx.lineTo(sim.x[i] * xScale, y);
+        if (i === 0) ctx.moveTo(toPx(sim.x[i]), y); else ctx.lineTo(toPx(sim.x[i]), y);
       }
       ctx.strokeStyle = 'rgba(244, 63, 94, 0.55)';
       ctx.lineWidth = 1.5;
@@ -230,7 +265,7 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
 
     // Classical ghost
     if (s.params.showClassical) {
-      const cx = sim.classicalX * xScale;
+      const cx = toPx(sim.classicalX);
       const cy = axisY - 12;
       ctx.fillStyle = 'rgba(251, 191, 36, 0.25)';
       ctx.beginPath(); ctx.arc(cx, cy, 10, 0, Math.PI * 2); ctx.fill();
@@ -243,11 +278,13 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
     ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(0, axisY); ctx.lineTo(displayW, axisY); ctx.stroke();
 
-    // Ticks
+    // Ticks — only draw visible ones when zoomed in
     ctx.fillStyle = 'rgba(148, 163, 184, 0.4)';
     ctx.font = '9px system-ui'; ctx.textAlign = 'center';
-    for (let xv = 0; xv <= L_BOX; xv += 10) {
-      const px = xv * xScale;
+    const tickStep = s.params.zoom >= 2 ? 5 : 10;
+    for (let xv = 0; xv <= L_BOX; xv += tickStep) {
+      const px = toPx(xv);
+      if (px < -20 || px > displayW + 20) continue;
       ctx.fillText(`${xv} Å`, px, axisY + 14);
       ctx.beginPath(); ctx.moveTo(px, axisY); ctx.lineTo(px, axisY + 4); ctx.stroke();
     }
@@ -255,13 +292,17 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
     // Region labels
     ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(59, 130, 246, 0.35)';
-    ctx.fillText('INCIDENT', pxStart / 2, 18);
+    const incidentLabelX = Math.max(20, pxStart / 2);
+    ctx.fillText('INCIDENT', incidentLabelX, 18);
     if (s.params.potentialType !== 'step') {
-      ctx.fillStyle = 'rgba(251, 191, 36, 0.35)';
-      ctx.fillText('BARRIER', (pxStart + pxEnd) / 2, 18);
+      const isWell = s.params.potentialType === 'well';
+      ctx.fillStyle = isWell ? 'rgba(6, 182, 212, 0.35)' : 'rgba(251, 191, 36, 0.35)';
+      const regionLabelX = Math.max(20, Math.min(displayW - 20, (pxStart + pxEnd) / 2));
+      ctx.fillText(isWell ? 'WELL' : 'BARRIER', regionLabelX, 18);
     }
     ctx.fillStyle = 'rgba(16, 185, 129, 0.35)';
-    ctx.fillText('TRANSMITTED', (pxEnd + displayW) / 2, 18);
+    const transLabelX = Math.min(displayW - 20, (pxEnd + displayW) / 2);
+    ctx.fillText('TRANSMITTED', transLabelX, 18);
 
     // Status
     ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
@@ -293,19 +334,24 @@ export function QuantumTunnelingCanvas({ params, isRunning, isPaused, onTick, wi
     }
 
     rafRef.current = requestAnimationFrame(draw);
-  }, [width, height, initSim]);
+  }, [width, height]);
 
   useEffect(() => {
     rafRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafRef.current);
   }, [draw]);
 
-  function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  function drawGrid(ctx: CanvasRenderingContext2D, w: number, h: number, zoom: number) {
     ctx.strokeStyle = 'rgba(148, 163, 184, 0.06)';
     ctx.lineWidth = 1;
-    const xScale = w / L_BOX;
-    for (let i = 0; i < L_BOX; i += 5) {
-      ctx.beginPath(); ctx.moveTo(i * xScale, 0); ctx.lineTo(i * xScale, h); ctx.stroke();
+    const xScale = (w / L_BOX) * zoom;
+    const viewOffset = zoom > 1 ? -(L_BOX / 2) * (w / L_BOX) * (zoom - 1) : 0;
+    const toPx = (x: number) => x * xScale + viewOffset;
+    const step = zoom >= 2 ? 2.5 : 5;
+    for (let i = 0; i < L_BOX; i += step) {
+      const px = toPx(i);
+      if (px < -1 || px > w + 1) continue;
+      ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, h); ctx.stroke();
     }
     for (let j = 0; j < h; j += 40) {
       ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(w, j); ctx.stroke();

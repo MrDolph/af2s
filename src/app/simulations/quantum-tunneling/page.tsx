@@ -268,7 +268,6 @@ export default function QuantumTunnelingPage() {
     return liveStats.theoreticalT;
   }, [potentialType, particleEnergy, barrierHeight, barrierWidth, particleMass, liveStats.theoreticalT]);
 
-  /* Derive dynamic notes based on selected scenario */
   const scenarioNote = SCENARIO_NOTES[potentialType];
 
   return (
@@ -301,33 +300,34 @@ export default function QuantumTunnelingPage() {
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════
-              SCENARIO PRINCIPLE CARDS — click to update teacher notes
+              SCENARIO PRINCIPLE CARDS — compact on mobile, click to update
+              teacher notes. 3 columns on mobile for better balance.
               ═══════════════════════════════════════════════════════════════ */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          <div className="grid grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2">
             {(['barrier', 'well', 'step', 'double', 'triangular'] as PotentialType[]).map((m) => {
               const labels: Record<PotentialType, string> = {
-                barrier: 'Barrier', well: 'Quantum Well', step: 'Step', double: 'Double Barrier', triangular: 'Triangular',
+                barrier: 'Barrier', well: 'Well', step: 'Step', double: 'Double', triangular: 'Triangular',
               };
               const desc: Record<PotentialType, string> = {
-                barrier: 'Rectangular potential wall',
-                well: 'Attractive potential trough',
+                barrier: 'Rectangular wall',
+                well: 'Attractive trough',
                 step: 'Semi-infinite step',
-                double: 'Two barriers with gap',
-                triangular: 'Linear ramp (STM/field emission)',
+                double: 'Two barriers',
+                triangular: 'Linear ramp',
               };
               const active = potentialType === m;
               return (
                 <button
                   key={m}
                   onClick={() => { setPotentialType(m); setIsRunning(false); setResetKey((k) => k + 1); }}
-                  className={`relative rounded-xl border px-3 py-3 text-left hover:shadow-md transition min-w-0
+                  className={`relative rounded-xl border px-2 py-2 sm:px-3 sm:py-3 text-left hover:shadow-md transition min-w-0
                     ${active ? 'border-indigo-400 bg-indigo-50 text-indigo-800 ring-1 ring-indigo-200' : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-200'}`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <p className={`text-xs font-semibold ${active ? 'text-indigo-700' : 'text-gray-700'}`}>{labels[m]}</p>
-                    {active && <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />}
+                  <div className="flex items-center justify-between mb-0.5 sm:mb-1">
+                    <p className={`text-[10px] sm:text-xs font-semibold ${active ? 'text-indigo-700' : 'text-gray-700'}`}>{labels[m]}</p>
+                    {active && <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-indigo-500 animate-pulse" />}
                   </div>
-                  <p className="text-[10px] text-gray-400 leading-relaxed">{desc[m]}</p>
+                  <p className="text-[9px] sm:text-[10px] text-gray-400 leading-relaxed">{desc[m]}</p>
                   {active && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-400 rounded-b-xl" />}
                 </button>
               );
@@ -345,9 +345,11 @@ export default function QuantumTunnelingPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_280px_300px] gap-4 items-start">
             {/* ═══════════════════════════════════════════════════════════════
-                MAIN COLUMN — Canvas + Controls
+                MAIN COLUMN — Canvas → Controls → Parameters (sticky bottom)
+                Parameters sits RIGHT HERE, immediately below the canvas,
+                making it the most accessible element on the page.
                 ═══════════════════════════════════════════════════════════════ */}
             <div className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
@@ -361,10 +363,62 @@ export default function QuantumTunnelingPage() {
                 <EmbedButton path="/embed/quantum-tunneling" title="Quantum Tunneling — A-Factor STEM Studio"
                   params={{ type: potentialType, E: particleEnergy, V: barrierHeight, w: barrierWidth, pos: barrierPosition, sigma: packetWidth, m: particleMass, speed, pot: showPotential ? 1 : 0, prob: showProbability ? 1 : 0, re: showRealPart ? 1 : 0, im: showImaginaryPart ? 1 : 0, phase: showPhase ? 1 : 0, classical: showClassical ? 1 : 0, eline: showEnergyLine ? 1 : 0, auto: autoRestart ? 1 : 0 }} />
               </div>
+
+              {/* ═══════════════════════════════════════════════════════════
+                  PARAMETERS PANEL — Sticky at bottom on desktop,
+                  right after controls on mobile. Always within easy reach.
+                  ═══════════════════════════════════════════════════════════ */}
+              <div className="lg:sticky lg:bottom-4 z-30">
+                <CollapsiblePanel title="Parameters" badge="Interactive" defaultOpen={true}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide">Wave Packet</p>
+                      <Slider label="Energy E" unit="eV" value={particleEnergy} min={0.1} max={10} step={0.1} set={setParticleEnergy} color="#6366f1" note="Kinetic energy of incident particle" />
+                      <Slider label="Packet width σ" unit="Å" value={packetWidth} min={0.5} max={4} step={0.1} set={setPacketWidth} color="#3b82f6" note="Spatial spread of Gaussian (uncertainty)" />
+                      <Slider label="Mass" unit="mₑ" value={particleMass} min={0.2} max={20} step={0.1} set={setParticleMass} color="#10b981" note="In units of electron mass" />
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-medium text-amber-600 uppercase tracking-wide">Potential</p>
+                      <Slider label="Height |V₀|" unit="eV" value={barrierHeight} min={0.5} max={10} step={0.1} set={setBarrierHeight} color="#fbbf24" note="Barrier height (well depth for Well)" />
+                      <Slider label="Width w" unit="Å" value={barrierWidth} min={0.5} max={10} step={0.1} set={setBarrierWidth} color="#f59e0b" note="Barrier thickness" />
+                      <Slider label="Position" unit="Å" value={barrierPosition} min={10} max={45} step={1} set={setBarrierPosition} color="#d97706" note="Distance from left edge" />
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wide">Animation</p>
+                      <Slider label="Speed" unit="×" value={speed} min={0} max={3} step={0.1} set={setSpeed} color="#3b82f6" note="Time evolution speed" />
+                      <Slider label="Zoom" unit="×" value={zoom} min={0.5} max={2} step={0.1} set={setZoom} color="#10b981" note="Canvas zoom level" />
+                      <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer mt-1">
+                        <input type="checkbox" checked={autoRestart} onChange={(e) => setAutoRestart(e.target.checked)} className="rounded" />
+                        Auto-restart when packet settles
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-100 mt-4 pt-3">
+                    <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-2">Visibility Layers</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { label: 'Potential V(x)', checked: showPotential, set: setShowPotential },
+                        { label: '|ψ|²', checked: showProbability, set: setShowProbability },
+                        { label: 'Re(ψ)', checked: showRealPart, set: setShowRealPart },
+                        { label: 'Im(ψ)', checked: showImaginaryPart, set: setShowImaginaryPart },
+                        { label: 'Phase', checked: showPhase, set: setShowPhase },
+                        { label: 'Classical', checked: showClassical, set: setShowClassical },
+                        { label: 'Energy line', checked: showEnergyLine, set: setShowEnergyLine },
+                      ].map((item) => (
+                        <label key={item.label} className="flex items-center gap-1.5 text-[11px] text-gray-600 cursor-pointer bg-gray-50 px-2 py-1 rounded-md border border-gray-100 hover:border-indigo-200 transition">
+                          <input type="checkbox" checked={item.checked} onChange={(e) => item.set(e.target.checked)} className="rounded" />
+                          {item.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </CollapsiblePanel>
+              </div>
             </div>
 
             {/* ═══════════════════════════════════════════════════════════════
-                RIGHT COLUMN 1 — Calculated Stats + Quick Formulas
+                RIGHT COLUMN 1 — Calculated Stats + Formulas + Curriculum
                 ═══════════════════════════════════════════════════════════════ */}
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
@@ -408,14 +462,12 @@ export default function QuantumTunnelingPage() {
                 RIGHT COLUMN 2 — Collapsible Teacher Notes + Exercises
                 ═══════════════════════════════════════════════════════════════ */}
             <div className="space-y-3 lg:col-span-2 xl:col-span-1">
-              {/* Dynamic Scenario Teacher Notes */}
               <CollapsiblePanel
                 title="Teacher Notes"
                 badge={potentialType.charAt(0).toUpperCase() + potentialType.slice(1)}
                 defaultOpen={true}
               >
                 <div className="space-y-3">
-                  {/* Scenario-specific header */}
                   <div className="rounded-lg bg-amber-50 border border-amber-100 p-3">
                     <p className="text-xs font-semibold text-amber-800 mb-1.5">{scenarioNote.title}</p>
                     <ul className="space-y-1.5">
@@ -426,8 +478,6 @@ export default function QuantumTunnelingPage() {
                       ))}
                     </ul>
                   </div>
-
-                  {/* General notes */}
                   <div>
                     <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-2">General Principles</p>
                     <ul className="space-y-2">
@@ -441,7 +491,6 @@ export default function QuantumTunnelingPage() {
                 </div>
               </CollapsiblePanel>
 
-              {/* Exercises */}
               <CollapsiblePanel title="Exercises" defaultOpen={false}>
                 <div className="space-y-2">
                   {EXERCISES.map((ex, i) => (
@@ -461,57 +510,6 @@ export default function QuantumTunnelingPage() {
                 </div>
               </CollapsiblePanel>
             </div>
-          </div>
-
-          {/* ═══════════════════════════════════════════════════════════════
-              PARAMETERS PANEL — Floating / Collapsible, placed for easy access
-              ═══════════════════════════════════════════════════════════════ */}
-          <div className="lg:sticky lg:bottom-4 z-30">
-            <CollapsiblePanel title="Simulation Parameters" badge="Interactive" defaultOpen={true}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
-                <div className="space-y-3">
-                  <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide">Wave Packet</p>
-                  <Slider label="Energy E" unit="eV" value={particleEnergy} min={0.1} max={10} step={0.1} set={setParticleEnergy} color="#6366f1" note="Kinetic energy of incident particle" />
-                  <Slider label="Packet width σ" unit="Å" value={packetWidth} min={0.5} max={4} step={0.1} set={setPacketWidth} color="#3b82f6" note="Spatial spread of Gaussian (uncertainty)" />
-                  <Slider label="Mass" unit="mₑ" value={particleMass} min={0.2} max={20} step={0.1} set={setParticleMass} color="#10b981" note="In units of electron mass" />
-                </div>
-                <div className="space-y-3">
-                  <p className="text-[10px] font-medium text-amber-600 uppercase tracking-wide">Potential</p>
-                  <Slider label="Height |V₀|" unit="eV" value={barrierHeight} min={0.5} max={10} step={0.1} set={setBarrierHeight} color="#fbbf24" note="Barrier height (well depth for Well)" />
-                  <Slider label="Width w" unit="Å" value={barrierWidth} min={0.5} max={10} step={0.1} set={setBarrierWidth} color="#f59e0b" note="Barrier thickness" />
-                  <Slider label="Position" unit="Å" value={barrierPosition} min={10} max={45} step={1} set={setBarrierPosition} color="#d97706" note="Distance from left edge" />
-                </div>
-                <div className="space-y-3">
-                  <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wide">Animation & Display</p>
-                  <Slider label="Speed" unit="×" value={speed} min={0} max={3} step={0.1} set={setSpeed} color="#3b82f6" note="Time evolution speed" />
-                  <Slider label="Zoom" unit="×" value={zoom} min={0.5} max={2} step={0.1} set={setZoom} color="#10b981" note="Canvas zoom level" />
-                  <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer mt-1">
-                    <input type="checkbox" checked={autoRestart} onChange={(e) => setAutoRestart(e.target.checked)} className="rounded" />
-                    Auto-restart when packet settles
-                  </label>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-100 mt-4 pt-3">
-                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-2">Visibility Layers</p>
-                <div className="flex flex-wrap gap-3">
-                  {[
-                    { label: 'Potential V(x)', checked: showPotential, set: setShowPotential },
-                    { label: '|ψ|² density', checked: showProbability, set: setShowProbability },
-                    { label: 'Re(ψ)', checked: showRealPart, set: setShowRealPart },
-                    { label: 'Im(ψ)', checked: showImaginaryPart, set: setShowImaginaryPart },
-                    { label: 'Phase color', checked: showPhase, set: setShowPhase },
-                    { label: 'Classical ghost', checked: showClassical, set: setShowClassical },
-                    { label: 'Energy line', checked: showEnergyLine, set: setShowEnergyLine },
-                  ].map((item) => (
-                    <label key={item.label} className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer bg-gray-50 px-2.5 py-1.5 rounded-lg border border-gray-100 hover:border-indigo-200 transition">
-                      <input type="checkbox" checked={item.checked} onChange={(e) => item.set(e.target.checked)} className="rounded" />
-                      {item.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </CollapsiblePanel>
           </div>
         </div>
       </main>
