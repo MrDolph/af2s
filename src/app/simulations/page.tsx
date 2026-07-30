@@ -94,7 +94,8 @@ const SIMULATIONS = [
     description: 'Interactive wave packet scattering through barriers, wells, and steps. Split-step Fourier evolution with real-time transmission/reflection measurement, WKB analysis, and classical comparison.',
     icon: '🌊',
     tags: ['IGCSE', 'SAT', 'JUPEB', 'A-Level', 'Undergrad'],
-    topic: 'Quantum Mechanics',
+    subtopic: 'Quantum Mechanics',
+    topic: 'Modern physics',
     status: 'live',
   },
   {
