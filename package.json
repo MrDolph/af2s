@@ -1,6 +1,10 @@
 {
   "name": "af2s",
   "version": "0.1.0",
+  "allowScripts": {
+    "sharp": true,
+    "unrs-resolver": true
+  },
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
