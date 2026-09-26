@@ -41,6 +41,14 @@ export function AppHeader() {
                 {n.label}
               </Link>
             ))}
+            <Link href="/minitab"
+              className={`px-3 py-1.5 rounded-lg text-sm transition ${
+                pathname.startsWith('/minitab')
+                  ? 'bg-indigo-50 text-indigo-700 font-medium'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+              }`}>
+              Student Login
+            </Link>
             <Link href="/simulations"
               className="ml-2 rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 transition">
               Try now
@@ -73,6 +81,14 @@ export function AppHeader() {
                 {n.label}
               </Link>
             ))}
+            <Link href="/minitab" onClick={() => setOpen(false)}
+              className={`block px-3 py-2 rounded-lg text-sm transition ${
+                pathname.startsWith('/minitab')
+                  ? 'bg-indigo-50 text-indigo-700 font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}>
+              Student Login
+            </Link>
             <Link href="/simulations" onClick={() => setOpen(false)}
               className="block mt-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white text-center">
               Try now
