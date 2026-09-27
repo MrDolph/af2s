@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -7,6 +7,21 @@ export function MinitabBar() {
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const tracked = useRef<string | null>(null);
+
+  // Fire a visit beacon once per page load — skipped on the login page and
+  // the admin dashboard itself, since neither is a "simulation visit".
+  useEffect(() => {
+    if (pathname === '/minitab/login' || pathname === '/minitab/admin') return;
+    if (tracked.current === pathname) return;
+    tracked.current = pathname;
+    const slug = pathname.replace(/^\/minitab\/?/, '') || 'hub';
+    fetch('/api/minitab-track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug }),
+    }).catch(() => {}); // best-effort — a failed beacon shouldn't disrupt the page
+  }, [pathname]);
 
   // The login page has nothing to log out of yet — hide the bar there.
   if (pathname === '/minitab/login') return null;
@@ -33,13 +48,18 @@ export function MinitabBar() {
             <span aria-hidden>←</span> Simulation Library
           </Link>
         )}
-        <button
-          onClick={logout}
-          disabled={loggingOut}
-          className="opacity-90 hover:opacity-100 underline underline-offset-2 disabled:opacity-50"
-        >
-          {loggingOut ? 'Logging out…' : 'Logout'}
-        </button>
+        <div className="flex items-center gap-4">
+          <Link href="/minitab/admin" className="opacity-70 hover:opacity-100 text-[11px]">
+            Analytics
+          </Link>
+          <button
+            onClick={logout}
+            disabled={loggingOut}
+            className="opacity-90 hover:opacity-100 underline underline-offset-2 disabled:opacity-50"
+          >
+            {loggingOut ? 'Logging out…' : 'Logout'}
+          </button>
+        </div>
       </div>
     </div>
   );

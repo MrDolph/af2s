@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hashPasscode, MINITAB_COOKIE } from '@/lib/utils/minitabAuth';
+import { recordLogin } from '@/lib/analytics/redis';
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,10 @@ export async function POST(req: NextRequest) {
       path: '/',
       maxAge: 60 * 60 * 24 * 30, // 30 days — students shouldn't need to re-enter it every visit
     });
+
+    // Best-effort, never blocks the login response if analytics isn't configured or fails.
+    recordLogin();
+
     return res;
   } catch (error) {
     console.error('[minitab-auth] Error', error);
