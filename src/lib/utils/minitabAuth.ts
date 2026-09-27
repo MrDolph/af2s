@@ -17,3 +17,5 @@ export async function hashPasscode(passcode: string): Promise<string> {
 }
 
 export const MINITAB_COOKIE = 'af2s_minitab';
+export const MINITAB_ADMIN_COOKIE = 'af2s_minitab_admin';
+export const MINITAB_NAME_COOKIE = 'af2s_minitab_name';

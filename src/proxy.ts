@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { hashPasscode, MINITAB_COOKIE } from '@/lib/utils/minitabAuth';
+import { hashPasscode, MINITAB_COOKIE, MINITAB_ADMIN_COOKIE } from '@/lib/utils/minitabAuth';
 
 export const config = {
   matcher: ['/minitab/:path*'],
@@ -10,9 +10,28 @@ const SESSION_COOKIE = 'af2s_minitab_sid';
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // The login page and its own auth API call must stay reachable — otherwise
-  // nobody could ever get past the gate to enter the passcode in the first place.
+  // The student login page must stay reachable — otherwise nobody could ever
+  // get past the gate to enter the passcode in the first place.
   if (pathname === '/minitab/login') {
+    return NextResponse.next();
+  }
+
+  // The admin dashboard is a completely separate area with its own passcode,
+  // checked before the student gate below — a student's passcode never
+  // grants access here, and vice versa.
+  if (pathname === '/minitab/admin' || pathname.startsWith('/minitab/admin/')) {
+    if (pathname === '/minitab/admin/login') {
+      return NextResponse.next();
+    }
+    const adminExpected = process.env.MINITAB_ADMIN_PASSCODE;
+    if (!adminExpected) {
+      return NextResponse.redirect(new URL('/minitab/admin/login', req.url));
+    }
+    const adminCookie = req.cookies.get(MINITAB_ADMIN_COOKIE)?.value;
+    const adminExpectedHash = await hashPasscode(adminExpected);
+    if (adminCookie !== adminExpectedHash) {
+      return NextResponse.redirect(new URL('/minitab/admin/login', req.url));
+    }
     return NextResponse.next();
   }
 
@@ -35,7 +54,7 @@ export async function proxy(req: NextRequest) {
 
   const res = NextResponse.next();
 
-  // Anonymous per-browser session id, used only to count distinct visitors
+  // Anonymous per-browser session id, used only to count distinct devices
   // on the analytics dashboard — never tied to a name or any other identity.
   if (!req.cookies.get(SESSION_COOKIE)) {
     const sid = crypto.randomUUID();

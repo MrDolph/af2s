@@ -10,9 +10,10 @@ export function MinitabBar() {
   const tracked = useRef<string | null>(null);
 
   // Fire a visit beacon once per page load — skipped on the login page and
-  // the admin dashboard itself, since neither is a "simulation visit".
+  // anything under /minitab/admin, since neither is a "simulation visit",
+  // and the admin area has its own separate access gate anyway.
   useEffect(() => {
-    if (pathname === '/minitab/login' || pathname === '/minitab/admin') return;
+    if (pathname === '/minitab/login' || pathname.startsWith('/minitab/admin')) return;
     if (tracked.current === pathname) return;
     tracked.current = pathname;
     const slug = pathname.replace(/^\/minitab\/?/, '') || 'hub';
@@ -48,18 +49,13 @@ export function MinitabBar() {
             <span aria-hidden>←</span> Simulation Library
           </Link>
         )}
-        <div className="flex items-center gap-4">
-          <Link href="/minitab/admin" className="opacity-70 hover:opacity-100 text-[11px]">
-            Analytics
-          </Link>
-          <button
-            onClick={logout}
-            disabled={loggingOut}
-            className="opacity-90 hover:opacity-100 underline underline-offset-2 disabled:opacity-50"
-          >
-            {loggingOut ? 'Logging out…' : 'Logout'}
-          </button>
-        </div>
+        <button
+          onClick={logout}
+          disabled={loggingOut}
+          className="opacity-90 hover:opacity-100 underline underline-offset-2 disabled:opacity-50"
+        >
+          {loggingOut ? 'Logging out…' : 'Logout'}
+        </button>
       </div>
     </div>
   );

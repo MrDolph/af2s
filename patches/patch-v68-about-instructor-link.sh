@@ -1,3 +1,24 @@
+#!/bin/bash
+# A-Factor STEM Studio — Instructor Login link on the About page
+# Run inside af2s/ folder: bash patches/patch-v68-about-instructor-link.sh
+#
+# Adds a small, deliberately understated "Instructor Login" link to the
+# About page's footer (next to Home/Simulations/About/Portfolio), pointing
+# to /minitab/admin/login. Styled lighter than the other footer links so it
+# doesn't draw attention from student/public visitors, but it's there
+# whenever you need it — no need to remember or bookmark the URL.
+#
+# Run this AFTER v67 (needs /minitab/admin/login to exist). Only touches
+# src/app/about/page.tsx. Verified with a full npm run build (zero
+# TypeScript errors) before delivery.
+
+set -e
+echo "Applying About page instructor-link patch..."
+
+mkdir -p src/app/about
+
+echo "  writing src/app/about/page.tsx"
+cat > src/app/about/page.tsx << 'FILEEOF'
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
 
@@ -276,3 +297,10 @@ export default function AboutPage() {
     </>
   );
 }
+FILEEOF
+
+echo ""
+echo "Done. The link is at the bottom of /about, in the footer row."
+echo "Rebuild to confirm:"
+echo "  bash -c \"rm -rf .next\""
+echo "  npm run build"
