@@ -2,10 +2,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { SimulationsMenu, SimulationsMobileMenu } from '@/components/layout/SimulationsMenu';
 
 const NAV = [
-  { label: 'Simulations', href: '/simulations' },
-  { label: 'Mathematics', href: '/mathematics' },
   { label: 'About', href: '/about' },
 ];
 
@@ -32,6 +31,7 @@ export function AppHeader() {
 
           {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-1">
+            <SimulationsMenu />
             {NAV.map(n => (
               <Link key={n.href} href={n.href}
                 className={`px-3 py-1.5 rounded-lg text-sm transition ${
@@ -72,6 +72,7 @@ export function AppHeader() {
         {/* Mobile nav */}
         {open && (
           <div className="sm:hidden border-t border-gray-100 py-3 space-y-1">
+            <SimulationsMobileMenu onNavigate={() => setOpen(false)} />
             {NAV.map(n => (
               <Link key={n.href} href={n.href} onClick={() => setOpen(false)}
                 className={`block px-3 py-2 rounded-lg text-sm transition ${
