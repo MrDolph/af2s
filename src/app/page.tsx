@@ -73,6 +73,9 @@ export default function HomePage() {
               <Link href="/simulations" className="text-xs text-gray-400 hover:text-indigo-600 transition">
                 All simulations →
               </Link>
+              <Link href="/mathematics" className="text-xs text-gray-400 hover:text-indigo-600 transition">
+                Mathematics →
+              </Link>
             </div>
             <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
               Describe your simulation

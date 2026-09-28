@@ -403,6 +403,10 @@ export default function SimulationsPage() {
                 Interactive, AI-powered simulations built for WAEC, NECO, IGCSE, SAT and JUPEB students.
                 Type a prompt or pick a topic below.
               </p>
+              <Link href="/mathematics"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition">
+                📐 Mathematics simulations →
+              </Link>
             </div>
           </div>
         </section>
@@ -495,7 +499,7 @@ export default function SimulationsPage() {
           {/* Coming soon note */}
           <p className="text-center text-xs text-gray-400 mt-8">
             More simulations being added weekly. Suggest a topic at{' '}
-            <a href="mailto:hello@afactor.app" className="text-indigo-500 hover:underline">hello@afactor.app</a>
+            <a href="mailto:hello@a-factoredtechsolutions.com.ng" className="text-indigo-500 hover:underline">hello@a-factoredtechsolutions.com.ng</a>
           </p>
         </section>
       </main>
