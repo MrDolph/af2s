@@ -22,70 +22,21 @@ const CC: Record<string, string> = {
   Undergrad: 'bg-rose-100 text-rose-700',
 };
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   DYNAMIC TEACHER NOTES — change when you click a scenario card
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-const SCENARIO_NOTES: Record<PotentialType, { title: string; bullets: string[] }> = {
-  barrier: {
-    title: 'Rectangular Barrier — The Canonical Tunneling Problem',
-    bullets: [
-      'When E < V₀, the wavefunction decays exponentially inside the barrier as ψ ∼ e^(−κx), where κ = √(2m(V₀−E))/ℏ. This is called an evanescent wave.',
-      'The transmission probability depends exponentially on width: T ≈ 16(E/V₀)(1−E/V₀)e^(−2κw). Doubling the width squares T — this extreme sensitivity is why tunneling only matters at nanometer scales.',
-      'Classically, the particle would bounce back with 100% probability. Quantum mechanically, there is always a non-zero probability of penetration, however small.',
-      'Watch for the evanescent wave inside the barrier — it carries no probability current, yet it "connects" the incident and transmitted waves, enabling the particle to appear on the far side.',
-      'When E > V₀, transmission is NOT 100%. The wave partially reflects at each boundary due to impedance mismatch (change in wavelength), creating interference oscillations in T(E).',
-    ],
-  },
-  well: {
-    title: 'Quantum Well — Attractive Scattering & Resonance',
-    bullets: [
-      'A quantum well is attractive (V < 0). Even though the particle is drawn inward, sudden changes in potential cause partial reflection at the boundaries — just like light reflecting at a change in refractive index.',
-      'When E > 0, the well acts like a region of higher kinetic energy. The de Broglie wavelength lengthens inside, causing impedance-mismatch reflections that classical mechanics cannot explain.',
-      'At specific resonance energies, the well becomes perfectly transparent (T = 1) due to constructive interference of multiple internal reflections. These are called transmission resonances.',
-      'If E < 0, bound states exist inside the well with quantized energies — this reduces to the famous "particle in a box" problem. The number of bound states depends on well depth and width.',
-      'In semiconductor devices, quantum wells confine electrons to 2D planes, creating quantum well lasers and high-electron-mobility transistors (HEMTs).',
-    ],
-  },
-  step: {
-    title: 'Step Potential — Evanescent Penetration & Total Reflection',
-    bullets: [
-      'A step potential represents a semi-infinite barrier. When E < V₀, the wave penetrates as an evanescent decay with characteristic length δ = 1/κ = ℏ/√(2m(V₀−E)).',
-      'Despite penetration into the classically forbidden region, the reflection probability is exactly 100% for a semi-infinite step. No net probability current flows into the barrier region.',
-      'The reflected wave acquires a phase shift relative to the incident wave. This phase shift contains information about the barrier height and is measurable in interference experiments.',
-      'If E > V₀, partial transmission occurs with a refracted wavelength (shorter inside, since kinetic energy increases). The transmission coefficient is T = 4k₁k₂/(k₁+k₂)².',
-      'Step potentials model metal-semiconductor interfaces (Schottky barriers) and the edge of a conductor where the work function creates a surface barrier.',
-    ],
-  },
-  double: {
-    title: 'Double Barrier — Resonant Tunneling & Quasi-Bound States',
-    bullets: [
-      'Two barriers separated by a quantum well create quasi-bound states. At resonance energies matching these bound states, the transmission coefficient can reach T ≈ 1 even though each barrier alone would block most of the wave.',
-      'This is deeply counter-intuitive: two opaque barriers together can become perfectly transparent! The wave constructively interferes in the central well, building up amplitude that leaks out equally on both sides.',
-      'Resonant tunneling diodes (RTDs) exploit this effect. Applying voltage shifts the well levels; current spikes sharply at resonance and drops off-resonance, creating negative differential resistance.',
-      'Off-resonance, the double barrier behaves like a single thick barrier with very low T. The sharp resonance makes RTDs useful as high-frequency oscillators and fast switches in electronics.',
-      'In quantum computing, double-barrier structures can isolate individual electrons or Cooper pairs, forming the basis of some qubit designs.',
-    ],
-  },
-  triangular: {
-    title: 'Triangular Barrier — Field Emission & STM Physics',
-    bullets: [
-      'A triangular barrier models field emission (Fowler-Nordheim tunneling). An electric field F tilts the vacuum barrier: V(x) = V₀ − eFx, making the effective barrier width depend on field strength.',
-      'Unlike a rectangular barrier, the tunneling distance shrinks as the field increases. Higher fields exponentially increase current, which is why sharp tips (high local field) are essential for STM operation.',
-      'This is the operating principle of scanning tunneling microscopes (STM). A 1 Å change in tip-sample distance changes current by roughly an order of magnitude, enabling true atomic resolution.',
-      'The WKB integral for a triangular barrier yields the Fowler-Nordheim formula: T ∝ exp(−4√(2m)(V₀−E)^(3/2)/3ℏeF). The 3/2 power on (V₀−E) is the signature of field emission.',
-      'Field emission is also used in electron guns for electron microscopes and in next-generation display technology (field emitter arrays).',
-    ],
-  },
-};
-
-const GENERAL_NOTES = [
+const TEACHER_NOTES = [
   'Quantum tunneling is the phenomenon where a particle passes through a potential energy barrier that it classically cannot surmount. It arises from the wave nature of matter encoded in the Schrödinger equation.',
   'The wavefunction ψ(x,t) is not zero inside the barrier even when E < V₀. It decays exponentially as ψ ∼ exp(−κx), where κ = √(2m(V₀−E))/ℏ. This evanescent wave carries no probability current, yet it connects to a non-zero transmitted wave on the far side.',
   'Transmission probability for a thick rectangular barrier: T ≈ 16(E/V₀)(1−E/V₀) exp(−2κw). The exponential dependence on width w and height V₀ makes tunneling extremely sensitive to atomic-scale geometry.',
   'Classically, a particle with E < V₀ is always reflected. The classical turning point is where E = V(x). Quantum mechanics permits non-zero |ψ|² beyond this point because the particle does not have a definite position — only a probability amplitude.',
   'When E > V₀, transmission is not 100%. The wave partially reflects from the barrier boundaries due to impedance mismatch (change in wavelength), creating interference oscillations in T(E). This is purely a wave phenomenon.',
-  'The split-step Fourier method used here is unconditionally stable and unitary (conserves total probability exactly). It is spectrally accurate in space, making it far superior to finite-difference methods for teaching the time-dependent Schrödinger equation.',
+  'Resonant tunneling occurs in double-barrier structures. Quasi-bound states in the quantum well between barriers allow T ≈ 1 even when each barrier individually would give T ≪ 1. This is the basis of resonant tunneling diodes (RTDs) and flash memory.',
+  'The scanning tunneling microscope (STM) relies on vacuum tunneling. The tunneling current I ∝ exp(−2κd), where d is tip-sample distance. A 1 Å change in d changes current by an order of magnitude, giving atomic resolution.',
+  'Alpha decay (Gamow 1928) is tunneling of an α-particle through the nuclear Coulomb barrier. The Geiger-Nuttall law relates half-life to decay energy: log τ ∝ 1/√E. Higher-energy α particles tunnel faster — dramatically so.',
+  'In fusion (e.g., the Sun), protons tunnel through the Coulomb repulsion barrier at temperatures where classical thermodynamics predicts essentially zero fusion. Without tunneling, stars would not shine.',
+  'The WKB approximation generalizes tunneling to arbitrary barriers: T ≈ exp(−2 ∫√(2m(V(x)−E)) dx / ℏ). It works when V(x) varies slowly compared to the de Broglie wavelength.',
+  'Heisenberg uncertainty explains tunneling qualitatively: borrowing energy ΔE for a time Δt ∼ ℏ/ΔE allows the particle to temporarily surmount the barrier. This is a hand-waving picture but useful for intuition.',
+  'Heavy particles tunnel less. The exponent 2κw scales as √m, so a proton tunnels far more readily than a macroscopic object. This explains why we do not observe people tunneling through walls.',
+  'In the classical limit (m → ∞ or ℏ → 0), κ → ∞ and T → 0. Tunneling is a purely quantum effect that vanishes in the correspondence limit, consistent with the Ehrenfest theorem.',
+  'Superconducting Josephson junctions and quantum computing qubits exploit controlled tunneling between states. The ability to tune barrier transparency with voltage or magnetic flux is central to quantum technology.',
 ];
 
 const EXERCISES = [
@@ -111,7 +62,7 @@ const EXERCISES = [
   },
   {
     q: 'Enable "Show Phase" and run the simulation. What does the color variation inside the packet represent? Why does the phase change faster inside the barrier when E < V₀?',
-    a: 'Color represents the complex phase arg(ψ). In free space, phase advances as exp(ikx) with k = √(2mE)/ℏ. Inside the barrier (E < V₀), the wave becomes evanescent with imaginary momentum iκ, so the phase behavior changes dramatically — the amplitude decays while the phase relationship between Re and Im shifts.',
+    a: 'Color represents the complex phase arg(ψ). In free space, phase advances as exp(ikx) with k = √(2mE)/ℏ. Inside the barrier (E < V₀), the wave becomes evanescent with imaginary momentum iκ, so the phase advances as exp(−κx) — actually, the phase is constant and the amplitude decays. Wait: in the evanescent region, the wave is real (or pure imaginary), so the phase is locked. The phase variation you see is actually the oscillation of the Re/Im components relative to the decaying envelope.',
   },
   {
     q: 'Set mass to 10 mₑ (Heavy Particle preset). How does the de Broglie wavelength change? Why does the packet behave more classically?',
@@ -154,33 +105,6 @@ function StatRow({ label, value, unit, color }: { label: string; value: string; 
     <div className="flex justify-between items-center rounded-lg bg-gray-50 px-3 py-2">
       <span className="text-xs text-gray-500">{label}</span>
       <span className={`text-xs font-semibold tabular-nums ${color}`}>{value} <span className="text-gray-400 font-normal">{unit}</span></span>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   COLLAPSIBLE PANEL COMPONENT
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-function CollapsiblePanel({
-  title, children, defaultOpen = true, badge,
-}: {
-  title: string; children: React.ReactNode; defaultOpen?: boolean; badge?: string;
-}) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition"
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{title}</span>
-          {badge && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 font-medium">{badge}</span>}
-        </div>
-        <span className="text-gray-400 text-xs">{open ? '▲ Hide' : '▼ Show'}</span>
-      </button>
-      {open && <div className="px-4 pb-4">{children}</div>}
     </div>
   );
 }
@@ -268,8 +192,6 @@ export default function QuantumTunnelingPage() {
     return liveStats.theoreticalT;
   }, [potentialType, particleEnergy, barrierHeight, barrierWidth, particleMass, liveStats.theoreticalT]);
 
-  const scenarioNote = SCENARIO_NOTES[potentialType];
-
   return (
     <>
       <AppHeader />
@@ -299,36 +221,24 @@ export default function QuantumTunnelingPage() {
             <span className="text-sm font-semibold font-mono text-gray-900">T ≈ exp(−2κw)</span>
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════════
-              SCENARIO PRINCIPLE CARDS — compact on mobile, click to update
-              teacher notes. 3 columns on mobile for better balance.
-              ═══════════════════════════════════════════════════════════════ */}
-          <div className="grid grid-cols-3 lg:grid-cols-5 gap-1.5 sm:gap-2">
+          {/* Scenario selector */}
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {(['barrier', 'well', 'step', 'double', 'triangular'] as PotentialType[]).map((m) => {
               const labels: Record<PotentialType, string> = {
-                barrier: 'Barrier', well: 'Well', step: 'Step', double: 'Double', triangular: 'Triangular',
+                barrier: 'Barrier', well: 'Quantum Well', step: 'Step', double: 'Double Barrier', triangular: 'Triangular',
               };
               const desc: Record<PotentialType, string> = {
-                barrier: 'Rectangular wall',
-                well: 'Attractive trough',
+                barrier: 'Rectangular potential wall',
+                well: 'Attractive potential trough',
                 step: 'Semi-infinite step',
-                double: 'Two barriers',
-                triangular: 'Linear ramp',
+                double: 'Two barriers with gap',
+                triangular: 'Linear ramp (STM/field emission)',
               };
-              const active = potentialType === m;
               return (
-                <button
-                  key={m}
-                  onClick={() => { setPotentialType(m); setIsRunning(false); setResetKey((k) => k + 1); }}
-                  className={`relative rounded-xl border px-2 py-2 sm:px-3 sm:py-3 text-left hover:shadow-md transition min-w-0
-                    ${active ? 'border-indigo-400 bg-indigo-50 text-indigo-800 ring-1 ring-indigo-200' : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-200'}`}
-                >
-                  <div className="flex items-center justify-between mb-0.5 sm:mb-1">
-                    <p className={`text-[10px] sm:text-xs font-semibold ${active ? 'text-indigo-700' : 'text-gray-700'}`}>{labels[m]}</p>
-                    {active && <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-indigo-500 animate-pulse" />}
-                  </div>
-                  <p className="text-[9px] sm:text-[10px] text-gray-400 leading-relaxed">{desc[m]}</p>
-                  {active && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-400 rounded-b-xl" />}
+                <button key={m} onClick={() => { setPotentialType(m); setIsRunning(false); setResetKey((k) => k + 1); }}
+                  className={`shrink-0 rounded-xl border px-4 py-2 text-left hover:shadow-sm transition min-w-[150px] ${potentialType === m ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-200'}`}>
+                  <p className="text-xs font-medium">{labels[m]}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{desc[m]}</p>
                 </button>
               );
             })}
@@ -345,12 +255,7 @@ export default function QuantumTunnelingPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_280px_300px] gap-4 items-start">
-            {/* ═══════════════════════════════════════════════════════════════
-                MAIN COLUMN — Canvas → Controls → Parameters (sticky bottom)
-                Parameters sits RIGHT HERE, immediately below the canvas,
-                making it the most accessible element on the page.
-                ═══════════════════════════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] xl:grid-cols-[1fr_240px_280px] gap-4">
             <div className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <QuantumTunnelingCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={canvasSize.width} height={canvasSize.height} />
@@ -364,62 +269,65 @@ export default function QuantumTunnelingPage() {
                   params={{ type: potentialType, E: particleEnergy, V: barrierHeight, w: barrierWidth, pos: barrierPosition, sigma: packetWidth, m: particleMass, speed, pot: showPotential ? 1 : 0, prob: showProbability ? 1 : 0, re: showRealPart ? 1 : 0, im: showImaginaryPart ? 1 : 0, phase: showPhase ? 1 : 0, classical: showClassical ? 1 : 0, eline: showEnergyLine ? 1 : 0, auto: autoRestart ? 1 : 0 }} />
               </div>
 
-              {/* ═══════════════════════════════════════════════════════════
-                  PARAMETERS PANEL — Sticky at bottom on desktop,
-                  right after controls on mobile. Always within easy reach.
-                  ═══════════════════════════════════════════════════════════ */}
-              <div className="lg:sticky lg:bottom-4 z-30">
-                <CollapsiblePanel title="Parameters" badge="Interactive" defaultOpen={true}>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
-                    <div className="space-y-3">
-                      <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide">Wave Packet</p>
-                      <Slider label="Energy E" unit="eV" value={particleEnergy} min={0.1} max={10} step={0.1} set={setParticleEnergy} color="#6366f1" note="Kinetic energy of incident particle" />
-                      <Slider label="Packet width σ" unit="Å" value={packetWidth} min={0.5} max={4} step={0.1} set={setPacketWidth} color="#3b82f6" note="Spatial spread of Gaussian (uncertainty)" />
-                      <Slider label="Mass" unit="mₑ" value={particleMass} min={0.2} max={20} step={0.1} set={setParticleMass} color="#10b981" note="In units of electron mass" />
-                    </div>
-                    <div className="space-y-3">
-                      <p className="text-[10px] font-medium text-amber-600 uppercase tracking-wide">Potential</p>
-                      <Slider label="Height |V₀|" unit="eV" value={barrierHeight} min={0.5} max={10} step={0.1} set={setBarrierHeight} color="#fbbf24" note="Barrier height (well depth for Well)" />
-                      <Slider label="Width w" unit="Å" value={barrierWidth} min={0.5} max={10} step={0.1} set={setBarrierWidth} color="#f59e0b" note="Barrier thickness" />
-                      <Slider label="Position" unit="Å" value={barrierPosition} min={10} max={45} step={1} set={setBarrierPosition} color="#d97706" note="Distance from left edge" />
-                    </div>
-                    <div className="space-y-3">
-                      <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wide">Animation</p>
-                      <Slider label="Speed" unit="×" value={speed} min={0} max={3} step={0.1} set={setSpeed} color="#3b82f6" note="Time evolution speed" />
-                      <Slider label="Zoom" unit="×" value={zoom} min={0.5} max={2} step={0.1} set={setZoom} color="#10b981" note="Canvas zoom level" />
-                      <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer mt-1">
-                        <input type="checkbox" checked={autoRestart} onChange={(e) => setAutoRestart(e.target.checked)} className="rounded" />
-                        Auto-restart when packet settles
-                      </label>
-                    </div>
-                  </div>
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
-                  <div className="border-t border-gray-100 mt-4 pt-3">
-                    <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-2">Visibility Layers</p>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { label: 'Potential V(x)', checked: showPotential, set: setShowPotential },
-                        { label: '|ψ|²', checked: showProbability, set: setShowProbability },
-                        { label: 'Re(ψ)', checked: showRealPart, set: setShowRealPart },
-                        { label: 'Im(ψ)', checked: showImaginaryPart, set: setShowImaginaryPart },
-                        { label: 'Phase', checked: showPhase, set: setShowPhase },
-                        { label: 'Classical', checked: showClassical, set: setShowClassical },
-                        { label: 'Energy line', checked: showEnergyLine, set: setShowEnergyLine },
-                      ].map((item) => (
-                        <label key={item.label} className="flex items-center gap-1.5 text-[11px] text-gray-600 cursor-pointer bg-gray-50 px-2 py-1 rounded-md border border-gray-100 hover:border-indigo-200 transition">
-                          <input type="checkbox" checked={item.checked} onChange={(e) => item.set(e.target.checked)} className="rounded" />
-                          {item.label}
-                        </label>
-                      ))}
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide">Wave Packet</p>
+                    <Slider label="Energy E" unit="eV" value={particleEnergy} min={0.1} max={10} step={0.1} set={setParticleEnergy} color="#6366f1" note="Kinetic energy of incident particle" />
+                    <Slider label="Packet width σ" unit="Å" value={packetWidth} min={0.5} max={4} step={0.1} set={setPacketWidth} color="#3b82f6" note="Spatial spread of Gaussian (uncertainty)" />
+                    <Slider label="Mass" unit="mₑ" value={particleMass} min={0.2} max={20} step={0.1} set={setParticleMass} color="#10b981" note="In units of electron mass" />
                   </div>
-                </CollapsiblePanel>
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-medium text-amber-600 uppercase tracking-wide">Potential</p>
+                    <Slider label="Height |V₀|" unit="eV" value={barrierHeight} min={0.5} max={10} step={0.1} set={setBarrierHeight} color="#fbbf24" note="Barrier height (well depth for Well)" />
+                    <Slider label="Width w" unit="Å" value={barrierWidth} min={0.5} max={10} step={0.1} set={setBarrierWidth} color="#f59e0b" note="Barrier thickness" />
+                    <Slider label="Position" unit="Å" value={barrierPosition} min={10} max={45} step={1} set={setBarrierPosition} color="#d97706" note="Distance from left edge" />
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-100 pt-3 space-y-3">
+                  <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-wide">Animation</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Slider label="Speed" unit="×" value={speed} min={0} max={3} step={0.1} set={setSpeed} color="#3b82f6" />
+                    <Slider label="Zoom" unit="×" value={zoom} min={0.5} max={2} step={0.1} set={setZoom} color="#10b981" />
+                  </div>
+                  <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                    <input type="checkbox" checked={autoRestart} onChange={(e) => setAutoRestart(e.target.checked)} className="rounded" />
+                    Auto-restart when packet settles
+                  </label>
+                </div>
+
+                <div className="border-t border-gray-100 pt-3">
+                  <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wide mb-2">Visibility</p>
+                  <div className="flex flex-wrap gap-3">
+                    <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                      <input type="checkbox" checked={showPotential} onChange={(e) => setShowPotential(e.target.checked)} className="rounded" />Potential
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                      <input type="checkbox" checked={showProbability} onChange={(e) => setShowProbability(e.target.checked)} className="rounded" />|ψ|²
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                      <input type="checkbox" checked={showRealPart} onChange={(e) => setShowRealPart(e.target.checked)} className="rounded" />Re(ψ)
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                      <input type="checkbox" checked={showImaginaryPart} onChange={(e) => setShowImaginaryPart(e.target.checked)} className="rounded" />Im(ψ)
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                      <input type="checkbox" checked={showPhase} onChange={(e) => setShowPhase(e.target.checked)} className="rounded" />Phase color
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                      <input type="checkbox" checked={showClassical} onChange={(e) => setShowClassical(e.target.checked)} className="rounded" />Classical particle
+                    </label>
+                    <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
+                      <input type="checkbox" checked={showEnergyLine} onChange={(e) => setShowEnergyLine(e.target.checked)} className="rounded" />Energy line
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* ═══════════════════════════════════════════════════════════════
-                RIGHT COLUMN 1 — Calculated Stats + Formulas + Curriculum
-                ═══════════════════════════════════════════════════════════════ */}
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Calculated</p>
@@ -458,40 +366,20 @@ export default function QuantumTunnelingPage() {
               </div>
             </div>
 
-            {/* ═══════════════════════════════════════════════════════════════
-                RIGHT COLUMN 2 — Collapsible Teacher Notes + Exercises
-                ═══════════════════════════════════════════════════════════════ */}
             <div className="space-y-3 lg:col-span-2 xl:col-span-1">
-              <CollapsiblePanel
-                title="Teacher Notes"
-                badge={potentialType.charAt(0).toUpperCase() + potentialType.slice(1)}
-                defaultOpen={true}
-              >
-                <div className="space-y-3">
-                  <div className="rounded-lg bg-amber-50 border border-amber-100 p-3">
-                    <p className="text-xs font-semibold text-amber-800 mb-1.5">{scenarioNote.title}</p>
-                    <ul className="space-y-1.5">
-                      {scenarioNote.bullets.map((b, i) => (
-                        <li key={i} className="text-[11px] text-amber-900 leading-relaxed flex gap-2">
-                          <span className="text-amber-400 shrink-0 mt-0.5">•</span>{b}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-2">General Principles</p>
-                    <ul className="space-y-2">
-                      {GENERAL_NOTES.map((n, i) => (
-                        <li key={i} className="text-xs text-gray-600 leading-relaxed flex gap-2">
-                          <span className="text-gray-300 shrink-0 mt-0.5">•</span>{n}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CollapsiblePanel>
+              <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+                <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-3">📋 Teacher notes</p>
+                <ul className="space-y-2">
+                  {TEACHER_NOTES.map((n, i) => (
+                    <li key={i} className="text-xs text-amber-900 leading-relaxed flex gap-2">
+                      <span className="text-amber-400 shrink-0 mt-0.5">•</span>{n}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-              <CollapsiblePanel title="Exercises" defaultOpen={false}>
+              <div className="rounded-2xl border border-gray-200 bg-white p-4">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">✏️ Exercises</p>
                 <div className="space-y-2">
                   {EXERCISES.map((ex, i) => (
                     <div key={i} className="rounded-xl border border-gray-100 overflow-hidden">
@@ -508,7 +396,7 @@ export default function QuantumTunnelingPage() {
                     </div>
                   ))}
                 </div>
-              </CollapsiblePanel>
+              </div>
             </div>
           </div>
         </div>
