@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
+import Image from 'next/image';
 
 const STATS = [
   { value: '25+', label: 'Physics simulations' },
@@ -256,9 +257,8 @@ export default function AboutPage() {
         <footer className="border-t border-gray-200 bg-white mt-10">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
             <div className="flex items-center gap-2">
-              <div className="h-5 w-5 rounded bg-indigo-600 flex items-center justify-center">
-                <svg width="10" height="10" viewBox="0 0 14 14" fill="white"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z"/></svg>
-              </div>
+              <Image src="/icon.png" alt="A-Factor STEM Studio" width={20} height={20}
+                className="h-5 w-5 rounded" />
               <span className="font-medium text-gray-600">A-Factor STEM Studio</span>
               <span>© {new Date().getFullYear()} A-Factor EdTech Solutions</span>
             </div>
