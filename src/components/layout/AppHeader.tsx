@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { SimulationsMenu, SimulationsMobileMenu } from '@/components/layout/SimulationsMenu';
 
@@ -18,11 +19,8 @@ export function AppHeader() {
         <div className="flex h-14 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 group-hover:bg-indigo-700 transition">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="white">
-                <path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z"/>
-              </svg>
-            </div>
+            <Image src="/icon.png" alt="A-Factor STEM Studio" width={32} height={32}
+              className="h-7 w-7 rounded-lg" priority />
             <div className="leading-none">
               <span className="text-sm font-semibold text-gray-900">A-Factor</span>
               <span className="hidden sm:block text-[10px] text-gray-400 leading-none">STEM Studio</span>
