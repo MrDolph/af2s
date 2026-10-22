@@ -40,9 +40,16 @@ export const SUBJECTS: Subject[] = [
     status: 'live',
   },
   // Examples — uncomment one (and create its hub page) when you're ready:
-  // { slug: 'chemistry', label: 'Chemistry', href: '/chemistry', icon: '🧪', description: 'Reactions, bonding and the periodic table', status: 'soon' },
   // { slug: 'biology',   label: 'Biology',   href: '/biology',   icon: '🧬', description: 'Cells, genetics and ecosystems',            status: 'soon' },
   // { slug: 'it',        label: 'IT',        href: '/it',        icon: '💻', description: 'Computing, networks and algorithms',        status: 'soon' },
+  {
+    slug: 'chemistry',
+    label: 'Chemistry',
+    href: '/chemistry',
+    icon: '🧪',
+    description: 'Periodic table, compounds and perovskite materials',
+    status: 'live',
+  },
 ];
 
 /** True if `pathname` is this subject's hub or any page beneath it. */
