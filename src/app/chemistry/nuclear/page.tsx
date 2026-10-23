@@ -115,8 +115,8 @@ export default function NuclearPage() {
           <h1 className="mt-1 text-xl font-semibold text-gray-900 sm:text-2xl">Nuclear playground</h1>
           <p className="mb-5 mt-1 text-sm text-gray-500">Chemistry rearranges electrons; nuclear processes change the nucleus. Pick a nuclide, test decay modes against the conservation laws, and run the decay law. Balance tells you a process is <span className="font-medium text-gray-700">allowed by the bookkeeping</span> — not that it happens.</p>
 
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-            <div className="space-y-5">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+            <div className="min-w-0 space-y-5">
               <Card>
                 <NuclideChart selected={nuc} daughter={decay.daughter} onSelect={choose} />
               </Card>
@@ -162,7 +162,7 @@ export default function NuclearPage() {
               </Card>
             </div>
 
-            <div className="space-y-5">
+            <div className="min-w-0 space-y-5">
               <Card>
                 <div className="flex flex-wrap gap-2">
                   {NUCLIDE_PRESETS.map(([t, zz, aa]) => <button key={t} type="button" onClick={() => choose(zz, aa)} className={`rounded-full border px-2.5 py-1 text-[11px] ${z === zz && a === aa ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-200 bg-white text-gray-700 hover:border-indigo-300'}`}>{t}</button>)}

@@ -8,7 +8,7 @@ import { CandidatesPanel } from '@/components/chemistry/CandidatesPanel';
 import { ELEMENTS, BY_SYMBOL } from '@/lib/chemistry/elements';
 import { molarMass, formulaOf, formulaPlain } from '@/lib/chemistry/compound';
 import {
-  MODELS, RADII_A_XII, RADII_B_VI, RADII_X_VI, analyseModel, availableStates, density, fmtCharge, key,
+  MODELS, RADII_A_XII, RADII_B_VI, RADII_X_VI, analyseModel, availableStates, density, key,
   toCif, withBoundaryImages, type ModelId, type Site, type ModelSites,
 } from '@/lib/chemistry/perovskite';
 import { saveCandidate, download, type Candidate } from '@/lib/chemistry/candidates';
@@ -91,7 +91,7 @@ function SitePicker({ site, value, onChange }: { site: SiteKey; value: Pick; onC
           </optgroup>
         </select>
         <select value={value.charge} onChange={e => onChange({ ...value, charge: Number(e.target.value) })} className="h-8 w-20 rounded-md border border-gray-200 bg-white px-2 text-sm" aria-label={`${SITE_NAME[site]} charge`}>
-          {(states.length ? states : [value.charge]).map(q => <option key={q} value={q}>{fmtCharge(q)}</option>)}
+          {(states.length ? states : [value.charge]).map(q => <option key={q} value={q}>{q > 0 ? '+' : '−'}{Math.abs(q)}</option>)}
         </select>
       </div>
       <div className="mt-1.5 text-[11px] text-gray-400">{r != null ? `Shannon radius ${r.toFixed(3)} Å` : 'No tabulated radius for this ion/site'}</div>
@@ -186,10 +186,10 @@ export default function PerovskiteLabPage() {
           </div>
           {presetNote && <p className="mb-5 rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2 text-xs text-indigo-900">{presetNote} <span className="opacity-70">Reference notes are summaries — check the primary literature before citing.</span></p>}
 
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-            <div className="space-y-5">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+            <div className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-4">
-                <CrystalViewer atoms={atoms} extent={n} styles={styles} bondDist={0.5 / modelDef.cellFactor} showBonds={bonds} showCell={cell} showA={showA} />
+                <CrystalViewer atoms={atoms} extent={n} styles={styles} bondDist={0.5 / modelDef.cellFactor} sizeScale={0.36} showBonds={bonds} showCell={cell} showA={showA} />
                 <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 text-xs text-gray-600">
                   <label className="flex items-center gap-1.5"><input type="checkbox" checked={bonds} onChange={e => setBonds(e.target.checked)} />B–X bonds</label>
                   <label className="flex items-center gap-1.5"><input type="checkbox" checked={cell} onChange={e => setCell(e.target.checked)} />Cell edges</label>
@@ -203,7 +203,7 @@ export default function PerovskiteLabPage() {
               <CandidatesPanel onLoad={onLoad} />
             </div>
 
-            <div className="space-y-5">
+            <div className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-5">
                 <div className="flex gap-2">
                   {(Object.keys(MODELS) as ModelId[]).map(id => (

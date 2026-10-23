@@ -78,14 +78,14 @@ export default function CompoundBuilderPage() {
   return (
     <>
       <AppHeader />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 pb-24 lg:pb-0">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           <Link href="/chemistry" className="text-xs text-gray-400 transition hover:text-indigo-600">← Chemistry</Link>
           <h1 className="mt-1 text-xl font-semibold text-gray-900 sm:text-2xl">Compound builder</h1>
           <p className="mb-5 mt-1 text-sm text-gray-500">Click elements to add atoms. The result is a <span className="font-medium text-gray-700">candidate composition</span>, not a claim that it exists.</p>
 
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-            <div className="space-y-5">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-4">
                 <PeriodicTable onPick={add} counts={clean} compact showLegend={false} />
                 {last && <p className="mt-2 text-[11px] text-gray-400">Added {last.name} ({last.symbol}).</p>}
@@ -101,8 +101,8 @@ export default function CompoundBuilderPage() {
               <CandidatesPanel onLoad={onLoad} />
             </div>
 
-            <div className="space-y-5">
-              <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="min-w-0 space-y-5">
+              <div id="composition-result" className="scroll-mt-20 rounded-2xl border border-gray-200 bg-white p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Formula</div>
@@ -169,6 +169,18 @@ export default function CompoundBuilderPage() {
             </div>
           </div>
         </div>
+
+        {syms.length > 0 && (
+          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white/95 px-4 py-2.5 backdrop-blur lg:hidden" style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}>
+            <div className="mx-auto flex max-w-7xl items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-lg font-semibold leading-tight text-gray-900">{formulaOf(clean)}</div>
+                <div className="truncate text-[11px] text-gray-500">{mass.toFixed(2)} g/mol · charge {balance.status === 'balanced' ? 'can balance' : balance.status === 'unbalanced' ? 'no balance found' : 'n/a'}</div>
+              </div>
+              <button type="button" onClick={() => document.getElementById('composition-result')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="h-10 shrink-0 rounded-xl bg-indigo-600 px-4 text-sm font-medium text-white">Review</button>
+            </div>
+          </div>
+        )}
       </main>
     </>
   );

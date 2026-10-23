@@ -222,12 +222,15 @@ export const decayConstant = (halfLife: number) => Math.LN2 / halfLife;
 export const timeToFraction = (f: number, halfLife: number) => halfLife * Math.log2(1 / f);
 export const AVOGADRO = 6.02214076e23;
 
+const SUP_CH: Record<string, string> = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+
 export function fmtNum(x: number, digits = 4): string {
   if (!Number.isFinite(x)) return '—';
   if (x === 0) return '0';
   const ax = Math.abs(x);
   if (ax >= 0.01 && ax < 1e5) return String(Number(x.toPrecision(digits)));
-  return x.toExponential(digits - 1).replace('e+', ' × 10^').replace('e-', ' × 10^−').replace(/10\^(\d)/, '10^$1');
+  const [mant, exp] = x.toExponential(digits - 1).split('e');
+  return `${mant} × 10${String(parseInt(exp, 10)).split('').map(c => SUP_CH[c] ?? c).join('')}`;
 }
 
 export function fmtTime(sec: number): string {

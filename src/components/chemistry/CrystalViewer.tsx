@@ -18,6 +18,10 @@ interface Props {
   bondMode?: 'bx' | 'nn';
   /** Optional legend names per site key (defaults to the perovskite A/B/B′/X naming). */
   siteNames?: Partial<Record<Site, string>>;
+  /** Multiplier on drawn atom radius (default 0.55). Lower it when large anions hide small cations. */
+  sizeScale?: number;
+  /** Short note under the legend explaining what atom size means. */
+  sizeNote?: string;
   showBonds: boolean;
   showCell: boolean;
   showA: boolean;
@@ -30,7 +34,7 @@ const VIEWS: Record<string, { yaw: number; pitch: number }> = {
   Top: { yaw: 0, pitch: Math.PI / 2 - 0.001 },
 };
 
-export function CrystalViewer({ atoms, extent, styles, bondDist, bondMode = 'bx', siteNames, showBonds, showCell, showA }: Props) {
+export function CrystalViewer({ atoms, extent, styles, bondDist, bondMode = 'bx', siteNames, sizeScale = 0.55, sizeNote = 'sizes ∝ Shannon radii', showBonds, showCell, showA }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { width, height } = useResponsiveCanvasSize(boxRef, 640, 440, 900);
@@ -122,7 +126,7 @@ export function CrystalViewer({ atoms, extent, styles, bondDist, bondMode = 'bx'
       for (const { a, p } of drawn) {
         const st = styles[a.site];
         if (!st) continue;
-        const r = Math.max(3, st.radius * scale * p.persp * 0.55);
+        const r = Math.max(3, st.radius * scale * p.persp * sizeScale);
         const grad = ctx.createRadialGradient(p.sx - r * 0.3, p.sy - r * 0.3, r * 0.1, p.sx, p.sy, r);
         grad.addColorStop(0, '#ffffff55'); grad.addColorStop(0.25, st.color); grad.addColorStop(1, st.color);
         ctx.fillStyle = grad;
@@ -139,7 +143,7 @@ export function CrystalViewer({ atoms, extent, styles, bondDist, bondMode = 'bx'
 
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [atoms, extent, styles, bonds, showBonds, showCell, showA, width, height, zoom, auto, tick]);
+  }, [atoms, extent, styles, bonds, showBonds, showCell, showA, width, height, zoom, auto, tick, sizeScale]);
 
   const onDown = (e: React.PointerEvent) => { drag.current = { x: e.clientX, y: e.clientY }; (e.target as Element).setPointerCapture(e.pointerId); };
   const onMove = (e: React.PointerEvent) => {
@@ -183,7 +187,7 @@ export function CrystalViewer({ atoms, extent, styles, bondDist, bondMode = 'bx'
             {siteNames?.[s] ?? `${s === 'B2' ? 'B′' : s}-site`}: {styles[s]!.label}
           </span>
         ))}
-        <span className="text-[11px] text-gray-400">Drag to rotate · sizes ∝ Shannon radii</span>
+        <span className="text-[11px] text-gray-400">Drag to rotate · {sizeNote}</span>
       </div>
     </div>
   );
