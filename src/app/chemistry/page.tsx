@@ -21,8 +21,8 @@ const PLAYGROUNDS: Playground[] = [
     description: 'Place elements into general structural sites, rotate unit cells and compare arrangements.' },
   { slug: 'organic', href: '#', title: 'Organic molecules', icon: '🧬', topic: 'Organic', status: 'coming',
     description: 'Connect atoms with bonds, explore functional groups, and compare isomers that share a formula.' },
-  { slug: 'nuclear', href: '#', title: 'Nuclear playground', icon: '☢️', topic: 'Nuclear', status: 'coming',
-    description: 'Choose isotopes and explore decay modes, half-life and conservation in nuclear equations.' },
+  { slug: 'nuclear', href: '/chemistry/nuclear', title: 'Nuclear playground', icon: '☢️', topic: 'Nuclear', status: 'live',
+    description: 'Choose a nuclide, test decay modes against conservation laws, follow decay chains, run the half-life law and check nuclear equations.' },
 ];
 const TOPICS = ['All', ...Array.from(new Set(PLAYGROUNDS.map(p => p.topic)))];
 

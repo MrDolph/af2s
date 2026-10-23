@@ -1,12 +1,19 @@
 'use client';
 // Makes the four evidence levels explicit so a built candidate is never mistaken for a known material.
 
+type Tier = { state: 'yes' | 'warn' | 'no'; text: string };
+
 interface Props {
   rule: { label: string; ok: boolean | null };
   extra?: string;
+  /** Replace the default “you built a candidate” line (e.g. for nuclides or equations). */
+  candidate?: string;
+  /** Override the database / calculated tiers when a page does bundle some data. */
+  database?: Tier;
+  calculated?: Tier;
 }
 
-export function EvidencePanel({ rule, extra }: Props) {
+export function EvidencePanel({ rule, extra, candidate, database, calculated }: Props) {
   const tier = (title: string, state: 'yes' | 'warn' | 'no', body: string) => (
     <li className="flex gap-2.5 py-2 text-xs">
       <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${state === 'yes' ? 'bg-emerald-500' : state === 'warn' ? 'bg-amber-500' : 'bg-gray-300'}`} />
@@ -17,10 +24,10 @@ export function EvidencePanel({ rule, extra }: Props) {
     <div className="rounded-2xl border border-gray-200 bg-white p-5">
       <h3 className="text-sm font-semibold text-gray-900">What this result is — and isn’t</h3>
       <ul className="mt-1 divide-y divide-gray-100">
-        {tier('User-built candidate', 'yes', 'You chose this composition' + (extra ? ` / ${extra}` : '') + '. Choosing elements does not mean the compound exists.')}
+        {tier('User-built candidate', 'yes', candidate ?? 'You chose this composition' + (extra ? ` / ${extra}` : '') + '. Choosing elements does not mean the compound exists.')}
         {tier('Rule-based assessment', rule.ok === null ? 'no' : rule.ok ? 'yes' : 'warn', rule.label)}
-        {tier('Database-supported material', 'no', 'Not checked. Look the formula up yourself (e.g. Materials Project, ICSD, OQMD) before calling it a known phase.')}
-        {tier('Calculated result', 'no', 'None. No DFT or other calculation is run here; tolerance factors are geometric heuristics.')}
+        {tier('Database-supported material', database?.state ?? 'no', database?.text ?? 'Not checked. Look the formula up yourself (e.g. Materials Project, ICSD, OQMD) before calling it a known phase.')}
+        {tier('Calculated result', calculated?.state ?? 'no', calculated?.text ?? 'None. No DFT or other calculation is run here; tolerance factors are geometric heuristics.')}
       </ul>
     </div>
   );
