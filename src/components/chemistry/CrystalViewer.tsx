@@ -14,6 +14,10 @@ interface Props {
   styles: Partial<Record<Site, SiteStyle>>;
   /** B–X distance in `pos` units; bonds are drawn between B/B2 and X atoms at this distance. */
   bondDist: number;
+  /** 'bx' (default): bonds between B/B′ and X. 'nn': bonds between any two atoms at `bondDist`. */
+  bondMode?: 'bx' | 'nn';
+  /** Optional legend names per site key (defaults to the perovskite A/B/B′/X naming). */
+  siteNames?: Partial<Record<Site, string>>;
   showBonds: boolean;
   showCell: boolean;
   showA: boolean;
@@ -26,7 +30,7 @@ const VIEWS: Record<string, { yaw: number; pitch: number }> = {
   Top: { yaw: 0, pitch: Math.PI / 2 - 0.001 },
 };
 
-export function CrystalViewer({ atoms, extent, styles, bondDist, showBonds, showCell, showA }: Props) {
+export function CrystalViewer({ atoms, extent, styles, bondDist, bondMode = 'bx', siteNames, showBonds, showCell, showA }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { width, height } = useResponsiveCanvasSize(boxRef, 640, 440, 900);
@@ -39,16 +43,22 @@ export function CrystalViewer({ atoms, extent, styles, bondDist, showBonds, show
   const bonds = useMemo(() => {
     const out: [number, number][] = [];
     const eps = 1e-3;
+    const dist = (u: V3, v: V3) => Math.hypot(u[0] - v[0], u[1] - v[1], u[2] - v[2]);
+    if (bondMode === 'nn') {
+      for (let i = 0; i < atoms.length; i++) for (let j = i + 1; j < atoms.length; j++) {
+        if (Math.abs(dist(atoms[i].pos, atoms[j].pos) - bondDist) < eps) out.push([i, j]);
+      }
+      return out;
+    }
     atoms.forEach((b, i) => {
       if (b.site !== 'B' && b.site !== 'B2') return;
       atoms.forEach((x, j) => {
         if (x.site !== 'X') return;
-        const d = Math.hypot(b.pos[0] - x.pos[0], b.pos[1] - x.pos[1], b.pos[2] - x.pos[2]);
-        if (Math.abs(d - bondDist) < eps) out.push([i, j]);
+        if (Math.abs(dist(b.pos, x.pos) - bondDist) < eps) out.push([i, j]);
       });
     });
     return out;
-  }, [atoms, bondDist]);
+  }, [atoms, bondDist, bondMode]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -170,7 +180,7 @@ export function CrystalViewer({ atoms, extent, styles, bondDist, showBonds, show
         {legend.map(s => (
           <span key={s} className="flex items-center gap-1.5 text-[11px] text-gray-600">
             <span className="inline-block h-3 w-3 rounded-full" style={{ background: styles[s]!.color }} />
-            {s === 'B2' ? 'B′' : s}-site: {styles[s]!.label}
+            {siteNames?.[s] ?? `${s === 'B2' ? 'B′' : s}-site`}: {styles[s]!.label}
           </span>
         ))}
         <span className="text-[11px] text-gray-400">Drag to rotate · sizes ∝ Shannon radii</span>

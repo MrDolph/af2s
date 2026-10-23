@@ -7,7 +7,7 @@ export interface Candidate {
   id: string;
   name: string;
   savedAt: string; // ISO
-  kind: 'composition' | 'perovskite';
+  kind: 'composition' | 'perovskite' | 'heusler';
   formula: string;
   composition: Composition;
   molarMass: number;
@@ -20,6 +20,13 @@ export interface Candidate {
     tolerance: number | null;
     octahedral: number | null;
     density: number | null;
+  };
+  heusler?: {
+    template: string;
+    elements: Record<string, string>;
+    a: number;
+    valenceElectrons: number;
+    slaterPauling: number | null;
   };
   note?: string;
 }
