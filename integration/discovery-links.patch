@@ -1,0 +1,36 @@
+--- a/src/components/layout/AppHeader.tsx
++++ b/src/components/layout/AppHeader.tsx
+@@ -6,6 +6,7 @@
+ import { SimulationsMenu, SimulationsMobileMenu } from '@/components/layout/SimulationsMenu';
+ 
+ const NAV = [
++  { label: 'Geophysics', href: '/geophysics' },
+   { label: 'About', href: '/about' },
+ ];
+ 
+--- a/src/app/simulations/page.tsx
++++ b/src/app/simulations/page.tsx
+@@ -6,6 +6,14 @@
+ const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'] as const;
+ 
+ const SIMULATIONS = [
++  {'slug': 'geophysics-field-lab', 'href': '/geophysics/index.html', 'title': 'Geophysics field lab', 'description': 'Gravity contours, resistivity, seismic arrivals, EM attenuation and well logging.', 'icon': '📈', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
++
++  {'slug': 'earth-explorer', 'href': '/geophysics/earth.html', 'title': 'Earth Explorer', 'description': 'Rotate and open the Earth from the inner core to the exosphere.', 'icon': '🌍', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
++
++  {'slug': 'solar-system-explorer', 'href': '/geophysics/solar.html', 'title': 'Solar System Explorer', 'description': 'Planet families, nebular formation and Kepler’s laws.', 'icon': '☀️', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
++
++  {'slug': 'plate-tectonics-explorer', 'href': '/geophysics/tectonics.html', 'title': 'Tectonics and Earth’s shape', 'description': 'World plates, continental drift, magnetic stripes, triple junctions and flattening.', 'icon': '🧩', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
++
+   {
+     slug: 'projectile-motion',
+     href: '/simulations/projectile-motion',
+@@ -365,7 +373,7 @@
+   },
+ ];
+ 
+-const TOPICS = ['All', 'Mechanics', 'Electricity', 'Waves', 'Optics', 'Thermal physics', 'Modern physics'];
++const TOPICS = ['All', 'Earth & Space', 'Mechanics', 'Electricity', 'Waves', 'Optics', 'Thermal physics', 'Modern physics'];
+ 
+ const CURRICULUM_COLORS: Record<string, string> = {
+   WAEC: 'bg-indigo-100 text-indigo-700',

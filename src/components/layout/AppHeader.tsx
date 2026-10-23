@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { SimulationsMenu, SimulationsMobileMenu } from '@/components/layout/SimulationsMenu';
 
 const NAV = [
+  // { label: 'Geophysics', href: '/geophysics' },
   { label: 'About', href: '/about' },
 ];
 
