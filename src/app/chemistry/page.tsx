@@ -19,8 +19,8 @@ const PLAYGROUNDS: Playground[] = [
     description: 'Half-Heusler XYZ and full-Heusler X₂YZ (regular and inverse) with alternative site arrangements, valence-electron rules and a Slater–Pauling estimate.' },
   { slug: 'crystal-builder', href: '/chemistry/crystal-builder', title: 'Crystal builder', icon: '🔷', topic: 'Materials', status: 'live',
     description: 'Pick a cubic prototype (rocksalt, CsCl, zincblende, fluorite, fcc, bcc, diamond…), assign elements and read computed coordination, density and packing.' },
-  { slug: 'organic', href: '#', title: 'Organic molecules', icon: '🧬', topic: 'Organic', status: 'coming',
-    description: 'Connect atoms with bonds, explore functional groups, and compare isomers that share a formula.' },
+  { slug: 'organic', href: '/chemistry/organic', title: 'Organic molecules', icon: '🧬', topic: 'Organic', status: 'live',
+    description: 'Draw atoms and bonds or type a SMILES string; get the formula, functional groups and library isomers with the same formula.' },
   { slug: 'nuclear', href: '/chemistry/nuclear', title: 'Nuclear playground', icon: '☢️', topic: 'Nuclear', status: 'live',
     description: 'Choose a nuclide, test decay modes against conservation laws, follow decay chains, run the half-life law and check nuclear equations.' },
 ];

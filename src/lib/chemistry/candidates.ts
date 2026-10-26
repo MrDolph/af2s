@@ -7,7 +7,7 @@ export interface Candidate {
   id: string;
   name: string;
   savedAt: string; // ISO
-  kind: 'composition' | 'perovskite' | 'heusler' | 'crystal';
+  kind: 'composition' | 'perovskite' | 'heusler' | 'crystal' | 'organic';
   formula: string;
   composition: Composition;
   molarMass: number;
@@ -33,6 +33,11 @@ export interface Candidate {
     elements: Record<string, string>;
     a: number;
     density: number;
+  };
+  organic?: {
+    atoms: { el: string; x: number; y: number }[];
+    bonds: { a: number; b: number; order: number }[];
+    smiles: string;
   };
   note?: string;
 }
