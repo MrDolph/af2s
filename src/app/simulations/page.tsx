@@ -6,6 +6,16 @@ import { AppHeader } from '@/components/layout/AppHeader';
 const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'] as const;
 
 const SIMULATIONS = [
+  {
+    slug: 'space',
+    href: '/simulations/space',
+    title: 'Space: position, distance & displacement',
+    description: 'Locate points on a line, a plane and in 3D space, then measure distance and displacement. Walk-through, journeys and practice included.',
+    icon: '🧊',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Space and time',
+    status: 'live',
+  },
   {'slug': 'geophysics-field-lab', 'href': '/geophysics/index.html', 'title': 'Geophysics field lab', 'description': 'Gravity contours, resistivity, seismic arrivals, EM attenuation and well logging.', 'icon': '📈', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
 
   {'slug': 'earth-explorer', 'href': '/geophysics/earth.html', 'title': 'Earth Explorer', 'description': 'Rotate and open the Earth from the inner core to the exosphere.', 'icon': '🌍', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
@@ -373,7 +383,7 @@ const SIMULATIONS = [
   },
 ];
 
-const TOPICS = ['All', 'Earth & Space', 'Mechanics', 'Electricity', 'Waves', 'Optics', 'Thermal physics', 'Modern physics'];
+const TOPICS = ['All', 'Space and time', 'Earth & Space', 'Mechanics', 'Electricity', 'Waves', 'Optics', 'Thermal physics', 'Modern physics'];
 
 const CURRICULUM_COLORS: Record<string, string> = {
   WAEC: 'bg-indigo-100 text-indigo-700',
