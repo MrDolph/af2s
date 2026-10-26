@@ -1,53 +1,619 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>A-Factor | Geophysics Field Lab</title><style>
-:root{--bg:#f4f5f0;--ink:#192e2b;--green:#185c4e;--muted:#64736c;--line:#dce2d9;--lime:#d9ee9c}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,sans-serif}button,input,select{font:inherit}button,a{ -webkit-tap-highlight-color:transparent}button{cursor:pointer}header{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 4%;gap:20px}.brand{font-weight:800;font-size:22px;letter-spacing:-1px}.brand b{display:inline-grid;place-items:center;background:var(--green);color:white;width:34px;height:34px;border-radius:9px;margin-right:10px}header a{color:var(--green);text-decoration:none;font-size:13px}.badge{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}.shell{display:grid;grid-template-columns:236px 1fr;min-height:calc(100vh - 76px)}aside{padding:30px 20px;background:#eef1e9;border-right:1px solid var(--line)}.nav{display:flex;flex-direction:column;gap:8px;margin:22px 0}.nav button{background:none;border:0;text-align:left;border-radius:8px;padding:13px;color:var(--muted)}.nav button.active{background:var(--green);color:white}.nav small{display:inline-block;width:28px;opacity:.65}.course{border-top:1px solid var(--line);padding-top:24px;font-size:12px;line-height:1.8;color:var(--muted)}main{max-width:1450px;padding:35px 4%;width:100%}.eyebrow{font-size:11px;letter-spacing:2px;font-weight:700;color:var(--green)}h1{font-size:36px;letter-spacing:-1.3px;margin:10px 0}p{color:var(--muted);line-height:1.65}.intro{max-width:750px}.toprow{display:flex;justify-content:space-between;align-items:center;gap:15px}.pill{border:1px solid var(--line);padding:8px 12px;border-radius:30px;font-size:12px;white-space:nowrap;background:white}.tabs{display:flex;border-bottom:1px solid var(--line);gap:25px;margin:28px 0 22px}.tabs button{border:0;background:none;padding:12px 0;color:var(--muted)}.tabs .active{color:var(--green);border-bottom:3px solid var(--green);font-weight:700}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:20px}.card{background:white;border:1px solid var(--line);border-radius:13px;overflow:hidden}.cardhead{padding:19px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}h2{font-size:16px;margin:0}canvas{display:block;width:100%;height:370px}.legend{display:flex;gap:18px;padding:0 22px 18px;color:var(--muted);font-size:12px}.dot{color:#2a8975}.controls{padding:22px}.controls h2{margin-bottom:24px}label{display:block;font-size:12px;color:var(--muted);margin:20px 0 8px}.value{float:right;color:var(--ink);font-weight:700}input[type=range]{width:100%;accent-color:var(--green)}.equation{background:#eef4e8;padding:15px;border-radius:8px;margin-top:24px;font-family:ui-monospace,monospace;font-size:13px;line-height:1.8}.metric{background:var(--green);color:white;padding:22px;border-radius:9px;margin-top:20px}.metric small{opacity:.7}.metric strong{display:block;font-size:28px;margin-top:7px}.bottom{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}.pad{padding:22px}.pad p{font-size:13px}.action{background:var(--green);color:white;border:0;padding:11px 16px;border-radius:7px}.secondary{background:white;color:var(--green);border:1px solid var(--line);padding:9px 13px;border-radius:7px}.answer{padding:10px;width:125px;border:1px solid var(--line);border-radius:7px;margin:10px 8px 10px 0}#feedback{font-weight:600;font-size:13px;line-height:1.6}footer{font-size:11px;color:var(--muted);padding:25px 0}.scenario{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.scenario button{margin-top:10px}select{width:100%;padding:10px;border:1px solid var(--line);background:white;border-radius:6px} .hidden{display:none!important}@media(max-width:1050px){.shell{grid-template-columns:190px 1fr}.workspace{grid-template-columns:1fr}.controls{display:grid;grid-template-columns:1fr 1fr;gap:0 25px}.controls h2,.equation,.metric{grid-column:1/-1}.scenario{grid-template-columns:1fr}}@media(max-width:700px){header{height:65px}.shell{display:block}aside{padding:12px 16px;border-right:0}.nav{flex-direction:row;overflow:auto;margin:8px 0}.nav button{white-space:nowrap}.course,aside>.badge{display:none}main{padding:25px 16px}h1{font-size:29px}.bottom{grid-template-columns:1fr}.toprow{align-items:start}.pill{display:none}canvas{height:310px}.brand{font-size:18px}.tabs{gap:20px;font-size:13px}}.visual-grid svg path{fill:none}.visual-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px}.visual-caption{font-size:12px;margin:0;padding:16px 20px;min-height:96px;border-top:1px solid var(--line)}#survey{height:340px}details{font-size:13px;color:var(--muted);margin-top:12px}summary{cursor:pointer;color:var(--green)}@media(max-width:1100px){.visual-grid{grid-template-columns:1fr}} 
-/* The host Next.js page renders the shared AppHeader. */
-.shell{min-height:100vh}
-</style></head><body>
-<div class="shell"><aside><div class="badge">Virtual field school</div><a target="_top" href="./earth.html" style="display:block;margin:18px 0;padding:13px;border-radius:8px;background:#dbe8d4;color:#185c4e;text-decoration:none;font-weight:700">◉ Earth Explorer ↗</a><a target="_top" href="./solar.html" style="display:block;margin:12px 0;color:#185c4e;text-decoration:none;font-weight:700">☀ Solar System ↗</a><a target="_top" href="./tectonics.html" style="display:block;margin:12px 0;color:#185c4e;text-decoration:none;font-weight:700">▱ Tectonics & Shape ↗</a><nav class="nav" id="nav"></nav><div class="course"><b>AUI-PHY 407 · 2 Units</b><br>Augustine University<br>Department of Physics<br><br>Based on lecture notes by<br><b>Fatai Olalekan Dawodu</b><br><br>Explore → Predict → Measure<br>→ Explain</div></aside><main><div class="toprow"><div><div class="eyebrow">THE GEOPHYSICS FIELD LAB</div><h1 id="title"></h1></div><span class="pill">● Interactive learning workspace</span></div><p class="intro" id="intro"></p><div class="tabs"><button class="active" data-tab="lab">Experiment</button><button data-tab="guide">Field guide</button><button data-tab="missions">Exploration missions</button></div><div id="lab"><div class="workspace"><section class="card"><div class="cardhead"><h2 id="plotTitle"></h2><button class="secondary" id="reset">↺ Reset</button></div><canvas id="plot" aria-label="Interactive geophysical response graph" role="img"></canvas><div class="legend"><span class="dot">● Model response</span><span>Idealised teaching model · SI inputs</span></div></section><section class="card controls"><h2>Model parameters</h2><div id="sliders"></div><div class="equation" id="formula"></div><div class="metric"><small id="metricLabel"></small><strong id="metric"></strong></div></section></div><div class="bottom"><section class="card pad"><div class="eyebrow">01 / OBSERVE & EXPLAIN</div><h2 style="margin-top:12px">Make the connection</h2><p id="observe"></p><button class="secondary" id="export">↓ Export measurements (CSV)</button></section><section class="card pad"><div class="eyebrow">02 / CHECK YOUR UNDERSTANDING</div><p id="question"></p><input class="answer" type="number" id="answer" aria-label="Your numerical answer" placeholder="Your answer"><button class="action" id="check">Check answer</button><div id="feedback" aria-live="polite"></div><small style="color:var(--muted)">Numerical tolerance: ±5%. Answers update with your model.</small></section></div></div><div id="guide" class="hidden card pad"></div><div id="missions" class="hidden"></div><footer>AUI-PHY 407 · Geophysics • Teaching simulations, not field inversion or resource certification. Progress is saved on this browser.</footer></main></div>
-<script>
-const modules=[
-{name:'Gravity',chapter:'Chapter 4',title:'Read the unseen with gravity.',intro:'Explore how a buried density contrast changes the gravity measured at the surface. Move from a subsurface model to a survey response.',plot:'Gravity anomaly · buried sphere',params:[['depth','Centre depth',50,300,100,1,'m'],['radius','Sphere radius',5,40,25,1,'m'],['density','Density contrast',-800,800,500,10,'kg/m³']],formula:'Δg = G (4πR³/3) Δρ z / (x² + z²)³ᐟ²<br>1 mGal = 10⁻⁵ m/s²',observe:'Increase depth while keeping radius and density contrast fixed. The anomaly becomes broader and weaker. Negative contrasts produce negative anomalies. Different size–depth combinations can give similar signals: gravity interpretation is non-unique.',assume:'Homogeneous sphere in a uniform host; surface profile passes over its centre. Radius is smaller than centre depth. Terrain, latitude, drift, free-air and Bouguer corrections are excluded.',goal:'Predict the peak anomaly above the sphere in mGal.',label:'Peak anomaly',unit:'mGal',axis:['Distance from target (m)','Gravity anomaly (mGal)']},
-{name:'Resistivity',chapter:'Chapter 5',title:'Probe the ground with current.',intro:'Build a Wenner survey over a uniform half-space. See how electrode spacing and rock resistivity control the measured voltage.',plot:'Wenner array · homogeneous earth',params:[['rho','Ground resistivity',10,1000,100,10,'Ω·m'],['current','Injected current',10,200,50,1,'mA'],['spacing','Electrode spacing',1,50,10,1,'m']],formula:'ρₐ = 2πa ΔV / I<br>ΔV = ρ I / (2πa)',observe:'Increase spacing and observe the voltage fall. The recovered apparent resistivity stays equal to the true resistivity for this uniform model. In layered ground, apparent resistivity is an integrated response, not a direct depth reading.',assume:'Point electrodes, flat surface, isotropic homogeneous half-space and negligible contact resistance. This is not a layered VES or ERT solver. Larger spacing does not correspond to one exact investigation depth.',goal:'Calculate the measured voltage at the selected spacing in mV.',label:'Measured potential difference',unit:'mV',axis:['Electrode spacing (m)','Voltage (mV)']},
-{name:'Seismic',chapter:'Chapter 6',title:'Listen to the layers below.',intro:'Compare direct, reflected and critically refracted arrivals above a horizontal interface. Discover where the head wave becomes the first arrival.',plot:'Two-layer seismic travel times',params:[['v1','Upper-layer velocity',300,1800,1000,50,'m/s'],['v2','Lower-layer velocity',2000,5000,3000,50,'m/s'],['h','Interface depth',5,100,30,1,'m']],formula:'tᵈ = x/v₁; tʳ = √(x²+4h²)/v₁<br>i꜀ = asin(v₁/v₂)<br>tʰ = x/v₂ + 2h cos(i꜀)/v₁',observe:'The direct wave arrives first at short offsets. Beyond the crossover, the critically refracted wave arrives first. Reflection follows a hyperbola. Increasing interface depth increases the intercept time and crossover distance.',assume:'Flat horizontal interface, constant isotropic velocities, v₂ > v₁, no attenuation or noise. Head-wave branch is plotted only beyond its minimum emergence offset. Refraction cannot resolve every hidden or low-velocity layer.',goal:'Calculate the zero-offset two-way reflection time in ms.',label:'Zero-offset reflection time',unit:'ms',axis:['Source–receiver offset (m)','Travel time (ms)']},
-{name:'Electromagnetics',chapter:'Chapter 7',title:'Explore depth through attenuation.',intro:'Investigate the link between frequency, resistivity and electromagnetic skin depth. Watch the field decay as it travels into the Earth.',plot:'EM amplitude · conductive half-space',params:[['rho','Ground resistivity',1,500,100,1,'Ω·m'],['freq','Frequency',10,10000,1000,10,'Hz']],formula:'δ ≈ 503 √(ρ/f) metres<br>A(z)/A₀ = exp(−z/δ)',observe:'Lower frequency or higher resistivity increases skin depth. At one skin depth the amplitude is about 37% of its surface value. Skin depth is an attenuation scale; it is not a guaranteed target detection depth.',assume:'Plane wave, non-magnetic homogeneous good conductor; displacement currents neglected. This model does not simulate a specific FDEM coil, TEM transient, VLF geometry or GPR pulse.',goal:'Calculate the skin depth in metres.',label:'Skin depth · 1/e amplitude',unit:'m',axis:['Depth (m)','Relative amplitude']},
-{name:'Well logging',chapter:'Chapter 8',title:'Translate a log into rock properties.',intro:'Use the density-porosity relationship to estimate pore space. Explore how matrix and fluid densities affect the bulk density measured by a well log.',plot:'Density log interpretation · clean formation',params:[['matrix','Matrix density',2400,2900,2650,10,'kg/m³'],['fluid','Fluid density',700,1200,1000,10,'kg/m³'],['porosity','Porosity',0,45,20,1,'%']],formula:'ρᵦ = (1−φ)ρₘₐ + φρ𝒻<br>φ = (ρₘₐ−ρᵦ)/(ρₘₐ−ρ𝒻)',observe:'Higher porosity lowers bulk density when pore fluid is less dense than the rock matrix. Density alone does not identify oil or gas. Combine gamma ray, resistivity, neutron and sonic information with geological context.',assume:'Clean single-mineral formation, uniform fully fluid-filled pores; no shale, gas correction, washout, invasion or tool effects. The chart is a mixing model, not a synthetic multi-tool borehole log.',goal:'Calculate the bulk density at the selected porosity in kg/m³.',label:'Formation bulk density',unit:'kg/m³',axis:['Porosity (%)','Bulk density (kg/m³)']}];
-let active=0,p={},data=[],expected=0;const $=id=>document.getElementById(id);let completed={};try{completed=JSON.parse(localStorage.getItem('afactor-geo-progress')||'{}')}catch{}
-function select(i){active=i;p={};const m=modules[i];m.params.forEach(q=>p[q[0]]=q[4]);$('nav').innerHTML=modules.map((m,j)=>`<button class="${j===i?'active':''}" onclick="select(${j})"><small>0${j+1}</small>${m.name} ${completed[j]?'✓':''}</button>`).join('');$('title').textContent=m.title;$('intro').textContent=m.intro;$('plotTitle').textContent=m.plot;$('formula').innerHTML=m.formula;$('observe').textContent=m.observe;$('question').textContent=m.goal;$('metricLabel').textContent=m.label;$('answer').value='';$('feedback').textContent='';$('sliders').innerHTML=m.params.map(([k,n,min,max,val,step,u])=>`<label for="${k}">${n}<span class="value" id="val-${k}">${val} ${u}</span></label><input id="${k}" type="range" min="${min}" max="${max}" value="${val}" step="${step}" oninput="update('${k}',this.value)">`).join('');$('guide').innerHTML=`<div class="eyebrow">${m.chapter} / LECTURE CONNECTION</div><h1>${m.name}</h1><p>${m.observe}</p><h2>Model assumptions & limits</h2><p>${m.assume}</p><h2>Suggested field exercise</h2><p>Before moving a slider, predict whether the response will increase, decrease, or remain unchanged. Change one variable at a time. Export two datasets, compare their shapes and values, and explain the result using the equation. State one alternative geological explanation and one complementary method.</p><h2>Course coverage</h2><p>Chapters 1–3: geological context, method selection, acquisition and interpretation. Chapters 4–8: the five numerical labs. Chapters 9–10: integrated exploration and engineering missions. These labs support the notes; they do not replace geological maps, field acquisition or inversion training.</p>`;draw()}
-function update(k,v){p[k]=+v;const q=modules[active].params.find(x=>x[0]===k);$('val-'+k).textContent=v+' '+q[6];$('feedback').textContent='';draw()}
-function compute(){const m=modules[active];let series=[];if(active===0){const f=x=>6.67430e-11*4*Math.PI/3*p.radius**3*p.density*p.depth/(x*x+p.depth*p.depth)**1.5*1e5;data=Array.from({length:201},(_,i)=>[-600+i*6,f(-600+i*6)]);expected=f(0);series=[{color:'#277c69',points:data}]}if(active===1){const f=a=>p.rho*p.current/(2*Math.PI*a);data=Array.from({length:100},(_,i)=>[1+i*.5,f(1+i*.5)]);expected=f(p.spacing);series=[{color:'#277c69',points:data}]}if(active===2){let c=Math.sqrt(1-(p.v1/p.v2)**2),min=2*p.h*Math.tan(Math.asin(p.v1/p.v2));data=Array.from({length:151},(_,i)=>{let x=i*4;return[x,x/p.v1*1000,Math.hypot(x,2*p.h)/p.v1*1000,x>=min?(x/p.v2+2*p.h*c/p.v1)*1000:null]});series=[1,2,3].map((j)=>({color:['','#277c69','#d08d45','#6689bc'][j],points:data.filter(r=>r[j]!==null).map(r=>[r[0],r[j]])}));expected=2*p.h/p.v1*1000}if(active===3){expected=503*Math.sqrt(p.rho/p.freq);data=Array.from({length:121},(_,i)=>[i*expected*4/120,Math.exp(-i*4/120)]);series=[{color:'#277c69',points:data}]}if(active===4){const f=x=>(1-x/100)*p.matrix+x/100*p.fluid;data=Array.from({length:46},(_,i)=>[i,f(i)]);expected=f(p.porosity);series=[{color:'#277c69',points:data}]}$('metric').textContent=expected.toFixed(active===0?4:1)+' '+m.unit;return series}
-function draw(){let series=compute(),canvas=$('plot'),w=canvas.clientWidth,h=canvas.clientHeight,dpr=window.devicePixelRatio||1;canvas.width=w*dpr;canvas.height=h*dpr;let ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);const pts=series.flatMap(s=>s.points);let xmin=Math.min(...pts.map(q=>q[0])),xmax=Math.max(...pts.map(q=>q[0])),ymin=Math.min(0,...pts.map(q=>q[1])),ymax=Math.max(...pts.map(q=>q[1]));if(ymax-ymin<1e-10){ymin=-1;ymax=1}let span=ymax-ymin;ymin-=span*.08;ymax+=span*.12;const L=76,R=w-27,T=35,B=h-60,X=x=>L+(x-xmin)/(xmax-xmin)*(R-L),Y=y=>B-(y-ymin)/(ymax-ymin)*(B-T);ctx.font='11px system-ui';ctx.textAlign='right';for(let i=0;i<=4;i++){let y=ymin+(ymax-ymin)*i/4;ctx.strokeStyle='#e7ece6';ctx.beginPath();ctx.moveTo(L,Y(y));ctx.lineTo(R,Y(y));ctx.stroke();ctx.fillStyle='#6b7a73';ctx.fillText(Math.abs(y)<1?y.toFixed(3):y.toFixed(0),L-10,Y(y)+4)}ctx.textAlign='center';for(let i=0;i<=4;i++){let x=xmin+(xmax-xmin)*i/4;ctx.fillText(x.toFixed(0),X(x),B+22)}for(let s of series){ctx.beginPath();ctx.strokeStyle=s.color;ctx.lineWidth=3;s.points.forEach((q,i)=>i?ctx.lineTo(X(q[0]),Y(q[1])):ctx.moveTo(X(q[0]),Y(q[1])));ctx.stroke()}ctx.fillStyle='#66776c';ctx.fillText(modules[active].axis[0],(L+R)/2,h-13);ctx.save();ctx.translate(17,(B+T)/2);ctx.rotate(-Math.PI/2);ctx.fillText(modules[active].axis[1],0,0);ctx.restore();ctx.textAlign='left';ctx.fillStyle='#192e2b';ctx.font='12px system-ui';ctx.fillText(active===2?'Green: direct    Amber: reflection    Blue: head wave':'Forward model • '+modules[active].chapter,L,20);if(active===0){ctx.setLineDash([4,4]);ctx.strokeStyle='#afc4b7';ctx.beginPath();ctx.moveTo(X(0),T);ctx.lineTo(X(0),B);ctx.stroke()}}
-$('reset').onclick=()=>select(active);$('check').onclick=()=>{const raw=$('answer').value;if(raw.trim()===''){$('feedback').textContent='Enter your calculated value first.';return}let ok=Math.abs(+raw-expected)<=Math.max(Math.abs(expected)*.05,1e-6);$('feedback').textContent=ok?'✓ Correct. Explain the trend in your own words before changing the model.':`Try again. Substitute your current inputs into the displayed equation. Model value: ${expected.toFixed(active===0?4:2)} ${modules[active].unit}.`;$('feedback').style.color=ok?'#185c4e':'#9b541f';if(ok){completed[active]=true;try{localStorage.setItem('afactor-geo-progress',JSON.stringify(completed))}catch{}}};$('export').onclick=()=>{let lines=['# A-Factor Geophysics Lab: '+modules[active].name,'# Parameters: '+JSON.stringify(p),'# '+modules[active].assume,active===2?'offset_m,direct_ms,reflection_ms,head_wave_ms':modules[active].axis.join(',')];lines.push(...data.map(r=>r.join(',')));let url=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv'})),a=document.createElement('a');a.href=url;a.download='geophysics-'+modules[active].name.toLowerCase()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['lab','guide','missions'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));if(b.dataset.tab==='lab')draw()});
-const missions=[['Groundwater · Chapter 9','A village needs a borehole in weathered crystalline terrain. Which first survey best maps electrical contrasts associated with weathering and fractures?',['Electrical resistivity','Gravity only','Gamma-ray satellite image'],0,'Resistivity can help map weathered/fractured zones. Clay and saline water may also be conductive; confirm with geology, drilling and water-quality testing.'],['Engineering · Chapter 10','A proposed building site may contain shallow cavities. Which workflow best reduces interpretation risk?',['One gravity reading','Combine microgravity with ERT or suitable GPR, then verify','Assume every low resistivity zone is a cavity'],1,'Combine complementary physical properties and ground truth. A gravity low is non-unique; GPR performance depends strongly on conductivity and access.'],['Hydrocarbons · Chapters 1–3, 9','A seismic survey maps an anticline. What can be concluded?',['Oil is proven','A possible structural trap needs further evaluation','All folded rocks contain gas'],1,'Structure alone does not prove hydrocarbons. Source, maturation, migration, reservoir, seal and timing must all be evaluated; well evidence is needed.']];$('missions').innerHTML='<div class="scenario">'+missions.map((m,i)=>`<section class="card pad"><div class="eyebrow">MISSION 0${i+1}</div><h2 style="margin-top:16px">${m[0]}</h2><p>${m[1]}</p><select id="mission-${i}" aria-label="${m[0]} answer"><option value="">Choose an interpretation</option>${m[2].map((s,j)=>`<option value="${j}">${s}</option>`).join('')}</select><button class="action" onclick="grade(${i})">Review interpretation</button><p id="mf-${i}" aria-live="polite"></p></section>`).join('');function grade(i){let val=$('mission-'+i).value;$('mf-'+i).textContent=val===''?'Choose an answer first.':(+val===missions[i][3]?'✓ Correct. ':'Reconsider. ')+missions[i][4]}window.addEventListener('resize',draw);select(0);
-// Linked visual interpretation layer: analytical models are distinguished from illustrations.
-const visualPanel=document.createElement('section');visualPanel.className='visual-grid';visualPanel.innerHTML=`<section class="card"><div class="cardhead"><h2>1 · See the physical setup</h2><span class="badge">MODEL</span></div><div id="earthModel"></div><p class="visual-caption" id="earthCaption"></p></section><section class="card"><div class="cardhead"><h2 id="mapTitle">2 · Read the survey</h2><button class="secondary" id="gridExport">Export map CSV</button></div><canvas id="survey" aria-label="Linked two-dimensional survey visual" role="img"></canvas><p class="visual-caption" id="mapCaption"></p></section>`;$('lab').prepend(visualPanel);
-const practice=document.createElement('section');practice.className='bottom';practice.innerHTML=`<section class="card pad"><div class="eyebrow">03 / WORKED SNIPPET</div><div id="worked"></div></section><section class="card pad"><div class="eyebrow">04 / TRY IT YOURSELF</div><p id="independentQ"></p><input class="answer" id="independentA" type="number" aria-label="Independent practice answer" placeholder="Your answer"><button class="action" id="independentCheck">Check attempt</button><p id="independentFeedback" aria-live="polite"></p><details><summary>Hint and worked solution</summary><p id="independentSolution"></p></details></section>`;$('lab').append(practice);
-modules[0].params.push(['line','Survey-line northing',-300,300,0,10,'m']);
-const examples=[
-['A sphere with R = 25 m, z = 100 m and Δρ = 500 kg/m³ gives Δg(0,0) = 0.02184 mGal. At x = 100 m, y = 0, the signal is 0.00772 mGal. The centre is strongest; each contour joins positions with the same anomaly.','Use the same sphere. At x = 0, y = 100 m, calculate Δg in mGal.',.007722,'Use r² = x² + y² + z². Δg = 0.0218412 / 2³ᐟ² = 0.007722 mGal. Equal horizontal distances from the centre give equal responses.'],
-['For ρ = 100 Ω·m, I = 50 mA and a = 10 m: ΔV = (100 × 0.05)/(2π × 10) = 0.07958 V = 79.58 mV. Substitution into ρₐ = 2πaΔV/I returns 100 Ω·m at every station in this uniform earth.','For ρ = 200 Ω·m, I = 50 mA and a = 20 m, calculate ΔV in mV.',79.5775,'Convert 50 mA to 0.05 A. ΔV = (200 × 0.05)/(2π × 20) = 0.07958 V = 79.58 mV.'],
-['For h = 30 m and v₁ = 1000 m/s, the vertical reflected path is 60 m, so t₀ = 2h/v₁ = 60 ms. With v₂ = 3000 m/s, the critical angle is 19.47° from the normal.','A reflection returns after 80 ms through an upper layer with v₁ = 1500 m/s. Estimate interface depth in metres.',60,'Convert 80 ms to 0.080 s. h = v₁t₀/2 = 1500 × 0.080 / 2 = 60 m.'],
-['At ρ = 100 Ω·m and f = 1000 Hz, δ = 503√(100/1000) = 159.06 m. At z = δ, A/A₀ = e⁻¹ = 0.3679. This is attenuation, not a sharp depth boundary.','At two skin depths, what percentage of the surface amplitude remains?',13.5335,'A/A₀ = e⁻² = 0.135335. Multiply by 100: 13.53%.'],
-['For ρₘₐ = 2650 kg/m³, ρ𝒻 = 1000 kg/m³ and φ = 0.20, ρᵦ = 0.8(2650) + 0.2(1000) = 2320 kg/m³. The lower density in the clean reservoir interval is consistent with more pore space in this idealised model.','A clean formation has bulk density 2155 kg/m³, matrix density 2650 kg/m³ and fluid density 1000 kg/m³. Estimate porosity in percent.',30,'φ = (2650 − 2155)/(2650 − 1000) = 495/1650 = 0.30 = 30%.']];
-function svgSetup(content){return `<svg viewBox="0 0 600 300" role="img" aria-label="${modules[active].name} physical setup" style="width:100%;display:block;background:#f7f7ef"><rect x="45" y="65" width="520" height="210" fill="#e7d9b9"/><path d="M45 65H565" stroke="#476b4b" stroke-width="5"/>${content}</svg>`}
-function sphereResponse(x,y){return 6.67430e-11*4*Math.PI/3*p.radius**3*p.density*p.depth/(x*x+y*y+p.depth*p.depth)**1.5*1e5}
-const originalCompute=compute;compute=function(){let s=originalCompute();if(active===0){data=Array.from({length:201},(_,i)=>[-600+i*6,sphereResponse(-600+i*6,p.line)]);s=[{color:'#277c69',points:data}];expected=sphereResponse(0,p.line);$('metricLabel').textContent='Peak along selected survey line';$('metric').textContent=expected.toFixed(4)+' mGal';$('question').textContent='Calculate the peak anomaly on the selected survey line (x = 0) in mGal.';$('formula').innerHTML='Δg = G (4πR³/3) Δρ z / (x²+y²+z²)³ᐟ²<br>Survey line: y = '+p.line+' m'}return s};
-const oldSelect=select;select=function(i){oldSelect(i);$('worked').innerHTML='<p>'+examples[i][0]+'</p>';$('independentQ').textContent=examples[i][1];$('independentSolution').textContent=examples[i][3];$('independentA').value='';$('independentFeedback').textContent='';document.querySelectorAll('details').forEach(e=>e.open=false);renderVisuals()};
-const oldDraw=draw;draw=function(){oldDraw();renderVisuals()};
-function renderVisuals(){if(!document.getElementById('survey'))return;let body='',caption='',mapCaption='';const text=(x,y,t)=>`<text x="${x}" y="${y}" fill="#263e35" font-size="13" font-family="system-ui">${t}</text>`;
-if(active===0){let cy=65+p.depth/300*170,r=p.radius/300*170;body=`<circle cx="305" cy="${cy}" r="${r}" fill="${p.density<0?'#6098ba':'#bc7542'}" stroke="#674e34"/><path d="M305 65V${cy}" stroke="#4f6855" stroke-dasharray="4 4"/>`+text(315,(65+cy)/2,'z = '+p.depth+' m')+text(65,35,'Surface survey grid · target centred at (0, 0)')+text(65,250,'Sphere R = '+p.radius+' m · Δρ = '+p.density+' kg/m³');caption='Section through the target centre. The surface map is a plan view, not a depth slice. Positive contrast = excess mass; negative contrast = mass deficit.';$('mapTitle').textContent='2 · Gravity contour map · plan view';mapCaption='Easting x and northing y in metres; anomaly in mGal. Contour labels are signed values. Dashed line selects the profile below. The colour scale updates with the model; compare numerical values across runs.'}
-if(active===1){body=[120,235,350,465].map((x,i)=>`<path d="M${x} 50V85" stroke="#1b6152" stroke-width="3"/>`+text(x-10,40,['C₁','P₁','P₂','C₂'][i])).join('')+text(150,120,'← a →          ← a →          ← a →')+text(80,175,'Uniform half-space: ρ = '+p.rho+' Ω·m')+text(80,210,'Current '+p.current+' mA · spacing '+p.spacing+' m');caption='Wenner geometry is schematic. The spacing slider changes all three electrode separations equally.';$('mapTitle').textContent='2 · Uniform-earth pseudosection';mapCaption='Apparent resistivity (Ω·m) at array midpoints and spacing levels. Vertical axis is spacing a (m), NOT true depth. Constant colour is the correct homogeneous-earth result. No layered response or inversion is implied.'}
-if(active===2){let sy=65+p.h/100*125;let angle=Math.asin(p.v1/p.v2),dx=(sy-65)*Math.tan(angle);body=`<rect x="45" y="${sy}" width="520" height="${275-sy}" fill="#d4b68c"/><path d="M45 ${sy}H565" stroke="#95724d"/><path d="M100 65L450 65" stroke="#277c69" stroke-width="3"/><path d="M100 65L275 ${sy}L450 65" stroke="#d08d45" stroke-width="3"/><path d="M100 65L${100+dx} ${sy}H${450-dx}L450 65" stroke="#6689bc" stroke-width="3"/>`+text(70,35,'Source ●')+text(420,35,'Receiver ▼')+text(55,sy-12,'v₁ = '+p.v1+' m/s')+text(65,250,'v₂ = '+p.v2+' m/s · h = '+p.h+' m');caption='Schematic direct (green), reflected (amber) and head-wave (blue) paths. The head-wave legs use the critical angle; drawing width is not an offset scale.';$('mapTitle').textContent='2 · Synthetic shot gather';mapCaption='Horizontal: receiver offset (m). Vertical: time (ms), increasing downward. Synthetic pulses use the same arrival times as the travel-time curves below. Display amplitudes are illustrative; no wave-equation or reflection-coefficient modelling.'}
-if(active===3){body=`<path d="M150 40Q180 0 210 40M150 40H210" fill="none" stroke="#1b6152" stroke-width="4"/><path d="M180 65V245" stroke="#517d6b" stroke-dasharray="6 4"/>`+text(225,40,'Incident field · '+p.freq+' Hz')+text(225,130,'A(z) = A₀ exp(−z/δ)')+text(225,180,'δ = '+expected.toFixed(1)+' m')+text(65,255,'Uniform conductor · ρ = '+p.rho+' Ω·m');caption='Plane-wave attenuation model. The coil symbol indicates excitation schematically; this is not a finite-coil instrument simulation.';$('mapTitle').textContent='2 · Field attenuation section';mapCaption='Horizontal position (m) and depth (m). Colour shows A/A₀. In a uniform earth, amplitude varies with depth only; lateral uniformity is expected. Depth range scales with δ: compare labelled values, not colour alone.'}
-if(active===4){body=`<rect x="45" y="65" width="520" height="65" fill="#c7bcaa"/><rect x="45" y="130" width="520" height="80" fill="#edc989"/><rect x="45" y="210" width="520" height="65" fill="#c7bcaa"/><rect x="170" y="65" width="22" height="210" fill="#57635d"/>`+text(220,100,'Shale cap · 0–30 m')+text(220,165,'Clean reservoir · 30–70 m')+text(220,190,'Porosity '+p.porosity+'% · density '+expected.toFixed(0)+' kg/m³')+text(220,250,'Shale · 70–100 m');caption='Illustrative three-layer borehole. Sliders control the clean reservoir density; shale properties are fixed teaching presets.';$('mapTitle').textContent='2 · Correlated well-log tracks';mapCaption='Shared depth axis in metres. Gamma ray (API) and resistivity (Ω·m, log scale) are illustrative lithology presets; density (kg/m³) in the reservoir is calculated from your mixing model. These tracks do not establish hydrocarbon presence.'}
-$('earthModel').innerHTML=svgSetup(body);$('earthCaption').textContent=caption;$('mapCaption').textContent=mapCaption;$('gridExport').hidden=active!==0;drawSurvey()}
-function drawSurvey(){let cv=$('survey'),w=cv.clientWidth,h=340,dpr=window.devicePixelRatio||1;if(w<140)return;cv.width=w*dpr;cv.height=h*dpr;let c=cv.getContext('2d');c.scale(dpr,dpr);let L=60,R=w-55,T=35,B=280,W=R-L,H=B-T;c.font='11px system-ui';c.fillStyle='#64736c';const label=(s,x,y)=>c.fillText(s,x,y);const line=(x,y,x2,y2,color='#cfdbcf')=>{c.strokeStyle=color;c.beginPath();c.moveTo(x,y);c.lineTo(x2,y2);c.stroke()};
-if(active===0){W=H=Math.min(W,H);L=(w-W)/2;R=L+W;B=T+H;let peak=sphereResponse(0,0),extent=400,X=x=>L+(x+extent)/800*W,Y=y=>B-(y+extent)/800*H;for(let j=0;j<70;j++)for(let i=0;i<90;i++){let x=-400+(i+.5)*800/90,y=400-(j+.5)*800/70,v=peak===0?0:Math.abs(sphereResponse(x,y)/peak);c.fillStyle=peak===0?'#eef2e9':`hsl(${peak<0?207:153} ${25+v*40}% ${96-v*65}%)`;c.fillRect(L+i*W/90,T+j*H/70,W/90+1,H/70+1)}for(let fraction of [.1,.25,.5,.75]){let radius=p.depth*Math.sqrt(fraction**(-2/3)-1);if(radius>400||peak===0)continue;c.strokeStyle='#506e64';c.lineWidth=1;c.beginPath();c.ellipse(X(0),Y(0),radius/800*W,radius/800*H,0,0,Math.PI*2);c.stroke();c.fillStyle='#173b32';let angle={0.1:0.65,0.25:2.5,0.5:4,0.75:5.4}[fraction];label((peak*fraction).toFixed(4),X(radius*Math.cos(angle))+3,Y(radius*Math.sin(angle))-3)}c.setLineDash([6,4]);line(L,Y(p.line),R,Y(p.line),'#a34f30');c.setLineDash([]);c.fillStyle='#a34f30';label('y = '+p.line+' m',L+5,Y(p.line)-5);c.fillStyle='#64736c';for(let v of [-400,0,400]){label(v,X(v)-10,B+18);label(v,L-32,Y(v)+3)}label('Easting x (m)',L+W/2-35,323);label('Northing y (m)',L,20);label('mGal · centre '+peak.toFixed(4),L,T+15);return}
-if(active===1){c.fillStyle='#bdd7b8';c.fillRect(L,T,W,H);let rows=[1,2,3,4,5].map(v=>v*p.spacing);for(let a of rows){let yy=T+a/(p.spacing*6)*H;for(let x=0;x<9;x++){c.beginPath();c.fillStyle='#255e4c';c.arc(L+25+x*(W-50)/8,yy,3,0,7);c.fill()}c.fillStyle='#64736c';label(a.toFixed(0),L-30,yy+3)}label('Spacing a (m) · pseudo-depth coordinate',L,20);label('Array midpoint x (m)',L+25,323);label('0',L,B+18);label('200',R-22,B+18);label('ρₐ = '+p.rho+' Ω·m at every point',L+10,B-15);return}
-if(active===2){let maxT=Math.max(...data.map(r=>r[2]))*1.1;for(let j=0;j<40;j++){let x=j*600/39,yy=T;c.strokeStyle='#26715f';c.beginPath();for(let t=0;t<=maxT;t+=maxT/350){let ic=Math.asin(p.v1/p.v2),headMin=2*p.h*Math.tan(ic);let ts=[x/p.v1*1000,Math.hypot(x,2*p.h)/p.v1*1000,...(x>=headMin?[(x/p.v2+2*p.h*Math.cos(ic)/p.v1)*1000]:[])];let amp=ts.reduce((s,tt)=>{let q=(t-tt)/5;return s+(1-2*q*q)*Math.exp(-q*q)},0);let xx=L+j*W/39+amp*4;yy=T+t/maxT*H;t===0?c.moveTo(xx,yy):c.lineTo(xx,yy)}c.stroke()}c.fillStyle='#64736c';for(let i=0;i<=4;i++){label((maxT*i/4).toFixed(0),L-30,T+H*i/4);label((600*i/4).toFixed(0),L+W*i/4-10,B+20)}label('Time (ms) ↓',L,20);label('Receiver offset (m)',L+W/2-50,323);return}
-if(active===3){let delta=503*Math.sqrt(p.rho/p.freq);for(let j=0;j<100;j++){let a=Math.exp(-j*4/100);c.fillStyle=`hsl(153 38% ${96-a*65}%)`;c.fillRect(L,T+j*H/100,W,H/100+1)}for(let i=0;i<=4;i++){let yy=T+i*H/4;line(L,yy,R,yy,'#a7b7a4');c.fillStyle='#64736c';label((delta*i).toFixed(0),L-40,yy+3);label('A/A₀ = '+Math.exp(-i).toFixed(3),L+10,yy+15)}label('Depth (m) ↓',L,20);label('Lateral position (m): 0 → 200',L,323);return}
-if(active===4){const tracks=[{title:'Gamma (API)',min:0,max:150,values:[110,25,110],color:'#b98a3f'},{title:'ρ (Ω·m, log)',min:0,max:3,values:[Math.log10(8),Math.log10(100),Math.log10(8)],color:'#5d88b4'},{title:'Density (kg/m³)',min:1500,max:3000,values:[2500,expected,2500],color:'#277c69'}];let tw=W/3;tracks.forEach((s,i)=>{let xx=L+i*tw; c.fillStyle='#64736c';label(s.title,xx+3,20);line(xx,T,xx,B);for(let z of [30,70])line(xx,T+z/100*H,xx+tw,T+z/100*H);const X=v=>xx+8+(v-s.min)/(s.max-s.min)*(tw-16);c.strokeStyle=s.color;c.lineWidth=3;c.beginPath();c.moveTo(X(s.values[0]),T);c.lineTo(X(s.values[0]),T+.3*H);c.lineTo(X(s.values[1]),T+.3*H);c.lineTo(X(s.values[1]),T+.7*H);c.lineTo(X(s.values[2]),T+.7*H);c.lineTo(X(s.values[2]),B);c.stroke();c.lineWidth=1;c.fillStyle='#64736c';label(i===1?'1 → 1000':s.min+' → '+s.max,xx+4,B+20)});for(let z of [0,30,70,100])label(z,L-28,T+z/100*H);label('Depth (m) ↓',L,323)}}
-$('independentCheck').onclick=()=>{let v=$('independentA').value,e=examples[active][2];$('independentFeedback').textContent=v===''?'Enter your answer first.':Math.abs(+v-e)<=Math.abs(e)*.05?'✓ Correct. Now explain which feature of the visual supports your result.':'Try again. Check units, then open the hint if needed.'};
-$('gridExport').onclick=()=>{let rows=['easting_m,northing_m,gravity_anomaly_mGal'];for(let y=-400;y<=400;y+=20)for(let x=-400;x<=400;x+=20)rows.push([x,y,sphereResponse(x,y)].join(','));let url=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'})),a=document.createElement('a');a.href=url;a.download='gravity-grid.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
-window.addEventListener('resize',renderVisuals);select(0);
+<!doctype html>
+<html lang="en">
 
-</script></body></html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>A-Factor | Geophysics Field Lab</title>
+    <style>
+        :root {
+            --bg: #f4f5f0;
+            --ink: #192e2b;
+            --green: #185c4e;
+            --muted: #64736c;
+            --line: #dce2d9;
+            --lime: #d9ee9c
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font: 15px system-ui, sans-serif
+        }
+
+        button,
+        input,
+        select {
+            font: inherit
+        }
+
+        button,
+        a {
+            -webkit-tap-highlight-color: transparent
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        header {
+            height: 76px;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4%;
+            gap: 20px
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: -1px
+        }
+
+        .brand b {
+            display: inline-grid;
+            place-items: center;
+            background: var(--green);
+            color: white;
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            margin-right: 10px
+        }
+
+        header a {
+            color: var(--green);
+            text-decoration: none;
+            font-size: 13px
+        }
+
+        .badge {
+            font-size: 11px;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--muted)
+        }
+
+        .shell {
+            display: grid;
+            grid-template-columns: 236px 1fr;
+            min-height: 100vh
+        }
+
+        aside {
+            padding: 30px 20px;
+            background: #eef1e9;
+            border-right: 1px solid var(--line)
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 22px 0
+        }
+
+        .nav button {
+            background: none;
+            border: 0;
+            text-align: left;
+            border-radius: 8px;
+            padding: 13px;
+            color: var(--muted)
+        }
+
+        .nav button.active {
+            background: var(--green);
+            color: white
+        }
+
+        .nav small {
+            display: inline-block;
+            width: 28px;
+            opacity: .65
+        }
+
+        .course {
+            border-top: 1px solid var(--line);
+            padding-top: 24px;
+            font-size: 12px;
+            line-height: 1.8;
+            color: var(--muted)
+        }
+
+        main {
+            max-width: 1450px;
+            padding: 35px 4%;
+            width: 100%
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: 700;
+            color: var(--green)
+        }
+
+        h1 {
+            font-size: 36px;
+            letter-spacing: -1.3px;
+            margin: 10px 0
+        }
+
+        p {
+            color: var(--muted);
+            line-height: 1.65
+        }
+
+        .intro {
+            max-width: 750px
+        }
+
+        .toprow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px
+        }
+
+        .pill {
+            border: 1px solid var(--line);
+            padding: 8px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            white-space: nowrap;
+            background: white
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--line);
+            gap: 25px;
+            margin: 28px 0 22px
+        }
+
+        .tabs button {
+            border: 0;
+            background: none;
+            padding: 12px 0;
+            color: var(--muted)
+        }
+
+        .tabs .active {
+            color: var(--green);
+            border-bottom: 3px solid var(--green);
+            font-weight: 700
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 285px;
+            gap: 20px
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            overflow: hidden
+        }
+
+        .cardhead {
+            padding: 19px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--line)
+        }
+
+        h2 {
+            font-size: 16px;
+            margin: 0
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 370px
+        }
+
+        .legend {
+            display: flex;
+            gap: 18px;
+            padding: 0 22px 18px;
+            color: var(--muted);
+            font-size: 12px
+        }
+
+        .dot {
+            color: #2a8975
+        }
+
+        .controls {
+            padding: 22px
+        }
+
+        .controls h2 {
+            margin-bottom: 24px
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin: 20px 0 8px
+        }
+
+        .value {
+            float: right;
+            color: var(--ink);
+            font-weight: 700
+        }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--green)
+        }
+
+        .equation {
+            background: #eef4e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 24px;
+            font-family: ui-monospace, monospace;
+            font-size: 13px;
+            line-height: 1.8
+        }
+
+        .metric {
+            background: var(--green);
+            color: white;
+            padding: 22px;
+            border-radius: 9px;
+            margin-top: 20px
+        }
+
+        .metric small {
+            opacity: .7
+        }
+
+        .metric strong {
+            display: block;
+            font-size: 28px;
+            margin-top: 7px
+        }
+
+        .bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px
+        }
+
+        .pad {
+            padding: 22px
+        }
+
+        .pad p {
+            font-size: 13px
+        }
+
+        .action {
+            background: var(--green);
+            color: white;
+            border: 0;
+            padding: 11px 16px;
+            border-radius: 7px
+        }
+
+        .secondary {
+            background: white;
+            color: var(--green);
+            border: 1px solid var(--line);
+            padding: 9px 13px;
+            border-radius: 7px
+        }
+
+        .answer {
+            padding: 10px;
+            width: 125px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            margin: 10px 8px 10px 0
+        }
+
+        #feedback {
+            font-weight: 600;
+            font-size: 13px;
+            line-height: 1.6
+        }
+
+        footer {
+            font-size: 11px;
+            color: var(--muted);
+            padding: 25px 0
+        }
+
+        .scenario {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px
+        }
+
+        .scenario button {
+            margin-top: 10px
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--line);
+            background: white;
+            border-radius: 6px
+        }
+
+        .hidden {
+            display: none !important
+        }
+
+        @media(max-width:1050px) {
+            .shell {
+                grid-template-columns: 190px 1fr
+            }
+
+            .workspace {
+                grid-template-columns: 1fr
+            }
+
+            .controls {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0 25px
+            }
+
+            .controls h2,
+            .equation,
+            .metric {
+                grid-column: 1/-1
+            }
+
+            .scenario {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:700px) {
+            header {
+                height: 65px
+            }
+
+            .shell {
+                display: block
+            }
+
+            aside {
+                padding: 12px 16px;
+                border-right: 0
+            }
+
+            .nav {
+                flex-direction: row;
+                overflow: auto;
+                margin: 8px 0
+            }
+
+            .nav button {
+                white-space: nowrap
+            }
+
+            .course,
+            aside>.badge {
+                display: none
+            }
+
+            main {
+                padding: 25px 16px
+            }
+
+            h1 {
+                font-size: 29px
+            }
+
+            .bottom {
+                grid-template-columns: 1fr
+            }
+
+            .toprow {
+                align-items: start
+            }
+
+            .pill {
+                display: none
+            }
+
+            canvas {
+                height: 310px
+            }
+
+            .brand {
+                font-size: 18px
+            }
+
+            .tabs {
+                gap: 20px;
+                font-size: 13px
+            }
+        }
+
+        .visual-grid svg path {
+            fill: none
+        }
+
+        .visual-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 22px
+        }
+
+        .visual-caption {
+            font-size: 12px;
+            margin: 0;
+            padding: 16px 20px;
+            min-height: 96px;
+            border-top: 1px solid var(--line)
+        }
+
+        #survey {
+            height: 340px
+        }
+
+        details {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 12px
+        }
+
+        summary {
+            cursor: pointer;
+            color: var(--green)
+        }
+
+        @media(max-width:1100px) {
+            .visual-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* The host Next.js page renders the shared AppHeader. */
+        .shell {
+            min-height: 100vh
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <aside>
+            <div class="badge">Virtual field school</div><a href="/geophysics/earth"
+                style="display:block;margin:18px 0;padding:13px;border-radius:8px;background:#dbe8d4;color:#185c4e;text-decoration:none;font-weight:700" target="_top">◉
+                Earth Explorer ↗</a><a href="/geophysics/solar"
+                style="display:block;margin:12px 0;color:#185c4e;text-decoration:none;font-weight:700" target="_top">☀ Solar System
+                ↗</a><a href="/geophysics/tectonics"
+                style="display:block;margin:12px 0;color:#185c4e;text-decoration:none;font-weight:700" target="_top">▱ Tectonics &
+                Shape ↗</a>
+            <nav class="nav" id="nav"></nav>
+            <div class="course"><b>AUI-PHY 407 · 2 Units</b><br>Augustine University<br>Department of
+                Physics<br><br>Based on lecture notes by<br><b>Fatai Olalekan Dawodu</b><br><br>Explore → Predict →
+                Measure<br>→ Explain</div>
+        </aside>
+        <main>
+            <div class="toprow">
+                <div>
+                    <div class="eyebrow">THE GEOPHYSICS FIELD LAB</div>
+                    <h1 id="title"></h1>
+                </div><span class="pill">● Interactive learning workspace</span>
+            </div>
+            <p class="intro" id="intro"></p>
+            <div class="tabs"><button class="active" data-tab="lab">Experiment</button><button data-tab="guide">Field
+                    guide</button><button data-tab="missions">Exploration missions</button></div>
+            <div id="lab">
+                <div class="workspace">
+                    <section class="card">
+                        <div class="cardhead">
+                            <h2 id="plotTitle"></h2><button class="secondary" id="reset">↺ Reset</button>
+                        </div><canvas id="plot" aria-label="Interactive geophysical response graph" role="img"></canvas>
+                        <div class="legend"><span class="dot">● Model response</span><span>Idealised teaching model · SI
+                                inputs</span></div>
+                    </section>
+                    <section class="card controls">
+                        <h2>Model parameters</h2>
+                        <div id="sliders"></div>
+                        <div class="equation" id="formula"></div>
+                        <div class="metric"><small id="metricLabel"></small><strong id="metric"></strong></div>
+                    </section>
+                </div>
+                <div class="bottom">
+                    <section class="card pad">
+                        <div class="eyebrow">01 / OBSERVE & EXPLAIN</div>
+                        <h2 style="margin-top:12px">Make the connection</h2>
+                        <p id="observe"></p><button class="secondary" id="export">↓ Export measurements (CSV)</button>
+                    </section>
+                    <section class="card pad">
+                        <div class="eyebrow">02 / CHECK YOUR UNDERSTANDING</div>
+                        <p id="question"></p><input class="answer" type="number" id="answer"
+                            aria-label="Your numerical answer" placeholder="Your answer"><button class="action"
+                            id="check">Check answer</button>
+                        <div id="feedback" aria-live="polite"></div><small style="color:var(--muted)">Numerical
+                            tolerance: ±5%. Answers update with your model.</small>
+                    </section>
+                </div>
+            </div>
+            <div id="guide" class="hidden card pad"></div>
+            <div id="missions" class="hidden"></div>
+            <footer>AUI-PHY 407 · Geophysics • Teaching simulations, not field inversion or resource certification.
+                Progress is saved on this browser.</footer>
+        </main>
+    </div>
+    <script>
+        const modules = [
+            { name: 'Gravity', chapter: 'Chapter 4', title: 'Read the unseen with gravity.', intro: 'Explore how a buried density contrast changes the gravity measured at the surface. Move from a subsurface model to a survey response.', plot: 'Gravity anomaly · buried sphere', params: [['depth', 'Centre depth', 50, 300, 100, 1, 'm'], ['radius', 'Sphere radius', 5, 40, 25, 1, 'm'], ['density', 'Density contrast', -800, 800, 500, 10, 'kg/m³']], formula: 'Δg = G (4πR³/3) Δρ z / (x² + z²)³ᐟ²<br>1 mGal = 10⁻⁵ m/s²', observe: 'Increase depth while keeping radius and density contrast fixed. The anomaly becomes broader and weaker. Negative contrasts produce negative anomalies. Different size–depth combinations can give similar signals: gravity interpretation is non-unique.', assume: 'Homogeneous sphere in a uniform host; surface profile passes over its centre. Radius is smaller than centre depth. Terrain, latitude, drift, free-air and Bouguer corrections are excluded.', goal: 'Predict the peak anomaly above the sphere in mGal.', label: 'Peak anomaly', unit: 'mGal', axis: ['Distance from target (m)', 'Gravity anomaly (mGal)'] },
+            { name: 'Resistivity', chapter: 'Chapter 5', title: 'Probe the ground with current.', intro: 'Build a Wenner survey over a uniform half-space. See how electrode spacing and rock resistivity control the measured voltage.', plot: 'Wenner array · homogeneous earth', params: [['rho', 'Ground resistivity', 10, 1000, 100, 10, 'Ω·m'], ['current', 'Injected current', 10, 200, 50, 1, 'mA'], ['spacing', 'Electrode spacing', 1, 50, 10, 1, 'm']], formula: 'ρₐ = 2πa ΔV / I<br>ΔV = ρ I / (2πa)', observe: 'Increase spacing and observe the voltage fall. The recovered apparent resistivity stays equal to the true resistivity for this uniform model. In layered ground, apparent resistivity is an integrated response, not a direct depth reading.', assume: 'Point electrodes, flat surface, isotropic homogeneous half-space and negligible contact resistance. This is not a layered VES or ERT solver. Larger spacing does not correspond to one exact investigation depth.', goal: 'Calculate the measured voltage at the selected spacing in mV.', label: 'Measured potential difference', unit: 'mV', axis: ['Electrode spacing (m)', 'Voltage (mV)'] },
+            { name: 'Seismic', chapter: 'Chapter 6', title: 'Listen to the layers below.', intro: 'Compare direct, reflected and critically refracted arrivals above a horizontal interface. Discover where the head wave becomes the first arrival.', plot: 'Two-layer seismic travel times', params: [['v1', 'Upper-layer velocity', 300, 1800, 1000, 50, 'm/s'], ['v2', 'Lower-layer velocity', 2000, 5000, 3000, 50, 'm/s'], ['h', 'Interface depth', 5, 100, 30, 1, 'm']], formula: 'tᵈ = x/v₁; tʳ = √(x²+4h²)/v₁<br>i꜀ = asin(v₁/v₂)<br>tʰ = x/v₂ + 2h cos(i꜀)/v₁', observe: 'The direct wave arrives first at short offsets. Beyond the crossover, the critically refracted wave arrives first. Reflection follows a hyperbola. Increasing interface depth increases the intercept time and crossover distance.', assume: 'Flat horizontal interface, constant isotropic velocities, v₂ > v₁, no attenuation or noise. Head-wave branch is plotted only beyond its minimum emergence offset. Refraction cannot resolve every hidden or low-velocity layer.', goal: 'Calculate the zero-offset two-way reflection time in ms.', label: 'Zero-offset reflection time', unit: 'ms', axis: ['Source–receiver offset (m)', 'Travel time (ms)'] },
+            { name: 'Electromagnetics', chapter: 'Chapter 7', title: 'Explore depth through attenuation.', intro: 'Investigate the link between frequency, resistivity and electromagnetic skin depth. Watch the field decay as it travels into the Earth.', plot: 'EM amplitude · conductive half-space', params: [['rho', 'Ground resistivity', 1, 500, 100, 1, 'Ω·m'], ['freq', 'Frequency', 10, 10000, 1000, 10, 'Hz']], formula: 'δ ≈ 503 √(ρ/f) metres<br>A(z)/A₀ = exp(−z/δ)', observe: 'Lower frequency or higher resistivity increases skin depth. At one skin depth the amplitude is about 37% of its surface value. Skin depth is an attenuation scale; it is not a guaranteed target detection depth.', assume: 'Plane wave, non-magnetic homogeneous good conductor; displacement currents neglected. This model does not simulate a specific FDEM coil, TEM transient, VLF geometry or GPR pulse.', goal: 'Calculate the skin depth in metres.', label: 'Skin depth · 1/e amplitude', unit: 'm', axis: ['Depth (m)', 'Relative amplitude'] },
+            { name: 'Well logging', chapter: 'Chapter 8', title: 'Translate a log into rock properties.', intro: 'Use the density-porosity relationship to estimate pore space. Explore how matrix and fluid densities affect the bulk density measured by a well log.', plot: 'Density log interpretation · clean formation', params: [['matrix', 'Matrix density', 2400, 2900, 2650, 10, 'kg/m³'], ['fluid', 'Fluid density', 700, 1200, 1000, 10, 'kg/m³'], ['porosity', 'Porosity', 0, 45, 20, 1, '%']], formula: 'ρᵦ = (1−φ)ρₘₐ + φρ𝒻<br>φ = (ρₘₐ−ρᵦ)/(ρₘₐ−ρ𝒻)', observe: 'Higher porosity lowers bulk density when pore fluid is less dense than the rock matrix. Density alone does not identify oil or gas. Combine gamma ray, resistivity, neutron and sonic information with geological context.', assume: 'Clean single-mineral formation, uniform fully fluid-filled pores; no shale, gas correction, washout, invasion or tool effects. The chart is a mixing model, not a synthetic multi-tool borehole log.', goal: 'Calculate the bulk density at the selected porosity in kg/m³.', label: 'Formation bulk density', unit: 'kg/m³', axis: ['Porosity (%)', 'Bulk density (kg/m³)'] }];
+        let active = 0, p = {}, data = [], expected = 0; const $ = id => document.getElementById(id); let completed = {}; try { completed = JSON.parse(localStorage.getItem('afactor-geo-progress') || '{}') } catch { }
+        function select(i) { active = i; p = {}; const m = modules[i]; m.params.forEach(q => p[q[0]] = q[4]); $('nav').innerHTML = modules.map((m, j) => `<button class="${j === i ? 'active' : ''}" onclick="select(${j})"><small>0${j + 1}</small>${m.name} ${completed[j] ? '✓' : ''}</button>`).join(''); $('title').textContent = m.title; $('intro').textContent = m.intro; $('plotTitle').textContent = m.plot; $('formula').innerHTML = m.formula; $('observe').textContent = m.observe; $('question').textContent = m.goal; $('metricLabel').textContent = m.label; $('answer').value = ''; $('feedback').textContent = ''; $('sliders').innerHTML = m.params.map(([k, n, min, max, val, step, u]) => `<label for="${k}">${n}<span class="value" id="val-${k}">${val} ${u}</span></label><input id="${k}" type="range" min="${min}" max="${max}" value="${val}" step="${step}" oninput="update('${k}',this.value)">`).join(''); $('guide').innerHTML = `<div class="eyebrow">${m.chapter} / LECTURE CONNECTION</div><h1>${m.name}</h1><p>${m.observe}</p><h2>Model assumptions & limits</h2><p>${m.assume}</p><h2>Suggested field exercise</h2><p>Before moving a slider, predict whether the response will increase, decrease, or remain unchanged. Change one variable at a time. Export two datasets, compare their shapes and values, and explain the result using the equation. State one alternative geological explanation and one complementary method.</p><h2>Course coverage</h2><p>Chapters 1–3: geological context, method selection, acquisition and interpretation. Chapters 4–8: the five numerical labs. Chapters 9–10: integrated exploration and engineering missions. These labs support the notes; they do not replace geological maps, field acquisition or inversion training.</p>`; draw() }
+        function update(k, v) { p[k] = +v; const q = modules[active].params.find(x => x[0] === k); $('val-' + k).textContent = v + ' ' + q[6]; $('feedback').textContent = ''; draw() }
+        function compute() { const m = modules[active]; let series = []; if (active === 0) { const f = x => 6.67430e-11 * 4 * Math.PI / 3 * p.radius ** 3 * p.density * p.depth / (x * x + p.depth * p.depth) ** 1.5 * 1e5; data = Array.from({ length: 201 }, (_, i) => [-600 + i * 6, f(-600 + i * 6)]); expected = f(0); series = [{ color: '#277c69', points: data }] } if (active === 1) { const f = a => p.rho * p.current / (2 * Math.PI * a); data = Array.from({ length: 100 }, (_, i) => [1 + i * .5, f(1 + i * .5)]); expected = f(p.spacing); series = [{ color: '#277c69', points: data }] } if (active === 2) { let c = Math.sqrt(1 - (p.v1 / p.v2) ** 2), min = 2 * p.h * Math.tan(Math.asin(p.v1 / p.v2)); data = Array.from({ length: 151 }, (_, i) => { let x = i * 4; return [x, x / p.v1 * 1000, Math.hypot(x, 2 * p.h) / p.v1 * 1000, x >= min ? (x / p.v2 + 2 * p.h * c / p.v1) * 1000 : null] }); series = [1, 2, 3].map((j) => ({ color: ['', '#277c69', '#d08d45', '#6689bc'][j], points: data.filter(r => r[j] !== null).map(r => [r[0], r[j]]) })); expected = 2 * p.h / p.v1 * 1000 } if (active === 3) { expected = 503 * Math.sqrt(p.rho / p.freq); data = Array.from({ length: 121 }, (_, i) => [i * expected * 4 / 120, Math.exp(-i * 4 / 120)]); series = [{ color: '#277c69', points: data }] } if (active === 4) { const f = x => (1 - x / 100) * p.matrix + x / 100 * p.fluid; data = Array.from({ length: 46 }, (_, i) => [i, f(i)]); expected = f(p.porosity); series = [{ color: '#277c69', points: data }] } $('metric').textContent = expected.toFixed(active === 0 ? 4 : 1) + ' ' + m.unit; return series }
+        function draw() { let series = compute(), canvas = $('plot'), w = canvas.clientWidth, h = canvas.clientHeight, dpr = window.devicePixelRatio || 1; canvas.width = w * dpr; canvas.height = h * dpr; let ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr); const pts = series.flatMap(s => s.points); let xmin = Math.min(...pts.map(q => q[0])), xmax = Math.max(...pts.map(q => q[0])), ymin = Math.min(0, ...pts.map(q => q[1])), ymax = Math.max(...pts.map(q => q[1])); if (ymax - ymin < 1e-10) { ymin = -1; ymax = 1 } let span = ymax - ymin; ymin -= span * .08; ymax += span * .12; const L = 76, R = w - 27, T = 35, B = h - 60, X = x => L + (x - xmin) / (xmax - xmin) * (R - L), Y = y => B - (y - ymin) / (ymax - ymin) * (B - T); ctx.font = '11px system-ui'; ctx.textAlign = 'right'; for (let i = 0; i <= 4; i++) { let y = ymin + (ymax - ymin) * i / 4; ctx.strokeStyle = '#e7ece6'; ctx.beginPath(); ctx.moveTo(L, Y(y)); ctx.lineTo(R, Y(y)); ctx.stroke(); ctx.fillStyle = '#6b7a73'; ctx.fillText(Math.abs(y) < 1 ? y.toFixed(3) : y.toFixed(0), L - 10, Y(y) + 4) } ctx.textAlign = 'center'; for (let i = 0; i <= 4; i++) { let x = xmin + (xmax - xmin) * i / 4; ctx.fillText(x.toFixed(0), X(x), B + 22) } for (let s of series) { ctx.beginPath(); ctx.strokeStyle = s.color; ctx.lineWidth = 3; s.points.forEach((q, i) => i ? ctx.lineTo(X(q[0]), Y(q[1])) : ctx.moveTo(X(q[0]), Y(q[1]))); ctx.stroke() } ctx.fillStyle = '#66776c'; ctx.fillText(modules[active].axis[0], (L + R) / 2, h - 13); ctx.save(); ctx.translate(17, (B + T) / 2); ctx.rotate(-Math.PI / 2); ctx.fillText(modules[active].axis[1], 0, 0); ctx.restore(); ctx.textAlign = 'left'; ctx.fillStyle = '#192e2b'; ctx.font = '12px system-ui'; ctx.fillText(active === 2 ? 'Green: direct    Amber: reflection    Blue: head wave' : 'Forward model • ' + modules[active].chapter, L, 20); if (active === 0) { ctx.setLineDash([4, 4]); ctx.strokeStyle = '#afc4b7'; ctx.beginPath(); ctx.moveTo(X(0), T); ctx.lineTo(X(0), B); ctx.stroke() } }
+        $('reset').onclick = () => select(active); $('check').onclick = () => { const raw = $('answer').value; if (raw.trim() === '') { $('feedback').textContent = 'Enter your calculated value first.'; return } let ok = Math.abs(+raw - expected) <= Math.max(Math.abs(expected) * .05, 1e-6); $('feedback').textContent = ok ? '✓ Correct. Explain the trend in your own words before changing the model.' : `Try again. Substitute your current inputs into the displayed equation. Model value: ${expected.toFixed(active === 0 ? 4 : 2)} ${modules[active].unit}.`; $('feedback').style.color = ok ? '#185c4e' : '#9b541f'; if (ok) { completed[active] = true; try { localStorage.setItem('afactor-geo-progress', JSON.stringify(completed)) } catch { } } }; $('export').onclick = () => { let lines = ['# A-Factor Geophysics Lab: ' + modules[active].name, '# Parameters: ' + JSON.stringify(p), '# ' + modules[active].assume, active === 2 ? 'offset_m,direct_ms,reflection_ms,head_wave_ms' : modules[active].axis.join(',')]; lines.push(...data.map(r => r.join(','))); let url = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' })), a = document.createElement('a'); a.href = url; a.download = 'geophysics-' + modules[active].name.toLowerCase() + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000) }; document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { document.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('active', x === b));['lab', 'guide', 'missions'].forEach(id => $(id).classList.toggle('hidden', id !== b.dataset.tab)); if (b.dataset.tab === 'lab') draw() });
+        const missions = [['Groundwater · Chapter 9', 'A village needs a borehole in weathered crystalline terrain. Which first survey best maps electrical contrasts associated with weathering and fractures?', ['Electrical resistivity', 'Gravity only', 'Gamma-ray satellite image'], 0, 'Resistivity can help map weathered/fractured zones. Clay and saline water may also be conductive; confirm with geology, drilling and water-quality testing.'], ['Engineering · Chapter 10', 'A proposed building site may contain shallow cavities. Which workflow best reduces interpretation risk?', ['One gravity reading', 'Combine microgravity with ERT or suitable GPR, then verify', 'Assume every low resistivity zone is a cavity'], 1, 'Combine complementary physical properties and ground truth. A gravity low is non-unique; GPR performance depends strongly on conductivity and access.'], ['Hydrocarbons · Chapters 1–3, 9', 'A seismic survey maps an anticline. What can be concluded?', ['Oil is proven', 'A possible structural trap needs further evaluation', 'All folded rocks contain gas'], 1, 'Structure alone does not prove hydrocarbons. Source, maturation, migration, reservoir, seal and timing must all be evaluated; well evidence is needed.']]; $('missions').innerHTML = '<div class="scenario">' + missions.map((m, i) => `<section class="card pad"><div class="eyebrow">MISSION 0${i + 1}</div><h2 style="margin-top:16px">${m[0]}</h2><p>${m[1]}</p><select id="mission-${i}" aria-label="${m[0]} answer"><option value="">Choose an interpretation</option>${m[2].map((s, j) => `<option value="${j}">${s}</option>`).join('')}</select><button class="action" onclick="grade(${i})">Review interpretation</button><p id="mf-${i}" aria-live="polite"></p></section>`).join(''); function grade(i) { let val = $('mission-' + i).value; $('mf-' + i).textContent = val === '' ? 'Choose an answer first.' : (+val === missions[i][3] ? '✓ Correct. ' : 'Reconsider. ') + missions[i][4] } window.addEventListener('resize', draw); select(0);
+        // Linked visual interpretation layer: analytical models are distinguished from illustrations.
+        const visualPanel = document.createElement('section'); visualPanel.className = 'visual-grid'; visualPanel.innerHTML = `<section class="card"><div class="cardhead"><h2>1 · See the physical setup</h2><span class="badge">MODEL</span></div><div id="earthModel"></div><p class="visual-caption" id="earthCaption"></p></section><section class="card"><div class="cardhead"><h2 id="mapTitle">2 · Read the survey</h2><button class="secondary" id="gridExport">Export map CSV</button></div><canvas id="survey" aria-label="Linked two-dimensional survey visual" role="img"></canvas><p class="visual-caption" id="mapCaption"></p></section>`; $('lab').prepend(visualPanel);
+        const practice = document.createElement('section'); practice.className = 'bottom'; practice.innerHTML = `<section class="card pad"><div class="eyebrow">03 / WORKED SNIPPET</div><div id="worked"></div></section><section class="card pad"><div class="eyebrow">04 / TRY IT YOURSELF</div><p id="independentQ"></p><input class="answer" id="independentA" type="number" aria-label="Independent practice answer" placeholder="Your answer"><button class="action" id="independentCheck">Check attempt</button><p id="independentFeedback" aria-live="polite"></p><details><summary>Hint and worked solution</summary><p id="independentSolution"></p></details></section>`; $('lab').append(practice);
+        modules[0].params.push(['line', 'Survey-line northing', -300, 300, 0, 10, 'm']);
+        const examples = [
+            ['A sphere with R = 25 m, z = 100 m and Δρ = 500 kg/m³ gives Δg(0,0) = 0.02184 mGal. At x = 100 m, y = 0, the signal is 0.00772 mGal. The centre is strongest; each contour joins positions with the same anomaly.', 'Use the same sphere. At x = 0, y = 100 m, calculate Δg in mGal.', .007722, 'Use r² = x² + y² + z². Δg = 0.0218412 / 2³ᐟ² = 0.007722 mGal. Equal horizontal distances from the centre give equal responses.'],
+            ['For ρ = 100 Ω·m, I = 50 mA and a = 10 m: ΔV = (100 × 0.05)/(2π × 10) = 0.07958 V = 79.58 mV. Substitution into ρₐ = 2πaΔV/I returns 100 Ω·m at every station in this uniform earth.', 'For ρ = 200 Ω·m, I = 50 mA and a = 20 m, calculate ΔV in mV.', 79.5775, 'Convert 50 mA to 0.05 A. ΔV = (200 × 0.05)/(2π × 20) = 0.07958 V = 79.58 mV.'],
+            ['For h = 30 m and v₁ = 1000 m/s, the vertical reflected path is 60 m, so t₀ = 2h/v₁ = 60 ms. With v₂ = 3000 m/s, the critical angle is 19.47° from the normal.', 'A reflection returns after 80 ms through an upper layer with v₁ = 1500 m/s. Estimate interface depth in metres.', 60, 'Convert 80 ms to 0.080 s. h = v₁t₀/2 = 1500 × 0.080 / 2 = 60 m.'],
+            ['At ρ = 100 Ω·m and f = 1000 Hz, δ = 503√(100/1000) = 159.06 m. At z = δ, A/A₀ = e⁻¹ = 0.3679. This is attenuation, not a sharp depth boundary.', 'At two skin depths, what percentage of the surface amplitude remains?', 13.5335, 'A/A₀ = e⁻² = 0.135335. Multiply by 100: 13.53%.'],
+            ['For ρₘₐ = 2650 kg/m³, ρ𝒻 = 1000 kg/m³ and φ = 0.20, ρᵦ = 0.8(2650) + 0.2(1000) = 2320 kg/m³. The lower density in the clean reservoir interval is consistent with more pore space in this idealised model.', 'A clean formation has bulk density 2155 kg/m³, matrix density 2650 kg/m³ and fluid density 1000 kg/m³. Estimate porosity in percent.', 30, 'φ = (2650 − 2155)/(2650 − 1000) = 495/1650 = 0.30 = 30%.']];
+        function svgSetup(content) { return `<svg viewBox="0 0 600 300" role="img" aria-label="${modules[active].name} physical setup" style="width:100%;display:block;background:#f7f7ef"><rect x="45" y="65" width="520" height="210" fill="#e7d9b9"/><path d="M45 65H565" stroke="#476b4b" stroke-width="5"/>${content}</svg>` }
+        function sphereResponse(x, y) { return 6.67430e-11 * 4 * Math.PI / 3 * p.radius ** 3 * p.density * p.depth / (x * x + y * y + p.depth * p.depth) ** 1.5 * 1e5 }
+        const originalCompute = compute; compute = function () { let s = originalCompute(); if (active === 0) { data = Array.from({ length: 201 }, (_, i) => [-600 + i * 6, sphereResponse(-600 + i * 6, p.line)]); s = [{ color: '#277c69', points: data }]; expected = sphereResponse(0, p.line); $('metricLabel').textContent = 'Peak along selected survey line'; $('metric').textContent = expected.toFixed(4) + ' mGal'; $('question').textContent = 'Calculate the peak anomaly on the selected survey line (x = 0) in mGal.'; $('formula').innerHTML = 'Δg = G (4πR³/3) Δρ z / (x²+y²+z²)³ᐟ²<br>Survey line: y = ' + p.line + ' m' } return s };
+        const oldSelect = select; select = function (i) { oldSelect(i); $('worked').innerHTML = '<p>' + examples[i][0] + '</p>'; $('independentQ').textContent = examples[i][1]; $('independentSolution').textContent = examples[i][3]; $('independentA').value = ''; $('independentFeedback').textContent = ''; document.querySelectorAll('details').forEach(e => e.open = false); renderVisuals() };
+        const oldDraw = draw; draw = function () { oldDraw(); renderVisuals() };
+        function renderVisuals() {
+            if (!document.getElementById('survey')) return; let body = '', caption = '', mapCaption = ''; const text = (x, y, t) => `<text x="${x}" y="${y}" fill="#263e35" font-size="13" font-family="system-ui">${t}</text>`;
+            if (active === 0) { let cy = 65 + p.depth / 300 * 170, r = p.radius / 300 * 170; body = `<circle cx="305" cy="${cy}" r="${r}" fill="${p.density < 0 ? '#6098ba' : '#bc7542'}" stroke="#674e34"/><path d="M305 65V${cy}" stroke="#4f6855" stroke-dasharray="4 4"/>` + text(315, (65 + cy) / 2, 'z = ' + p.depth + ' m') + text(65, 35, 'Surface survey grid · target centred at (0, 0)') + text(65, 250, 'Sphere R = ' + p.radius + ' m · Δρ = ' + p.density + ' kg/m³'); caption = 'Section through the target centre. The surface map is a plan view, not a depth slice. Positive contrast = excess mass; negative contrast = mass deficit.'; $('mapTitle').textContent = '2 · Gravity contour map · plan view'; mapCaption = 'Easting x and northing y in metres; anomaly in mGal. Contour labels are signed values. Dashed line selects the profile below. The colour scale updates with the model; compare numerical values across runs.' }
+            if (active === 1) { body = [120, 235, 350, 465].map((x, i) => `<path d="M${x} 50V85" stroke="#1b6152" stroke-width="3"/>` + text(x - 10, 40, ['C₁', 'P₁', 'P₂', 'C₂'][i])).join('') + text(150, 120, '← a →          ← a →          ← a →') + text(80, 175, 'Uniform half-space: ρ = ' + p.rho + ' Ω·m') + text(80, 210, 'Current ' + p.current + ' mA · spacing ' + p.spacing + ' m'); caption = 'Wenner geometry is schematic. The spacing slider changes all three electrode separations equally.'; $('mapTitle').textContent = '2 · Uniform-earth pseudosection'; mapCaption = 'Apparent resistivity (Ω·m) at array midpoints and spacing levels. Vertical axis is spacing a (m), NOT true depth. Constant colour is the correct homogeneous-earth result. No layered response or inversion is implied.' }
+            if (active === 2) { let sy = 65 + p.h / 100 * 125; let angle = Math.asin(p.v1 / p.v2), dx = (sy - 65) * Math.tan(angle); body = `<rect x="45" y="${sy}" width="520" height="${275 - sy}" fill="#d4b68c"/><path d="M45 ${sy}H565" stroke="#95724d"/><path d="M100 65L450 65" stroke="#277c69" stroke-width="3"/><path d="M100 65L275 ${sy}L450 65" stroke="#d08d45" stroke-width="3"/><path d="M100 65L${100 + dx} ${sy}H${450 - dx}L450 65" stroke="#6689bc" stroke-width="3"/>` + text(70, 35, 'Source ●') + text(420, 35, 'Receiver ▼') + text(55, sy - 12, 'v₁ = ' + p.v1 + ' m/s') + text(65, 250, 'v₂ = ' + p.v2 + ' m/s · h = ' + p.h + ' m'); caption = 'Schematic direct (green), reflected (amber) and head-wave (blue) paths. The head-wave legs use the critical angle; drawing width is not an offset scale.'; $('mapTitle').textContent = '2 · Synthetic shot gather'; mapCaption = 'Horizontal: receiver offset (m). Vertical: time (ms), increasing downward. Synthetic pulses use the same arrival times as the travel-time curves below. Display amplitudes are illustrative; no wave-equation or reflection-coefficient modelling.' }
+            if (active === 3) { body = `<path d="M150 40Q180 0 210 40M150 40H210" fill="none" stroke="#1b6152" stroke-width="4"/><path d="M180 65V245" stroke="#517d6b" stroke-dasharray="6 4"/>` + text(225, 40, 'Incident field · ' + p.freq + ' Hz') + text(225, 130, 'A(z) = A₀ exp(−z/δ)') + text(225, 180, 'δ = ' + expected.toFixed(1) + ' m') + text(65, 255, 'Uniform conductor · ρ = ' + p.rho + ' Ω·m'); caption = 'Plane-wave attenuation model. The coil symbol indicates excitation schematically; this is not a finite-coil instrument simulation.'; $('mapTitle').textContent = '2 · Field attenuation section'; mapCaption = 'Horizontal position (m) and depth (m). Colour shows A/A₀. In a uniform earth, amplitude varies with depth only; lateral uniformity is expected. Depth range scales with δ: compare labelled values, not colour alone.' }
+            if (active === 4) { body = `<rect x="45" y="65" width="520" height="65" fill="#c7bcaa"/><rect x="45" y="130" width="520" height="80" fill="#edc989"/><rect x="45" y="210" width="520" height="65" fill="#c7bcaa"/><rect x="170" y="65" width="22" height="210" fill="#57635d"/>` + text(220, 100, 'Shale cap · 0–30 m') + text(220, 165, 'Clean reservoir · 30–70 m') + text(220, 190, 'Porosity ' + p.porosity + '% · density ' + expected.toFixed(0) + ' kg/m³') + text(220, 250, 'Shale · 70–100 m'); caption = 'Illustrative three-layer borehole. Sliders control the clean reservoir density; shale properties are fixed teaching presets.'; $('mapTitle').textContent = '2 · Correlated well-log tracks'; mapCaption = 'Shared depth axis in metres. Gamma ray (API) and resistivity (Ω·m, log scale) are illustrative lithology presets; density (kg/m³) in the reservoir is calculated from your mixing model. These tracks do not establish hydrocarbon presence.' }
+            $('earthModel').innerHTML = svgSetup(body); $('earthCaption').textContent = caption; $('mapCaption').textContent = mapCaption; $('gridExport').hidden = active !== 0; drawSurvey()
+        }
+        function drawSurvey() {
+            let cv = $('survey'), w = cv.clientWidth, h = 340, dpr = window.devicePixelRatio || 1; if (w < 140) return; cv.width = w * dpr; cv.height = h * dpr; let c = cv.getContext('2d'); c.scale(dpr, dpr); let L = 60, R = w - 55, T = 35, B = 280, W = R - L, H = B - T; c.font = '11px system-ui'; c.fillStyle = '#64736c'; const label = (s, x, y) => c.fillText(s, x, y); const line = (x, y, x2, y2, color = '#cfdbcf') => { c.strokeStyle = color; c.beginPath(); c.moveTo(x, y); c.lineTo(x2, y2); c.stroke() };
+            if (active === 0) { W = H = Math.min(W, H); L = (w - W) / 2; R = L + W; B = T + H; let peak = sphereResponse(0, 0), extent = 400, X = x => L + (x + extent) / 800 * W, Y = y => B - (y + extent) / 800 * H; for (let j = 0; j < 70; j++)for (let i = 0; i < 90; i++) { let x = -400 + (i + .5) * 800 / 90, y = 400 - (j + .5) * 800 / 70, v = peak === 0 ? 0 : Math.abs(sphereResponse(x, y) / peak); c.fillStyle = peak === 0 ? '#eef2e9' : `hsl(${peak < 0 ? 207 : 153} ${25 + v * 40}% ${96 - v * 65}%)`; c.fillRect(L + i * W / 90, T + j * H / 70, W / 90 + 1, H / 70 + 1) } for (let fraction of [.1, .25, .5, .75]) { let radius = p.depth * Math.sqrt(fraction ** (-2 / 3) - 1); if (radius > 400 || peak === 0) continue; c.strokeStyle = '#506e64'; c.lineWidth = 1; c.beginPath(); c.ellipse(X(0), Y(0), radius / 800 * W, radius / 800 * H, 0, 0, Math.PI * 2); c.stroke(); c.fillStyle = '#173b32'; let angle = { 0.1: 0.65, 0.25: 2.5, 0.5: 4, 0.75: 5.4 }[fraction]; label((peak * fraction).toFixed(4), X(radius * Math.cos(angle)) + 3, Y(radius * Math.sin(angle)) - 3) } c.setLineDash([6, 4]); line(L, Y(p.line), R, Y(p.line), '#a34f30'); c.setLineDash([]); c.fillStyle = '#a34f30'; label('y = ' + p.line + ' m', L + 5, Y(p.line) - 5); c.fillStyle = '#64736c'; for (let v of [-400, 0, 400]) { label(v, X(v) - 10, B + 18); label(v, L - 32, Y(v) + 3) } label('Easting x (m)', L + W / 2 - 35, 323); label('Northing y (m)', L, 20); label('mGal · centre ' + peak.toFixed(4), L, T + 15); return }
+            if (active === 1) { c.fillStyle = '#bdd7b8'; c.fillRect(L, T, W, H); let rows = [1, 2, 3, 4, 5].map(v => v * p.spacing); for (let a of rows) { let yy = T + a / (p.spacing * 6) * H; for (let x = 0; x < 9; x++) { c.beginPath(); c.fillStyle = '#255e4c'; c.arc(L + 25 + x * (W - 50) / 8, yy, 3, 0, 7); c.fill() } c.fillStyle = '#64736c'; label(a.toFixed(0), L - 30, yy + 3) } label('Spacing a (m) · pseudo-depth coordinate', L, 20); label('Array midpoint x (m)', L + 25, 323); label('0', L, B + 18); label('200', R - 22, B + 18); label('ρₐ = ' + p.rho + ' Ω·m at every point', L + 10, B - 15); return }
+            if (active === 2) { let maxT = Math.max(...data.map(r => r[2])) * 1.1; for (let j = 0; j < 40; j++) { let x = j * 600 / 39, yy = T; c.strokeStyle = '#26715f'; c.beginPath(); for (let t = 0; t <= maxT; t += maxT / 350) { let ic = Math.asin(p.v1 / p.v2), headMin = 2 * p.h * Math.tan(ic); let ts = [x / p.v1 * 1000, Math.hypot(x, 2 * p.h) / p.v1 * 1000, ...(x >= headMin ? [(x / p.v2 + 2 * p.h * Math.cos(ic) / p.v1) * 1000] : [])]; let amp = ts.reduce((s, tt) => { let q = (t - tt) / 5; return s + (1 - 2 * q * q) * Math.exp(-q * q) }, 0); let xx = L + j * W / 39 + amp * 4; yy = T + t / maxT * H; t === 0 ? c.moveTo(xx, yy) : c.lineTo(xx, yy) } c.stroke() } c.fillStyle = '#64736c'; for (let i = 0; i <= 4; i++) { label((maxT * i / 4).toFixed(0), L - 30, T + H * i / 4); label((600 * i / 4).toFixed(0), L + W * i / 4 - 10, B + 20) } label('Time (ms) ↓', L, 20); label('Receiver offset (m)', L + W / 2 - 50, 323); return }
+            if (active === 3) { let delta = 503 * Math.sqrt(p.rho / p.freq); for (let j = 0; j < 100; j++) { let a = Math.exp(-j * 4 / 100); c.fillStyle = `hsl(153 38% ${96 - a * 65}%)`; c.fillRect(L, T + j * H / 100, W, H / 100 + 1) } for (let i = 0; i <= 4; i++) { let yy = T + i * H / 4; line(L, yy, R, yy, '#a7b7a4'); c.fillStyle = '#64736c'; label((delta * i).toFixed(0), L - 40, yy + 3); label('A/A₀ = ' + Math.exp(-i).toFixed(3), L + 10, yy + 15) } label('Depth (m) ↓', L, 20); label('Lateral position (m): 0 → 200', L, 323); return }
+            if (active === 4) { const tracks = [{ title: 'Gamma (API)', min: 0, max: 150, values: [110, 25, 110], color: '#b98a3f' }, { title: 'ρ (Ω·m, log)', min: 0, max: 3, values: [Math.log10(8), Math.log10(100), Math.log10(8)], color: '#5d88b4' }, { title: 'Density (kg/m³)', min: 1500, max: 3000, values: [2500, expected, 2500], color: '#277c69' }]; let tw = W / 3; tracks.forEach((s, i) => { let xx = L + i * tw; c.fillStyle = '#64736c'; label(s.title, xx + 3, 20); line(xx, T, xx, B); for (let z of [30, 70]) line(xx, T + z / 100 * H, xx + tw, T + z / 100 * H); const X = v => xx + 8 + (v - s.min) / (s.max - s.min) * (tw - 16); c.strokeStyle = s.color; c.lineWidth = 3; c.beginPath(); c.moveTo(X(s.values[0]), T); c.lineTo(X(s.values[0]), T + .3 * H); c.lineTo(X(s.values[1]), T + .3 * H); c.lineTo(X(s.values[1]), T + .7 * H); c.lineTo(X(s.values[2]), T + .7 * H); c.lineTo(X(s.values[2]), B); c.stroke(); c.lineWidth = 1; c.fillStyle = '#64736c'; label(i === 1 ? '1 → 1000' : s.min + ' → ' + s.max, xx + 4, B + 20) }); for (let z of [0, 30, 70, 100]) label(z, L - 28, T + z / 100 * H); label('Depth (m) ↓', L, 323) }
+        }
+        $('independentCheck').onclick = () => { let v = $('independentA').value, e = examples[active][2]; $('independentFeedback').textContent = v === '' ? 'Enter your answer first.' : Math.abs(+v - e) <= Math.abs(e) * .05 ? '✓ Correct. Now explain which feature of the visual supports your result.' : 'Try again. Check units, then open the hint if needed.' };
+        $('gridExport').onclick = () => { let rows = ['easting_m,northing_m,gravity_anomaly_mGal']; for (let y = -400; y <= 400; y += 20)for (let x = -400; x <= 400; x += 20)rows.push([x, y, sphereResponse(x, y)].join(',')); let url = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' })), a = document.createElement('a'); a.href = url; a.download = 'gravity-grid.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000) };
+        window.addEventListener('resize', renderVisuals); select(0);
+
+    </script>
+</body>
+
+</html>

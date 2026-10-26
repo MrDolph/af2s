@@ -1,0 +1,1513 @@
+--- /dev/null
++++ b/src/components/geophysics/GeophysicsFrame.tsx
+@@ -0,0 +1,42 @@
++import Link from 'next/link';
++import { AppHeader } from '@/components/layout/AppHeader';
++
++type ModuleName = 'lab' | 'earth' | 'solar' | 'tectonics';
++
++const MODULES: { id: ModuleName; label: string; href: string }[] = [
++  { id: 'lab', label: 'Geophysics lab', href: '/geophysics/lab' },
++  { id: 'earth', label: 'Earth Explorer', href: '/geophysics/earth' },
++  { id: 'solar', label: 'Solar System', href: '/geophysics/solar' },
++  { id: 'tectonics', label: 'Tectonics & Earth’s shape', href: '/geophysics/tectonics' },
++];
++
++export function GeophysicsFrame({ active, src, title }: {
++  active: ModuleName;
++  src: string;
++  title: string;
++}) {
++  return (
++    <div style={{ height: '100dvh', minHeight: '28rem', display: 'flex', flexDirection: 'column' }}>
++      <div className="shrink-0"><AppHeader /></div>
++      <nav aria-label="Geophysics modules" className="shrink-0 border-b border-gray-200 bg-white">
++        <div className="mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-4 py-2 sm:px-6">
++          {MODULES.map(module => (
++            <Link key={module.id} href={module.href}
++              aria-current={active === module.id ? 'page' : undefined}
++              className={`whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
++                active === module.id
++                  ? 'bg-indigo-50 text-indigo-700'
++                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
++              }`}>
++              {module.label}
++            </Link>
++          ))}
++        </div>
++      </nav>
++      <main aria-label={title} style={{ flex: '1 1 0%', minHeight: 0 }}>
++        <iframe key={src} src={src} title={title}
++          style={{ display: 'block', width: '100%', height: '100%', border: 0 }} />
++      </main>
++    </div>
++  );
++}
+--- a/src/app/geophysics/lab/page.tsx
++++ b/src/app/geophysics/lab/page.tsx
+@@ -1,25 +1,12 @@
+ import type { Metadata } from 'next';
+-import { AppHeader } from '@/components/layout/AppHeader';
++import { GeophysicsFrame } from '@/components/geophysics/GeophysicsFrame';
+ 
+ export const metadata: Metadata = {
+-  title: 'Geophysics Field Lab | A-Factor STEM Studio',
+-  description: 'Interactive gravity, resistivity, seismic, electromagnetic and well-logging experiments for AUI-PHY 407.',
++  title: "Geophysics Field Lab | A-Factor STEM Studio",
++  description: "Interactive gravity, resistivity, seismic, electromagnetic and well-logging experiments for AUI-PHY 407.",
+ };
+ 
+-export default function GeophysicsLabPage() {
+-  return (
+-    <>
+-      <AppHeader />
+-      <main
+-        aria-label="Geophysics field lab"
+-        style={{ height: 'calc(100dvh - 3.5rem)', minHeight: '24rem' }}
+-      >
+-        <iframe
+-          src="/geophysics/field-lab.html"
+-          title="AUI-PHY 407 interactive geophysics field lab"
+-          style={{ display: 'block', width: '100%', height: '100%', border: 0 }}
+-        />
+-      </main>
+-    </>
+-  );
++export default function Page() {
++  return <GeophysicsFrame active="lab" src="/geophysics/field-lab.html"
++    title="AUI-PHY 407 · Geophysics Field Lab" />;
+ }
+--- /dev/null
++++ b/src/app/geophysics/earth/page.tsx
+@@ -0,0 +1,12 @@
++import type { Metadata } from 'next';
++import { GeophysicsFrame } from '@/components/geophysics/GeophysicsFrame';
++
++export const metadata: Metadata = {
++  title: "Earth Explorer | A-Factor STEM Studio",
++  description: "Rotate and open the Earth to explore its interior and atmosphere from inner core to exosphere.",
++};
++
++export default function Page() {
++  return <GeophysicsFrame active="earth" src="/geophysics/earth-content.html"
++    title="AUI-PHY 407 · Earth Explorer" />;
++}
+--- /dev/null
++++ b/src/app/geophysics/solar/page.tsx
+@@ -0,0 +1,12 @@
++import type { Metadata } from 'next';
++import { GeophysicsFrame } from '@/components/geophysics/GeophysicsFrame';
++
++export const metadata: Metadata = {
++  title: "Solar System Explorer | A-Factor STEM Studio",
++  description: "Planet families, nebular formation and Kepler’s laws through interactive experiments.",
++};
++
++export default function Page() {
++  return <GeophysicsFrame active="solar" src="/geophysics/solar-content.html"
++    title="AUI-PHY 407 · Solar System Explorer" />;
++}
+--- /dev/null
++++ b/src/app/geophysics/tectonics/page.tsx
+@@ -0,0 +1,12 @@
++import type { Metadata } from 'next';
++import { GeophysicsFrame } from '@/components/geophysics/GeophysicsFrame';
++
++export const metadata: Metadata = {
++  title: "Tectonics & Earth’s Shape | A-Factor STEM Studio",
++  description: "World plates, continental drift, plate margins, VMM anomalies, triple junctions and hydrostatic flattening.",
++};
++
++export default function Page() {
++  return <GeophysicsFrame active="tectonics" src="/geophysics/tectonics-content.html"
++    title="AUI-PHY 407 · Tectonics & Earth’s Shape" />;
++}
+--- a/public/geophysics/field-lab.html
++++ b/public/geophysics/field-lab.html
+@@ -85,7 +85,7 @@
+         .shell {
+             display: grid;
+             grid-template-columns: 236px 1fr;
+-            min-height: calc(100vh - 76px)
++            min-height: 100vh
+         }
+ 
+         aside {
+@@ -503,12 +503,12 @@
+ <body>
+     <div class="shell">
+         <aside>
+-            <div class="badge">Virtual field school</div><a target="_top" href="./earth.html"
+-                style="display:block;margin:18px 0;padding:13px;border-radius:8px;background:#dbe8d4;color:#185c4e;text-decoration:none;font-weight:700">◉
+-                Earth Explorer ↗</a><a target="_top" href="./solar.html"
+-                style="display:block;margin:12px 0;color:#185c4e;text-decoration:none;font-weight:700">☀ Solar System
+-                ↗</a><a target="_top" href="./tectonics.html"
+-                style="display:block;margin:12px 0;color:#185c4e;text-decoration:none;font-weight:700">▱ Tectonics &
++            <div class="badge">Virtual field school</div><a href="/geophysics/earth"
++                style="display:block;margin:18px 0;padding:13px;border-radius:8px;background:#dbe8d4;color:#185c4e;text-decoration:none;font-weight:700" target="_top">◉
++                Earth Explorer ↗</a><a href="/geophysics/solar"
++                style="display:block;margin:12px 0;color:#185c4e;text-decoration:none;font-weight:700" target="_top">☀ Solar System
++                ↗</a><a href="/geophysics/tectonics"
++                style="display:block;margin:12px 0;color:#185c4e;text-decoration:none;font-weight:700" target="_top">▱ Tectonics &
+                 Shape ↗</a>
+             <nav class="nav" id="nav"></nav>
+             <div class="course"><b>AUI-PHY 407 · 2 Units</b><br>Augustine University<br>Department of
+--- /dev/null
++++ b/public/geophysics/earth-content.html
+@@ -0,0 +1,446 @@
++<!doctype html>
++<html lang="en">
++
++<head>
++    <meta charset="utf-8">
++    <meta name="viewport" content="width=device-width,initial-scale=1">
++    <title>A-Factor • Earth Explorer</title>
++    <style>
++        * {
++            box-sizing: border-box
++        }
++
++        body {
++            margin: 0;
++            background: #f3f5ef;
++            color: #183b33;
++            font: 15px system-ui
++        }
++
++        header {
++            height: 70px;
++            background: white;
++            border-bottom: 1px solid #dbe2d7;
++            display: flex;
++            align-items: center;
++            justify-content: space-between;
++            padding: 0 4%
++        }
++
++        a {
++            color: #216452
++        }
++
++        header b {
++            font-size: 21px
++        }
++
++        main {
++            max-width: 1600px;
++            margin: auto;
++            padding: 30px 4%
++        }
++
++        .eyebrow {
++            font-size: 11px;
++            letter-spacing: 2px;
++            color: #63806c
++        }
++
++        h1 {
++            font-size: 36px;
++            letter-spacing: -1px;
++            margin: 8px 0
++        }
++
++        p {
++            line-height: 1.7;
++            color: #607269
++        }
++
++        .layout {
++            display: grid;
++            grid-template-columns: minmax(0, 1fr) 360px;
++            gap: 22px
++        }
++
++        .stage {
++            position: relative;
++            background: radial-gradient(ellipse at 40% 40%, #143b48, #06141f 72%);
++            border-radius: 16px;
++            overflow: hidden;
++            min-height: 590px
++        }
++
++        #view {
++            height: 560px;
++            width: 100%;
++            touch-action: none;
++            display: block
++        }
++
++        .hint {
++            color: #a9c4c7;
++            font-size: 12px;
++            padding: 0 22px 18px;
++            margin: 0
++        }
++
++        .stagebadge {
++            position: absolute;
++            top: 20px;
++            left: 22px;
++            pointer-events: none;
++            font-size: 11px;
++            letter-spacing: 1px;
++            color: #cee6e1
++        }
++
++        .tools {
++            display: flex;
++            gap: 8px;
++            flex-wrap: wrap;
++            margin: 20px 0
++        }
++
++        button,
++        select,
++        input {
++            font: inherit
++        }
++
++        button {
++            cursor: pointer;
++            border: 1px solid #ccd9cb;
++            background: white;
++            border-radius: 7px;
++            padding: 10px 14px;
++            color: #215d4c
++        }
++
++        button.active,
++        .primary {
++            background: #195e4b;
++            color: white;
++            border-color: #195e4b
++        }
++
++        .panel {
++            border: 1px solid #dbe2d7;
++            border-radius: 12px;
++            background: white;
++            padding: 23px
++        }
++
++        h2 {
++            font-size: 23px;
++            margin: 12px 0
++        }
++
++        h3 {
++            font-size: 14px;
++            margin: 22px 0 6px
++        }
++
++        .range {
++            display: grid;
++            grid-template-columns: 1fr 1fr;
++            gap: 18px
++        }
++
++        .range label {
++            font-size: 12px;
++            display: block;
++            color: #607269
++        }
++
++        .range input {
++            width: 100%;
++            accent-color: #256c54
++        }
++
++        .layers {
++            display: flex;
++            flex-wrap: wrap;
++            gap: 7px;
++            margin-top: 16px
++        }
++
++        .layers button {
++            font-size: 12px;
++            padding: 9px
++        }
++
++        .swatch {
++            display: inline-block;
++            width: 9px;
++            height: 9px;
++            border-radius: 50%;
++            margin-right: 7px
++        }
++
++        .tag {
++            font-size: 12px;
++            padding: 8px 10px;
++            background: #edf3e9;
++            border-radius: 6px;
++            display: inline-block
++        }
++
++        .details {
++            font-size: 13px
++        }
++
++        .details p {
++            margin: 5px 0
++        }
++
++        .grid {
++            display: grid;
++            grid-template-columns: 1fr 1fr;
++            gap: 22px;
++            margin-top: 22px
++        }
++
++        summary {
++            cursor: pointer;
++            font-weight: 600;
++            padding: 10px 0
++        }
++
++        details p {
++            font-size: 13px
++        }
++
++        .row {
++            display: flex;
++            gap: 10px;
++            align-items: center;
++            flex-wrap: wrap
++        }
++
++        .answer {
++            padding: 10px;
++            border: 1px solid #cad7c7;
++            border-radius: 6px;
++            width: 100px
++        }
++
++        #status {
++            font-size: 12px;
++            color: #56786c
++        }
++
++        footer {
++            font-size: 12px;
++            line-height: 1.9;
++            margin-top: 25px;
++            color: #617266
++        }
++
++        #fallback {
++            display: none;
++            padding: 30px;
++            color: white
++        }
++
++        table {
++            width: 100%;
++            border-collapse: collapse;
++            font-size: 12px
++        }
++
++        td,
++        th {
++            padding: 8px;
++            text-align: left;
++            border-bottom: 1px solid #e0e6dc
++        }
++
++        @media(max-width:1000px) {
++            .layout {
++                grid-template-columns: 1fr
++            }
++
++            .panel {
++                padding: 20px
++            }
++
++            .stage {
++                min-height: 460px
++            }
++
++            #view {
++                height: 440px
++            }
++
++            .grid {
++                grid-template-columns: 1fr
++            }
++        }
++
++        @media(max-width:600px) {
++            main {
++                padding: 22px 15px
++            }
++
++            h1 {
++                font-size: 29px
++            }
++
++            header b {
++                font-size: 17px
++            }
++
++            .range {
++                grid-template-columns: 1fr
++            }
++
++            #view {
++                height: 380px
++            }
++
++            .stage {
++                min-height: 400px
++            }
++
++            .tools button {
++                font-size: 12px;
++                padding: 9px
++            }
++        }
++    </style>
++</head>
++
++<body>
++    
++    <main>
++        <div class="eyebrow">AUI-PHY 407 · INTERACTIVE REFERENCE ATLAS</div>
++        <h1>A journey from core to cosmos.</h1>
++        <p>Turn the Earth. Open a window into its interior. Explore the layers above your head.</p>
++        <div class="tools" id="modes"><button data-mode="globe">Surface globe</button><button data-mode="interior"
++                class="active">Inside the Earth</button><button data-mode="atmosphere">Atmosphere</button><button
++                id="tour">▶ Guided journey</button><button id="spin">Auto-rotate: off</button><button id="reset">Reset
++                view</button></div>
++        <div class="layout">
++            <div>
++                <div class="stage">
++                    <div class="stagebadge" id="stageLabel">CUTAWAY · EXPANDED TEACHING SCALE</div><canvas id="view"
++                        tabindex="0"
++                        aria-label="Rotatable 3D Earth. Drag or use arrow keys to rotate. Select named layers below for accessible reference descriptions."></canvas>
++                    <div id="fallback">3D rendering is unavailable on this device. All layer descriptions and reference
++                        activities below remain available.</div>
++                    <p class="hint">Drag to turn · use + / − to zoom · arrow keys also rotate · tap a visible layer or
++                        choose its name below</p>
++                </div>
++                <div class="panel" style="margin-top:16px">
++                    <div class="range">
++                        <div><label for="cut">Open the Earth <span id="cutVal">95°</span></label><input id="cut"
++                                type="range" min="0" max="140" value="95"></div>
++                        <div><label for="peel">Peel outer layers <span id="peelVal">0</span></label><input id="peel"
++                                type="range" min="0" max="5" value="0"></div>
++                    </div>
++                    <div class="row" style="margin-top:15px"><label for="scale">Scale</label><select id="scale">
++                            <option value="teaching">Expanded teaching view</option>
++                            <option value="physical">Physical radial proportions</option>
++                        </select><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut"
++                            aria-label="Zoom out">−</button></div>
++                    <p style="font-size:12px" id="scaleNote"></p>
++                    <div id="layers" class="layers"></div>
++                    <p id="status" aria-live="polite"></p>
++                </div>
++            </div>
++            <aside class="panel details" id="info" aria-live="polite"></aside>
++        </div>
++        <div class="grid">
++            <section class="panel">
++                <div class="eyebrow">CONNECT THE CLASSIFICATIONS</div>
++                <h2>One Earth, several useful maps.</h2>
++                <div id="features"></div>
++            </section>
++            <section class="panel">
++                <div class="eyebrow">PRACTISE & EXPLAIN</div>
++                <h2>From the model to your notebook.</h2>
++                <p><b>Worked example:</b> mean Earth radius ≈ 6,371 km. The core–mantle boundary lies about 2,891 km
++                    below the surface, so its radius is 6,371 − 2,891 = <b>3,480 km</b>. Depth and radius run in
++                    opposite directions.</p>
++                <p>The inner-core boundary is about 5,150 km deep. What is its radius from Earth's centre, in km?</p>
++                <div class="row"><input class="answer" id="radiusAnswer" type="number"
++                        aria-label="Inner-core radius in kilometres"><button id="grade" class="primary">Check
++                        answer</button></div>
++                <p id="feedback" aria-live="polite"></p>
++                <details>
++                    <summary>Hint and solution</summary>
++                    <p>Radius = surface radius − depth = 6,371 − 5,150 = 1,221 km. A radius is measured from the centre;
++                        a depth is measured inward from the surface.</p>
++                </details>
++                <details>
++                    <summary>Three investigations to try</summary>
++                    <p>1. Switch between expanded and physical scale. Why do the crust and lower atmosphere become hard
++                        to see?</p>
++                    <p>2. Select outer core and inner core. Explain why high temperature does not require both to be
++                        liquid.</p>
++                    <p>3. Open the ionosphere reference. Why is it not a sixth non-overlapping thermal layer? Which
++                        geophysical measurements could it affect?</p>
++                </details>
++                <details>
++                    <summary>Boundary reference table</summary>
++                    <table>
++                        <thead>
++                            <tr>
++                                <th>Boundary</th>
++                                <th>Approximate location</th>
++                            </tr>
++                        </thead>
++                        <tbody>
++                            <tr>
++                                <td>Moho</td>
++                                <td>Base of crust; varies with location</td>
++                            </tr>
++                            <tr>
++                                <td>410 / 660 km transitions</td>
++                                <td>Mantle mineral phase changes</td>
++                            </tr>
++                            <tr>
++                                <td>Gutenberg boundary</td>
++                                <td>2,891 km depth</td>
++                            </tr>
++                            <tr>
++                                <td>Inner-core boundary</td>
++                                <td>5,150 km depth</td>
++                            </tr>
++                            <tr>
++                                <td>Tropopause</td>
++                                <td>~8–18 km altitude; varies</td>
++                            </tr>
++                            <tr>
++                                <td>Stratopause / mesopause</td>
++                                <td>~50 / 85 km altitude</td>
++                            </tr>
++                            <tr>
++                                <td>Exobase</td>
++                                <td>~500–1,000 km altitude; varies</td>
++                            </tr>
++                        </tbody>
++                    </table>
++                </details>
++            </section>
++        </div>
++        <footer><b>Reference and model notes.</b> Values are rounded educational approximations, not a local Earth
++            model. Mantle boundaries are simplified and Earth is shown spherically for the layer diagrams. The
++            atmosphere has no sharp outer edge; 10,000 km is a conventional display limit here. The surface globe uses
++            Earth's approximate physical flattening. Continents: Natural Earth low-resolution public-domain land
++            outlines; no terrain relief or political boundaries.<br>Read further: <a
++                href="https://pubs.usgs.gov/gip/dynamic/inside.html" target="_blank" rel="noopener">USGS · Earth's
++                interior</a> · <a href="https://www.noaa.gov/jetstream/atmosphere/layers-of-atmosphere" target="_blank"
++                rel="noopener">NOAA · Atmospheric layers</a> · <a
++                href="https://scied.ucar.edu/learning-zone/atmosphere/layers-earths-atmosphere" target="_blank"
++                rel="noopener">UCAR · Atmospheric regions</a> · <a href="https://oceanservice.noaa.gov/facts/geoid.html"
++                target="_blank" rel="noopener">NOAA · Geoid</a> · <a
++                href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html" target="_blank"
++                rel="noopener">NASA · Earth dimensions</a></footer>
++    </main>
++    <script type="module" src="./earth.js"></script>
++</body>
++
++</html>
+\ No newline at end of file
+--- a/public/geophysics/earth.html
++++ b/public/geophysics/earth.html
+@@ -1,447 +1,8 @@
+ <!doctype html>
+-<html lang="en">
+-
+-<head>
+-    <meta charset="utf-8">
+-    <meta name="viewport" content="width=device-width,initial-scale=1">
+-    <title>A-Factor • Earth Explorer</title>
+-    <style>
+-        * {
+-            box-sizing: border-box
+-        }
+-
+-        body {
+-            margin: 0;
+-            background: #f3f5ef;
+-            color: #183b33;
+-            font: 15px system-ui
+-        }
+-
+-        header {
+-            height: 70px;
+-            background: white;
+-            border-bottom: 1px solid #dbe2d7;
+-            display: flex;
+-            align-items: center;
+-            justify-content: space-between;
+-            padding: 0 4%
+-        }
+-
+-        a {
+-            color: #216452
+-        }
+-
+-        header b {
+-            font-size: 21px
+-        }
+-
+-        main {
+-            max-width: 1600px;
+-            margin: auto;
+-            padding: 30px 4%
+-        }
+-
+-        .eyebrow {
+-            font-size: 11px;
+-            letter-spacing: 2px;
+-            color: #63806c
+-        }
+-
+-        h1 {
+-            font-size: 36px;
+-            letter-spacing: -1px;
+-            margin: 8px 0
+-        }
+-
+-        p {
+-            line-height: 1.7;
+-            color: #607269
+-        }
+-
+-        .layout {
+-            display: grid;
+-            grid-template-columns: minmax(0, 1fr) 360px;
+-            gap: 22px
+-        }
+-
+-        .stage {
+-            position: relative;
+-            background: radial-gradient(ellipse at 40% 40%, #143b48, #06141f 72%);
+-            border-radius: 16px;
+-            overflow: hidden;
+-            min-height: 590px
+-        }
+-
+-        #view {
+-            height: 560px;
+-            width: 100%;
+-            touch-action: none;
+-            display: block
+-        }
+-
+-        .hint {
+-            color: #a9c4c7;
+-            font-size: 12px;
+-            padding: 0 22px 18px;
+-            margin: 0
+-        }
+-
+-        .stagebadge {
+-            position: absolute;
+-            top: 20px;
+-            left: 22px;
+-            pointer-events: none;
+-            font-size: 11px;
+-            letter-spacing: 1px;
+-            color: #cee6e1
+-        }
+-
+-        .tools {
+-            display: flex;
+-            gap: 8px;
+-            flex-wrap: wrap;
+-            margin: 20px 0
+-        }
+-
+-        button,
+-        select,
+-        input {
+-            font: inherit
+-        }
+-
+-        button {
+-            cursor: pointer;
+-            border: 1px solid #ccd9cb;
+-            background: white;
+-            border-radius: 7px;
+-            padding: 10px 14px;
+-            color: #215d4c
+-        }
+-
+-        button.active,
+-        .primary {
+-            background: #195e4b;
+-            color: white;
+-            border-color: #195e4b
+-        }
+-
+-        .panel {
+-            border: 1px solid #dbe2d7;
+-            border-radius: 12px;
+-            background: white;
+-            padding: 23px
+-        }
+-
+-        h2 {
+-            font-size: 23px;
+-            margin: 12px 0
+-        }
+-
+-        h3 {
+-            font-size: 14px;
+-            margin: 22px 0 6px
+-        }
+-
+-        .range {
+-            display: grid;
+-            grid-template-columns: 1fr 1fr;
+-            gap: 18px
+-        }
+-
+-        .range label {
+-            font-size: 12px;
+-            display: block;
+-            color: #607269
+-        }
+-
+-        .range input {
+-            width: 100%;
+-            accent-color: #256c54
+-        }
+-
+-        .layers {
+-            display: flex;
+-            flex-wrap: wrap;
+-            gap: 7px;
+-            margin-top: 16px
+-        }
+-
+-        .layers button {
+-            font-size: 12px;
+-            padding: 9px
+-        }
+-
+-        .swatch {
+-            display: inline-block;
+-            width: 9px;
+-            height: 9px;
+-            border-radius: 50%;
+-            margin-right: 7px
+-        }
+-
+-        .tag {
+-            font-size: 12px;
+-            padding: 8px 10px;
+-            background: #edf3e9;
+-            border-radius: 6px;
+-            display: inline-block
+-        }
+-
+-        .details {
+-            font-size: 13px
+-        }
+-
+-        .details p {
+-            margin: 5px 0
+-        }
+-
+-        .grid {
+-            display: grid;
+-            grid-template-columns: 1fr 1fr;
+-            gap: 22px;
+-            margin-top: 22px
+-        }
+-
+-        summary {
+-            cursor: pointer;
+-            font-weight: 600;
+-            padding: 10px 0
+-        }
+-
+-        details p {
+-            font-size: 13px
+-        }
+-
+-        .row {
+-            display: flex;
+-            gap: 10px;
+-            align-items: center;
+-            flex-wrap: wrap
+-        }
+-
+-        .answer {
+-            padding: 10px;
+-            border: 1px solid #cad7c7;
+-            border-radius: 6px;
+-            width: 100px
+-        }
+-
+-        #status {
+-            font-size: 12px;
+-            color: #56786c
+-        }
+-
+-        footer {
+-            font-size: 12px;
+-            line-height: 1.9;
+-            margin-top: 25px;
+-            color: #617266
+-        }
+-
+-        #fallback {
+-            display: none;
+-            padding: 30px;
+-            color: white
+-        }
+-
+-        table {
+-            width: 100%;
+-            border-collapse: collapse;
+-            font-size: 12px
+-        }
+-
+-        td,
+-        th {
+-            padding: 8px;
+-            text-align: left;
+-            border-bottom: 1px solid #e0e6dc
+-        }
+-
+-        @media(max-width:1000px) {
+-            .layout {
+-                grid-template-columns: 1fr
+-            }
+-
+-            .panel {
+-                padding: 20px
+-            }
+-
+-            .stage {
+-                min-height: 460px
+-            }
+-
+-            #view {
+-                height: 440px
+-            }
+-
+-            .grid {
+-                grid-template-columns: 1fr
+-            }
+-        }
+-
+-        @media(max-width:600px) {
+-            main {
+-                padding: 22px 15px
+-            }
+-
+-            h1 {
+-                font-size: 29px
+-            }
+-
+-            header b {
+-                font-size: 17px
+-            }
+-
+-            .range {
+-                grid-template-columns: 1fr
+-            }
+-
+-            #view {
+-                height: 380px
+-            }
+-
+-            .stage {
+-                min-height: 400px
+-            }
+-
+-            .tools button {
+-                font-size: 12px;
+-                padding: 9px
+-            }
+-        }
+-    </style>
+-</head>
+-
+-<body>
+-    <header><b>A-Factor / Earth Explorer</b><a href="./index.html">← Geophysics labs</a><a href="./solar.html">Solar
+-            System</a><a href="./tectonics.html">Tectonics</a></header>
+-    <main>
+-        <div class="eyebrow">AUI-PHY 407 · INTERACTIVE REFERENCE ATLAS</div>
+-        <h1>A journey from core to cosmos.</h1>
+-        <p>Turn the Earth. Open a window into its interior. Explore the layers above your head.</p>
+-        <div class="tools" id="modes"><button data-mode="globe">Surface globe</button><button data-mode="interior"
+-                class="active">Inside the Earth</button><button data-mode="atmosphere">Atmosphere</button><button
+-                id="tour">▶ Guided journey</button><button id="spin">Auto-rotate: off</button><button id="reset">Reset
+-                view</button></div>
+-        <div class="layout">
+-            <div>
+-                <div class="stage">
+-                    <div class="stagebadge" id="stageLabel">CUTAWAY · EXPANDED TEACHING SCALE</div><canvas id="view"
+-                        tabindex="0"
+-                        aria-label="Rotatable 3D Earth. Drag or use arrow keys to rotate. Select named layers below for accessible reference descriptions."></canvas>
+-                    <div id="fallback">3D rendering is unavailable on this device. All layer descriptions and reference
+-                        activities below remain available.</div>
+-                    <p class="hint">Drag to turn · use + / − to zoom · arrow keys also rotate · tap a visible layer or
+-                        choose its name below</p>
+-                </div>
+-                <div class="panel" style="margin-top:16px">
+-                    <div class="range">
+-                        <div><label for="cut">Open the Earth <span id="cutVal">95°</span></label><input id="cut"
+-                                type="range" min="0" max="140" value="95"></div>
+-                        <div><label for="peel">Peel outer layers <span id="peelVal">0</span></label><input id="peel"
+-                                type="range" min="0" max="5" value="0"></div>
+-                    </div>
+-                    <div class="row" style="margin-top:15px"><label for="scale">Scale</label><select id="scale">
+-                            <option value="teaching">Expanded teaching view</option>
+-                            <option value="physical">Physical radial proportions</option>
+-                        </select><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut"
+-                            aria-label="Zoom out">−</button></div>
+-                    <p style="font-size:12px" id="scaleNote"></p>
+-                    <div id="layers" class="layers"></div>
+-                    <p id="status" aria-live="polite"></p>
+-                </div>
+-            </div>
+-            <aside class="panel details" id="info" aria-live="polite"></aside>
+-        </div>
+-        <div class="grid">
+-            <section class="panel">
+-                <div class="eyebrow">CONNECT THE CLASSIFICATIONS</div>
+-                <h2>One Earth, several useful maps.</h2>
+-                <div id="features"></div>
+-            </section>
+-            <section class="panel">
+-                <div class="eyebrow">PRACTISE & EXPLAIN</div>
+-                <h2>From the model to your notebook.</h2>
+-                <p><b>Worked example:</b> mean Earth radius ≈ 6,371 km. The core–mantle boundary lies about 2,891 km
+-                    below the surface, so its radius is 6,371 − 2,891 = <b>3,480 km</b>. Depth and radius run in
+-                    opposite directions.</p>
+-                <p>The inner-core boundary is about 5,150 km deep. What is its radius from Earth's centre, in km?</p>
+-                <div class="row"><input class="answer" id="radiusAnswer" type="number"
+-                        aria-label="Inner-core radius in kilometres"><button id="grade" class="primary">Check
+-                        answer</button></div>
+-                <p id="feedback" aria-live="polite"></p>
+-                <details>
+-                    <summary>Hint and solution</summary>
+-                    <p>Radius = surface radius − depth = 6,371 − 5,150 = 1,221 km. A radius is measured from the centre;
+-                        a depth is measured inward from the surface.</p>
+-                </details>
+-                <details>
+-                    <summary>Three investigations to try</summary>
+-                    <p>1. Switch between expanded and physical scale. Why do the crust and lower atmosphere become hard
+-                        to see?</p>
+-                    <p>2. Select outer core and inner core. Explain why high temperature does not require both to be
+-                        liquid.</p>
+-                    <p>3. Open the ionosphere reference. Why is it not a sixth non-overlapping thermal layer? Which
+-                        geophysical measurements could it affect?</p>
+-                </details>
+-                <details>
+-                    <summary>Boundary reference table</summary>
+-                    <table>
+-                        <thead>
+-                            <tr>
+-                                <th>Boundary</th>
+-                                <th>Approximate location</th>
+-                            </tr>
+-                        </thead>
+-                        <tbody>
+-                            <tr>
+-                                <td>Moho</td>
+-                                <td>Base of crust; varies with location</td>
+-                            </tr>
+-                            <tr>
+-                                <td>410 / 660 km transitions</td>
+-                                <td>Mantle mineral phase changes</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Gutenberg boundary</td>
+-                                <td>2,891 km depth</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Inner-core boundary</td>
+-                                <td>5,150 km depth</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Tropopause</td>
+-                                <td>~8–18 km altitude; varies</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Stratopause / mesopause</td>
+-                                <td>~50 / 85 km altitude</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Exobase</td>
+-                                <td>~500–1,000 km altitude; varies</td>
+-                            </tr>
+-                        </tbody>
+-                    </table>
+-                </details>
+-            </section>
+-        </div>
+-        <footer><b>Reference and model notes.</b> Values are rounded educational approximations, not a local Earth
+-            model. Mantle boundaries are simplified and Earth is shown spherically for the layer diagrams. The
+-            atmosphere has no sharp outer edge; 10,000 km is a conventional display limit here. The surface globe uses
+-            Earth's approximate physical flattening. Continents: Natural Earth low-resolution public-domain land
+-            outlines; no terrain relief or political boundaries.<br>Read further: <a
+-                href="https://pubs.usgs.gov/gip/dynamic/inside.html" target="_blank" rel="noopener">USGS · Earth's
+-                interior</a> · <a href="https://www.noaa.gov/jetstream/atmosphere/layers-of-atmosphere" target="_blank"
+-                rel="noopener">NOAA · Atmospheric layers</a> · <a
+-                href="https://scied.ucar.edu/learning-zone/atmosphere/layers-earths-atmosphere" target="_blank"
+-                rel="noopener">UCAR · Atmospheric regions</a> · <a href="https://oceanservice.noaa.gov/facts/geoid.html"
+-                target="_blank" rel="noopener">NOAA · Geoid</a> · <a
+-                href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html" target="_blank"
+-                rel="noopener">NASA · Earth dimensions</a></footer>
+-    </main>
+-    <script type="module" src="./earth.js"></script>
+-</body>
+-
+-</html>
+\ No newline at end of file
++<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
++<title>Earth Explorer | A-Factor STEM Studio</title><meta http-equiv="refresh" content="0;url=/geophysics/earth"><link rel="canonical" href="/geophysics/earth"></head>
++<body><p><a href="/geophysics/earth" target="_top">Open Earth Explorer</a></p><script>
++const destination="/geophysics/earth"+window.location.search+window.location.hash;
++if(window.top===window.self)window.location.replace(destination);
++else window.top.location.replace(destination);
++</script></body></html>
+--- /dev/null
++++ b/public/geophysics/solar-content.html
+@@ -0,0 +1,128 @@
++<!doctype html>
++<html lang="en">
++
++<head>
++    <meta charset="utf-8">
++    <meta name="viewport" content="width=device-width,initial-scale=1">
++    <title>A-Factor • Solar System Explorer</title>
++    <link rel="stylesheet" href="./atlas.css">
++</head>
++
++<body>
++    
++    <main>
++        <div class="eyebrow">AUI-PHY 407 · PLANETARY CONTEXT</div>
++        <h1>One star. Eight worlds. A shared origin.</h1>
++        <p>Explore the planets, build an orbit, and follow the nebular model from cloud to planetary system.</p>
++        <div class="tabs"><button data-tab="system" class="active">Planetary system</button><button
++                data-tab="kepler">Kepler’s laboratory</button><button data-tab="formation">Nebular formation</button>
++        </div>
++        <div class="layout">
++            <section>
++                <div class="card stage"><canvas id="space" role="img"
++                        aria-label="Interactive Solar System and orbital mechanics diagram"></canvas>
++                    <p id="caption" class="caption"></p>
++                </div>
++                <div class="tools"><button id="play">▶ Play</button><button id="reset">Reset time</button><label
++                        for="speed">Time speed</label><select id="speed">
++                        <option value="0.1">0.1 years/s</option>
++                        <option value="1" selected>1 year/s</option>
++                        <option value="5">5 years/s</option>
++                    </select><span id="clock" style="padding:10px;font-size:13px">t = 0.00 years</span></div>
++                <div id="planetButtons" class="choices"></div>
++                <section class="card" id="readout"></section>
++            </section>
++            <aside class="card">
++                <h2 id="controlTitle"></h2>
++                <div id="controls"></div>
++                <div class="metric" id="metric"></div>
++                <h3>Read the model carefully</h3>
++                <p id="limits" style="font-size:13px"></p>
++            </aside>
++        </div>
++        <div class="grid">
++            <section class="card">
++                <div class="eyebrow">COMPARE THE FAMILIES</div>
++                <h2>Inner and outer planets</h2>
++                <div class="tablewrap">
++                    <table>
++                        <thead>
++                            <tr>
++                                <th>Property</th>
++                                <th>Inner terrestrial</th>
++                                <th>Outer giants</th>
++                            </tr>
++                        </thead>
++                        <tbody>
++                            <tr>
++                                <td>Members</td>
++                                <td>Mercury, Venus, Earth, Mars</td>
++                                <td>Jupiter, Saturn, Uranus, Neptune</td>
++                            </tr>
++                            <tr>
++                                <td>Material</td>
++                                <td>Rock and metal dominate</td>
++                                <td>Jupiter/Saturn: H–He dominated; Uranus/Neptune: larger fractions of heavier
++                                    compounds</td>
++                            </tr>
++                            <tr>
++                                <td>Surface</td>
++                                <td>Solid rocky surfaces</td>
++                                <td>No accessible solid surface like Earth's</td>
++                            </tr>
++                            <tr>
++                                <td>Size and density</td>
++                                <td>Smaller; generally higher bulk density</td>
++                                <td>Larger; generally lower bulk density</td>
++                            </tr>
++                            <tr>
++                                <td>Orbits</td>
++                                <td>Smaller semi-major axes and shorter years</td>
++                                <td>Larger semi-major axes and longer years</td>
++                            </tr>
++                            <tr>
++                                <td>Rings and moons</td>
++                                <td>No rings; zero to a few moons</td>
++                                <td>All have rings and multiple moons</td>
++                            </tr>
++                        </tbody>
++                    </table>
++                </div>
++                <p style="font-size:13px">“Ice giant” describes bulk composition, not a planet made of ordinary frozen
++                    ice. The asteroid belt lies mainly between Mars and Jupiter. Pluto is a dwarf planet in the
++                    trans-Neptunian region, not a ninth member of the eight-planet sequence.</p>
++            </section>
++            <section class="card">
++                <div class="eyebrow">WORKED EXAMPLE & PRACTICE</div>
++                <h2>Predict an orbital period.</h2>
++                <p>For a small body orbiting a one-solar-mass star, with a in AU and T in years: T² ≈ a³. At a = 4 AU, T
++                    = √64 = <b>8 years</b>. Eccentricity changes the speed distribution around the orbit, but not this
++                    period at fixed a.</p>
++                <p>What is T, in years, for a = 9 AU around a one-solar-mass star?</p><input class="answer" id="answer"
++                    type="number" aria-label="Orbital period in years"><button id="check" class="primary">Check
++                    answer</button>
++                <p id="feedback" aria-live="polite"></p>
++                <details>
++                    <summary>Hint and solution</summary>
++                    <p>T = a³ᐟ² = 9³ᐟ² = 27 years. For a star of mass M in solar masses and negligible orbiting mass,
++                        use T² = a³/M.</p>
++                </details>
++                <details>
++                    <summary>Investigate and explain</summary>
++                    <p>Choose e = 0.6 in Kepler’s laboratory. Compare the two equal-time sectors near perihelion and
++                        aphelion. Why are their shapes different while their areas are equal? Then double a and check
++                        that T increases by 2³ᐟ², not by 2.</p>
++                </details>
++            </section>
++        </div>
++        <footer>Educational model: no live ephemeris, mutual perturbations, relativistic corrections, orbit inclinations
++            or planetary spin. Positions use arbitrary initial phases. Planet markers and Sun are enlarged independently
++            of orbit distances.<br>Sources: <a href="https://science.nasa.gov/solar-system/planets/">NASA · Planet
++                families</a> · <a href="https://science.nasa.gov/solar-system/orbits-and-keplers-laws/">NASA · Kepler’s
++                laws</a> · <a href="https://science.nasa.gov/solar-system/solar-system-facts/">NASA · Formation</a> · <a
++                href="https://ssd.jpl.nasa.gov/planets/phys_par.html">JPL · Planetary parameters</a>.</footer>
++    </main>
++    <script type="module" src="./solar.js"></script>
++</body>
++
++</html>
+\ No newline at end of file
+--- a/public/geophysics/solar.html
++++ b/public/geophysics/solar.html
+@@ -1,131 +1,8 @@
+ <!doctype html>
+-<html lang="en">
+-
+-<head>
+-    <meta charset="utf-8">
+-    <meta name="viewport" content="width=device-width,initial-scale=1">
+-    <title>A-Factor • Solar System Explorer</title>
+-    <link rel="stylesheet" href="./atlas.css">
+-</head>
+-
+-<body>
+-    <header><b>A-Factor / Solar System Explorer</b>
+-        <nav><a href="./index.html">Geophysics labs</a> · <a href="./earth.html">Earth</a> · <a
+-                href="./tectonics.html">Tectonics</a></nav>
+-    </header>
+-    <main>
+-        <div class="eyebrow">AUI-PHY 407 · PLANETARY CONTEXT</div>
+-        <h1>One star. Eight worlds. A shared origin.</h1>
+-        <p>Explore the planets, build an orbit, and follow the nebular model from cloud to planetary system.</p>
+-        <div class="tabs"><button data-tab="system" class="active">Planetary system</button><button
+-                data-tab="kepler">Kepler’s laboratory</button><button data-tab="formation">Nebular formation</button>
+-        </div>
+-        <div class="layout">
+-            <section>
+-                <div class="card stage"><canvas id="space" role="img"
+-                        aria-label="Interactive Solar System and orbital mechanics diagram"></canvas>
+-                    <p id="caption" class="caption"></p>
+-                </div>
+-                <div class="tools"><button id="play">▶ Play</button><button id="reset">Reset time</button><label
+-                        for="speed">Time speed</label><select id="speed">
+-                        <option value="0.1">0.1 years/s</option>
+-                        <option value="1" selected>1 year/s</option>
+-                        <option value="5">5 years/s</option>
+-                    </select><span id="clock" style="padding:10px;font-size:13px">t = 0.00 years</span></div>
+-                <div id="planetButtons" class="choices"></div>
+-                <section class="card" id="readout"></section>
+-            </section>
+-            <aside class="card">
+-                <h2 id="controlTitle"></h2>
+-                <div id="controls"></div>
+-                <div class="metric" id="metric"></div>
+-                <h3>Read the model carefully</h3>
+-                <p id="limits" style="font-size:13px"></p>
+-            </aside>
+-        </div>
+-        <div class="grid">
+-            <section class="card">
+-                <div class="eyebrow">COMPARE THE FAMILIES</div>
+-                <h2>Inner and outer planets</h2>
+-                <div class="tablewrap">
+-                    <table>
+-                        <thead>
+-                            <tr>
+-                                <th>Property</th>
+-                                <th>Inner terrestrial</th>
+-                                <th>Outer giants</th>
+-                            </tr>
+-                        </thead>
+-                        <tbody>
+-                            <tr>
+-                                <td>Members</td>
+-                                <td>Mercury, Venus, Earth, Mars</td>
+-                                <td>Jupiter, Saturn, Uranus, Neptune</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Material</td>
+-                                <td>Rock and metal dominate</td>
+-                                <td>Jupiter/Saturn: H–He dominated; Uranus/Neptune: larger fractions of heavier
+-                                    compounds</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Surface</td>
+-                                <td>Solid rocky surfaces</td>
+-                                <td>No accessible solid surface like Earth's</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Size and density</td>
+-                                <td>Smaller; generally higher bulk density</td>
+-                                <td>Larger; generally lower bulk density</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Orbits</td>
+-                                <td>Smaller semi-major axes and shorter years</td>
+-                                <td>Larger semi-major axes and longer years</td>
+-                            </tr>
+-                            <tr>
+-                                <td>Rings and moons</td>
+-                                <td>No rings; zero to a few moons</td>
+-                                <td>All have rings and multiple moons</td>
+-                            </tr>
+-                        </tbody>
+-                    </table>
+-                </div>
+-                <p style="font-size:13px">“Ice giant” describes bulk composition, not a planet made of ordinary frozen
+-                    ice. The asteroid belt lies mainly between Mars and Jupiter. Pluto is a dwarf planet in the
+-                    trans-Neptunian region, not a ninth member of the eight-planet sequence.</p>
+-            </section>
+-            <section class="card">
+-                <div class="eyebrow">WORKED EXAMPLE & PRACTICE</div>
+-                <h2>Predict an orbital period.</h2>
+-                <p>For a small body orbiting a one-solar-mass star, with a in AU and T in years: T² ≈ a³. At a = 4 AU, T
+-                    = √64 = <b>8 years</b>. Eccentricity changes the speed distribution around the orbit, but not this
+-                    period at fixed a.</p>
+-                <p>What is T, in years, for a = 9 AU around a one-solar-mass star?</p><input class="answer" id="answer"
+-                    type="number" aria-label="Orbital period in years"><button id="check" class="primary">Check
+-                    answer</button>
+-                <p id="feedback" aria-live="polite"></p>
+-                <details>
+-                    <summary>Hint and solution</summary>
+-                    <p>T = a³ᐟ² = 9³ᐟ² = 27 years. For a star of mass M in solar masses and negligible orbiting mass,
+-                        use T² = a³/M.</p>
+-                </details>
+-                <details>
+-                    <summary>Investigate and explain</summary>
+-                    <p>Choose e = 0.6 in Kepler’s laboratory. Compare the two equal-time sectors near perihelion and
+-                        aphelion. Why are their shapes different while their areas are equal? Then double a and check
+-                        that T increases by 2³ᐟ², not by 2.</p>
+-                </details>
+-            </section>
+-        </div>
+-        <footer>Educational model: no live ephemeris, mutual perturbations, relativistic corrections, orbit inclinations
+-            or planetary spin. Positions use arbitrary initial phases. Planet markers and Sun are enlarged independently
+-            of orbit distances.<br>Sources: <a href="https://science.nasa.gov/solar-system/planets/">NASA · Planet
+-                families</a> · <a href="https://science.nasa.gov/solar-system/orbits-and-keplers-laws/">NASA · Kepler’s
+-                laws</a> · <a href="https://science.nasa.gov/solar-system/solar-system-facts/">NASA · Formation</a> · <a
+-                href="https://ssd.jpl.nasa.gov/planets/phys_par.html">JPL · Planetary parameters</a>.</footer>
+-    </main>
+-    <script type="module" src="./solar.js"></script>
+-</body>
+-
+-</html>
+\ No newline at end of file
++<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
++<title>Solar System Explorer | A-Factor STEM Studio</title><meta http-equiv="refresh" content="0;url=/geophysics/solar"><link rel="canonical" href="/geophysics/solar"></head>
++<body><p><a href="/geophysics/solar" target="_top">Open Solar System Explorer</a></p><script>
++const destination="/geophysics/solar"+window.location.search+window.location.hash;
++if(window.top===window.self)window.location.replace(destination);
++else window.top.location.replace(destination);
++</script></body></html>
+--- /dev/null
++++ b/public/geophysics/tectonics-content.html
+@@ -0,0 +1,75 @@
++<!doctype html>
++<html lang="en">
++
++<head>
++    <meta charset="utf-8">
++    <meta name="viewport" content="width=device-width,initial-scale=1">
++    <title>A-Factor • Tectonics & Earth's Shape</title>
++    <link rel="stylesheet" href="./atlas.css">
++</head>
++
++<body>
++    
++    <main>
++        <div class="eyebrow">AUI-PHY 407 · PROCESSES, PATTERNS & EVIDENCE</div>
++        <h1>A moving surface. A rotating planet.</h1>
++        <p>Connect continental drift, plate boundaries, magnetic stripes and Earth's figure through interactive teaching
++            models.</p>
++        <div class="tabs"><button data-topic="plates" class="active">World plates (12 groups)</button><button
++                data-topic="drift">Continental drift</button><button data-topic="margins">Plate margins</button><button
++                data-topic="vmm">VMM magnetic stripes</button><button data-topic="triple">Triple
++                junction</button><button data-topic="shape">Newton’s hydrostatic model</button></div>
++        <div class="layout">
++            <section>
++                <div class="diagram" id="diagram" role="img" aria-label="Interactive labelled tectonic process diagram">
++                </div>
++                <div class="card" style="margin-top:16px">
++                    <p id="caption" style="font-size:12px;margin:0"></p>
++                </div>
++                <div class="choices" id="variants"></div>
++                <div class="card" id="explanation"></div>
++            </section>
++            <aside class="card">
++                <h2 id="controlTitle"></h2>
++                <div id="controls"></div>
++                <div class="metric" id="metric"></div>
++                <h3>Model assumptions</h3>
++                <p id="limits" style="font-size:13px"></p>
++            </aside>
++        </div>
++        <div class="grid">
++            <section class="card">
++                <div class="eyebrow">WORKED SNIPPET</div>
++                <h2 id="workedTitle"></h2>
++                <div id="worked"></div>
++            </section>
++            <section class="card">
++                <div class="eyebrow">TRY IT YOURSELF</div>
++                <h2>Interpret, then calculate.</h2>
++                <p id="question"></p><input class="answer" id="answer" type="number"
++                    aria-label="Practice numerical answer"><button class="primary" id="check">Check attempt</button>
++                <p id="feedback" aria-live="polite"></p>
++                <details id="solutionDetails">
++                    <summary>Hint and solution</summary>
++                    <p id="solution"></p>
++                </details>
++            </section>
++        </div>
++        <footer>All diagrams are educational schematics unless numerical axes are supplied. Drift positions are
++            conceptual, not a palaeogeographic reconstruction. Plate-boundary anatomy is simplified; real regions
++            include diffuse deformation and oblique motion.<br>Plate map: PB2002 model (Bird, 2003); GeoJSON conversion
++            by Hugo Ahlenius/Nordpil and contributors, <a href="https://github.com/fraxen/tectonicplates">tectonicplates
++                dataset</a>, <a href="./assets/plates-LICENSE.md">ODC Attribution licence</a>. Coastlines: Natural
++            Earth, public domain. Map groups are a teaching overlay; source boundaries are retained.<br>Sources: <a
++                href="https://pubs.usgs.gov/gip/dynamic/understanding.html">USGS · Plate motions</a> · <a
++                href="https://pubs.usgs.gov/gip/dynamic/stripes.html">USGS · Magnetic stripes</a> · <a
++                href="https://www.geolsoc.org.uk/Plate-Tectonics/Chap1-Pioneers-of-Plate-Tectonics/Vine-and-Matthews.html">Geological
++                Society · Vine–Matthews–Morley</a> · <a href="https://pubs.usgs.gov/gip/dynamic/East_Africa.html">USGS ·
++                Afar junction</a> · <a href="https://farside.ph.utexas.edu/teaching/336L/Fluid/node35.html">University
++                of Texas · Maclaurin spheroids</a> · <a href="https://oceanservice.noaa.gov/facts/geoid.html">NOAA ·
++                Geoid</a>.</footer>
++    </main>
++    <script type="module" src="./tectonics.js"></script>
++</body>
++
++</html>
+\ No newline at end of file
+--- a/public/geophysics/tectonics.html
++++ b/public/geophysics/tectonics.html
+@@ -1,78 +1,8 @@
+ <!doctype html>
+-<html lang="en">
+-
+-<head>
+-    <meta charset="utf-8">
+-    <meta name="viewport" content="width=device-width,initial-scale=1">
+-    <title>A-Factor • Tectonics & Earth's Shape</title>
+-    <link rel="stylesheet" href="./atlas.css">
+-</head>
+-
+-<body>
+-    <header><b>A-Factor / Tectonics & Earth's Shape</b>
+-        <nav><a href="./index.html">Geophysics labs</a> · <a href="./earth.html">Earth</a> · <a
+-                href="./solar.html">Solar System</a></nav>
+-    </header>
+-    <main>
+-        <div class="eyebrow">AUI-PHY 407 · PROCESSES, PATTERNS & EVIDENCE</div>
+-        <h1>A moving surface. A rotating planet.</h1>
+-        <p>Connect continental drift, plate boundaries, magnetic stripes and Earth's figure through interactive teaching
+-            models.</p>
+-        <div class="tabs"><button data-topic="plates" class="active">World plates (12 groups)</button><button
+-                data-topic="drift">Continental drift</button><button data-topic="margins">Plate margins</button><button
+-                data-topic="vmm">VMM magnetic stripes</button><button data-topic="triple">Triple
+-                junction</button><button data-topic="shape">Newton’s hydrostatic model</button></div>
+-        <div class="layout">
+-            <section>
+-                <div class="diagram" id="diagram" role="img" aria-label="Interactive labelled tectonic process diagram">
+-                </div>
+-                <div class="card" style="margin-top:16px">
+-                    <p id="caption" style="font-size:12px;margin:0"></p>
+-                </div>
+-                <div class="choices" id="variants"></div>
+-                <div class="card" id="explanation"></div>
+-            </section>
+-            <aside class="card">
+-                <h2 id="controlTitle"></h2>
+-                <div id="controls"></div>
+-                <div class="metric" id="metric"></div>
+-                <h3>Model assumptions</h3>
+-                <p id="limits" style="font-size:13px"></p>
+-            </aside>
+-        </div>
+-        <div class="grid">
+-            <section class="card">
+-                <div class="eyebrow">WORKED SNIPPET</div>
+-                <h2 id="workedTitle"></h2>
+-                <div id="worked"></div>
+-            </section>
+-            <section class="card">
+-                <div class="eyebrow">TRY IT YOURSELF</div>
+-                <h2>Interpret, then calculate.</h2>
+-                <p id="question"></p><input class="answer" id="answer" type="number"
+-                    aria-label="Practice numerical answer"><button class="primary" id="check">Check attempt</button>
+-                <p id="feedback" aria-live="polite"></p>
+-                <details id="solutionDetails">
+-                    <summary>Hint and solution</summary>
+-                    <p id="solution"></p>
+-                </details>
+-            </section>
+-        </div>
+-        <footer>All diagrams are educational schematics unless numerical axes are supplied. Drift positions are
+-            conceptual, not a palaeogeographic reconstruction. Plate-boundary anatomy is simplified; real regions
+-            include diffuse deformation and oblique motion.<br>Plate map: PB2002 model (Bird, 2003); GeoJSON conversion
+-            by Hugo Ahlenius/Nordpil and contributors, <a href="https://github.com/fraxen/tectonicplates">tectonicplates
+-                dataset</a>, <a href="./assets/plates-LICENSE.md">ODC Attribution licence</a>. Coastlines: Natural
+-            Earth, public domain. Map groups are a teaching overlay; source boundaries are retained.<br>Sources: <a
+-                href="https://pubs.usgs.gov/gip/dynamic/understanding.html">USGS · Plate motions</a> · <a
+-                href="https://pubs.usgs.gov/gip/dynamic/stripes.html">USGS · Magnetic stripes</a> · <a
+-                href="https://www.geolsoc.org.uk/Plate-Tectonics/Chap1-Pioneers-of-Plate-Tectonics/Vine-and-Matthews.html">Geological
+-                Society · Vine–Matthews–Morley</a> · <a href="https://pubs.usgs.gov/gip/dynamic/East_Africa.html">USGS ·
+-                Afar junction</a> · <a href="https://farside.ph.utexas.edu/teaching/336L/Fluid/node35.html">University
+-                of Texas · Maclaurin spheroids</a> · <a href="https://oceanservice.noaa.gov/facts/geoid.html">NOAA ·
+-                Geoid</a>.</footer>
+-    </main>
+-    <script type="module" src="./tectonics.js"></script>
+-</body>
+-
+-</html>
+\ No newline at end of file
++<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
++<title>Tectonics & Earth’s Shape | A-Factor STEM Studio</title><meta http-equiv="refresh" content="0;url=/geophysics/tectonics"><link rel="canonical" href="/geophysics/tectonics"></head>
++<body><p><a href="/geophysics/tectonics" target="_top">Open Tectonics & Earth’s Shape</a></p><script>
++const destination="/geophysics/tectonics"+window.location.search+window.location.hash;
++if(window.top===window.self)window.location.replace(destination);
++else window.top.location.replace(destination);
++</script></body></html>
+--- a/src/lib/subjects.ts
++++ b/src/lib/subjects.ts
+@@ -54,5 +54,6 @@
+ 
+ /** True if `pathname` is this subject's hub or any page beneath it. */
+ export function isSubjectPath(pathname: string, subject: Subject): boolean {
++  if (subject.slug === 'physics' && (pathname === '/geophysics' || pathname.startsWith('/geophysics/'))) return true;
+   return pathname === subject.href || pathname.startsWith(subject.href + '/');
+ }

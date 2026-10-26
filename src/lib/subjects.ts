@@ -54,5 +54,6 @@ export const SUBJECTS: Subject[] = [
 
 /** True if `pathname` is this subject's hub or any page beneath it. */
 export function isSubjectPath(pathname: string, subject: Subject): boolean {
+  if (subject.slug === 'physics' && (pathname === '/geophysics' || pathname.startsWith('/geophysics/'))) return true;
   return pathname === subject.href || pathname.startsWith(subject.href + '/');
 }
