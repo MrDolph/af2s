@@ -1,0 +1,526 @@
+'use client';
+import { useState } from 'react';
+import Link from 'next/link';
+import { AppHeader } from '@/components/layout/AppHeader';
+
+const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'] as const;
+
+const SIMULATIONS = [
+  {
+    slug: 'space',
+    href: '/simulations/space',
+    title: 'Space: position, distance & displacement',
+    description: 'Locate points on a line, a plane and in 3D space, then measure distance and displacement. Walk-through, journeys and practice included.',
+    icon: '🧊',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Space and time',
+    status: 'live',
+  },
+  {'slug': 'geophysics-field-lab', 'href': '/geophysics/index.html', 'title': 'Geophysics field lab', 'description': 'Gravity contours, resistivity, seismic arrivals, EM attenuation and well logging.', 'icon': '📈', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
+
+  {'slug': 'earth-explorer', 'href': '/geophysics/earth.html', 'title': 'Earth Explorer', 'description': 'Rotate and open the Earth from the inner core to the exosphere.', 'icon': '🌍', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
+
+  {'slug': 'solar-system-explorer', 'href': '/geophysics/solar.html', 'title': 'Solar System Explorer', 'description': 'Planet families, nebular formation and Kepler’s laws.', 'icon': '☀️', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
+
+  {'slug': 'plate-tectonics-explorer', 'href': '/geophysics/tectonics.html', 'title': 'Tectonics and Earth’s shape', 'description': 'World plates, continental drift, magnetic stripes, triple junctions and flattening.', 'icon': '🧩', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
+
+  {
+    slug: 'projectile-motion',
+    href: '/simulations/projectile-motion',
+    title: 'Projectile motion',
+    description: 'Launch a projectile and explore range, height, and trajectory in real time.',
+    icon: '🎯',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'double-pendulum',
+    href: '/simulations/double-pendulum',
+    title: 'Double pendulum',
+    description: 'Explore deterministic chaos with a coupled nonlinear oscillator. Trail, energy monitor, and presets included.',
+    icon: '🌀',
+    tags: ['IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'coupled-oscillators',
+    href: '/simulations/coupled-oscillators',
+    title: 'Coupled oscillators',
+    description: 'Explore normal modes, beats, and energy transfer in a linear coupled spring–mass system.',
+    icon: '🔘',
+    tags: ['IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'gas-laws',
+    href: '/simulations/gas-laws',
+    title: "Gas laws (Boyle & Charles)",
+    description: 'Compress gas to see pressure rise. Heat it to watch volume expand.',
+    icon: '🧪',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
+    topic: 'Thermal physics',
+    status: 'live',
+  },
+  {
+    slug: 'newtons-second-law',
+    href: '/simulations/newtons-laws',
+    title: "Newton's 2nd law",
+    description: 'Apply forces to a block and observe acceleration in real time.',
+    icon: '⚡',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'consequences-of-newtons-motion-laws',
+    href: '/simulations/consequences-of-motion',
+    title: "Consequences of Newton's motion laws",
+    description: 'Explore inertia, momentum and action-reaction with interactive experiments.',
+    icon: '🚈',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'simple-harmonic-motion',
+    href: '/simulations/oscillations',
+    title: 'Simple harmonic motion',
+    description: 'Oscillating mass-spring system with displacement, velocity and energy graphs.',
+    icon: '〰️',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'quantum-harmonic-oscillator',
+    href: '/simulations/quantum-harmonic-oscillator',
+    title: 'Quantum Harmonic Oscillator',
+    description: 'Visualise quantum wavefunctions, superpositions, and coherent states in the exactly solvable QHO potential.',
+    icon: '⚛️',
+    tags: ['IGCSE', 'SAT', 'JUPEB'],
+    subtopic: 'Quantum Mechanics',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'quantum-tunneling',
+    href: '/simulations/quantum-tunneling',
+    title: '1D Quantum Tunneling',
+    description: 'Interactive wave packet scattering through barriers, wells, and steps. Split-step Fourier evolution with real-time transmission/reflection measurement, WKB analysis, and classical comparison.',
+    icon: '🌊',
+    tags: ['IGCSE', 'SAT', 'JUPEB', 'A-Level', 'Undergrad'],
+    subtopic: 'Quantum Mechanics',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'band-theory',
+    href: '/simulations/band-theory',
+    title: 'Energy Band Theory',
+    description: 'Explore how band gaps, temperature, and doping control whether a material is an insulator, semiconductor, or conductor. Fermi-Dirac statistics in action.',
+    icon: '⚡',
+    tags: ['IGCSE', 'SAT', 'JUPEB', 'A-Level', 'Undergrad'],
+    subtopic: 'Solid State Physics',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'pn-junction',
+    href: '/simulations/pn-junction',
+    title: 'PN Junction & Rectification',
+    description: 'Explore depletion regions, built-in potential, and the Shockley diode equation. Watch carrier diffusion and drift respond to applied bias across Si, Ge, and GaAs junctions.',
+    icon: '🔌',
+    tags: ['IGCSE', 'SAT', 'JUPEB', 'A-Level', 'Undergrad'],
+    subtopic: 'Semiconductor Devices',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'bjt-transistor',
+    href: '/simulations/bjt-transistor',
+    title: 'BJT Transistor Operating Regions',
+    description: 'NPN bipolar junction transistor: cutoff, active (amplification), and saturation. Watch electron injection, base recombination, and collector current control by base current.',
+    icon: '🔧',
+    tags: ['A-Level', 'Undergrad', 'Electronics'],
+    subtopic: 'Semiconductor Devices',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'mosfet',
+    href: '/simulations/mosfet',
+    title: 'MOSFET Transistor Characteristics',
+    description: 'Explore threshold voltage, inversion layer formation, and channel pinch-off. NMOS and PMOS with output/transfer characteristics in cutoff, triode, and saturation.',
+    icon: '⚡',
+    tags: ['Undergrad', 'Electronics', 'VLSI'],
+    subtopic: 'Semiconductor Devices',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'ohms-law',
+    href: '/simulations/ohms-law',
+    title: "Ohm's law & circuits",
+    description: 'Adjust voltage and resistance, measure current. Build series and parallel circuits.',
+    icon: '⚡',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'electrostatics-charging',
+    href: '/simulations/electrostatics-charging',
+    title: 'Electrostatics: Charging Objects',
+    description: 'Friction, conduction & induction, the gold-leaf electroscope, and the electrophorus.',
+    icon: '🍂',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'JUPEB'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'electrostatics-fields',
+    href: '/simulations/electrostatics-fields',
+    title: "Electrostatics: Coulomb's Law & Fields",
+    description: 'Force between point charges, with a real release animation, plus electric field lines.',
+    icon: '🧲',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'electrostatics-potential',
+    href: '/simulations/electrostatics-potential',
+    title: 'Electrostatics: Potential & Capacitors',
+    description: 'Potential energy with live KE/PE tracking, equipotential surfaces, and a charging/discharging capacitor.',
+    icon: '🔋',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'magnetic-effects',
+    href: '/simulations/magnetic-effects',
+    title: 'Magnetic Effects of Current',
+    description: "Field of a straight wire and solenoid (right-hand rule), plus the motor effect (Fleming's left-hand rule). Secondary to undergraduate level.",
+    icon: '🧲',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'Undergraduate'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'electromagnetic-induction',
+    href: '/simulations/electromagnetic-induction',
+    title: 'Electromagnetic Induction',
+    description: "Faraday's and Lenz's laws with a moving magnet and galvanometer, an AC generator with a live EMF-time graph, and a transformer. Secondary to undergraduate level.",
+    icon: '🔄',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'Undergraduate'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'ac-circuits',
+    href: '/simulations/ac-circuits',
+    title: 'Simple AC Circuits',
+    description: 'AC waveforms and RMS values, inductive/capacitive reactance with phasor diagrams, and a series RLC circuit with impedance triangle and resonance. Secondary to undergraduate level.',
+    icon: '📈',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'Undergraduate'],
+    topic: 'Electricity',
+    status: 'live',
+  },
+  {
+    slug: 'waves',
+    href: '/simulations/waves',
+    title: 'Wave motion',
+    description: 'Visualise transverse and longitudinal waves. Explore frequency and amplitude.',
+    icon: '🌊',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
+    topic: 'Waves',
+    status: 'live',
+  },
+  {
+    slug: 'diffraction',
+    href: '/simulations/diffraction',
+    title: 'Diffraction',
+    description: 'Waves spreading through a single slit, and diffraction-grating spectral orders.',
+    icon: '🌈',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'JUPEB'],
+    topic: 'Waves',
+    status: 'live',
+  },
+  {
+    slug: 'polarization',
+    href: '/simulations/polarization',
+    title: 'Polarization',
+    description: 'Unpolarized light through a single filter, and Malus\u2019s law with two polarizers.',
+    icon: '🕶️',
+    tags: ['IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Waves',
+    status: 'live',
+  },
+  {
+    slug: 'refraction',
+    href: '/simulations/refraction',
+    title: 'Refraction & lenses',
+    description: 'Trace light rays through convex and concave lenses. Find focal length.',
+    icon: '🔭',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
+    topic: 'Optics',
+    status: 'live',
+  },
+  {
+    slug: 'reflection',
+    href: '/simulations/reflection',
+    title: 'Reflection',
+    description: 'The law of reflection, mirror rotation (fixed source, 2θ rule), and concave/convex ray diagrams.',
+    icon: '👓',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
+    topic: 'Optics',
+    status: 'live',
+  },
+  {
+    slug: 'rectilinear-propagation',
+    href: '/simulations/rectilinear-propagation',
+    title: 'Sources of Light & Rectilinear Propagation',
+    description: 'Shadows (umbra & penumbra), solar & lunar eclipses, and the pinhole camera.',
+    icon: '🌑',
+    tags: ['WAEC', 'NECO', 'IGCSE'],
+    topic: 'Optics',
+    status: 'live',
+  },
+  {
+    slug: 'radioactive-decay',
+    href: '/simulations/radioactive-decay',
+    title: 'Radioactive decay',
+    description: 'Watch nuclei decay over time. Explore half-life with live decay curves.',
+    icon: '☢️',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'JUPEB'],
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'photoelectric-effect',
+    href: '/simulations/photoelectric-effect',
+    title: 'Photoelectric effect',
+    description: "Fire light at a metal plate and test Einstein's equation hf = φ + KEmax.",
+    icon: '💡',
+    tags: ['WAEC', 'IGCSE', 'JUPEB'],
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'de-broglie',
+    href: '/simulations/de-broglie',
+    title: 'De Broglie hypothesis',
+    description: 'See matter waves in action: λ = h/mv for particles from electrons to cricket balls.',
+    icon: '〰️',
+    tags: ['IGCSE', 'JUPEB', 'SAT'],
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'x-rays',
+    href: '/simulations/x-rays',
+    title: 'X-rays',
+    description: 'Explore X-ray tube production, the continuous spectrum, and the Duane–Hunt limit.',
+    icon: '⚡',
+    tags: ['WAEC', 'IGCSE', 'JUPEB'],
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'atomic-models',
+    href: '/simulations/atomic-models',
+    title: 'Atomic Models',
+    description: 'Explore the evolution of atomic theory from Thomson to quantum mechanics, with interactive scattering, quantized orbits, fine structure, Zeeman effect, and quantum orbitals.',
+    icon: '⚛️',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB', 'A-Level'],
+    subtopic: 'Atomic Physics',
+    topic: 'Modern physics',
+    status: 'live',
+  },
+  {
+    slug: 'friction',
+    href: '/simulations/friction',
+    title: 'Friction',
+    description: 'Static vs kinetic friction on flat and inclined surfaces, with the angle of repose.',
+    icon: '🧱',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'heat-transfer',
+    href: '/simulations/heat-transfer',
+    title: 'Modes of heat transfer',
+    description: 'Conduction, convection, and radiation compared side by side with live particle animation.',
+    icon: '🔥',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
+    topic: 'Thermal physics',
+    status: 'live',
+  },
+  {
+    slug: 'elasticity',
+    href: '/simulations/elasticity',
+    title: 'Elasticity',
+    description: "Hooke's law with a loaded spring, and Young's modulus for a stretched wire.",
+    icon: '🏉',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+  {
+    slug: 'equilibrium-of-forces',
+    href: '/simulations/equilibrium-of-forces',
+    title: 'Equilibrium of forces',
+    description: 'Static & dynamic equilibrium, coplanar forces, moments, and floating bodies.',
+    icon: '⚖️',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'JUPEB'],
+    topic: 'Mechanics',
+    status: 'live',
+  },
+];
+
+const TOPICS = ['All', 'Space and time', 'Earth & Space', 'Mechanics', 'Electricity', 'Waves', 'Optics', 'Thermal physics', 'Modern physics'];
+
+const CURRICULUM_COLORS: Record<string, string> = {
+  WAEC: 'bg-indigo-100 text-indigo-700',
+  NECO: 'bg-pink-100 text-pink-700',
+  IGCSE: 'bg-emerald-100 text-emerald-700',
+  SAT: 'bg-orange-100 text-orange-700',
+  JUPEB: 'bg-purple-100 text-purple-700',
+  Undergraduate: 'bg-slate-200 text-slate-700',
+};
+
+export default function SimulationsPage() {
+  const [selectedTopic, setSelectedTopic] = useState<string>('All');
+  const visibleSims = selectedTopic === 'All'
+    ? SIMULATIONS
+    : SIMULATIONS.filter(sim => sim.topic === selectedTopic);
+
+  return (
+    <>
+      <AppHeader />
+      <main className="min-h-screen bg-gray-50">
+
+        {/* Hero */}
+        <section className="border-b border-gray-200 bg-white">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10 sm:py-14">
+            <div className="max-w-2xl">
+              <div className="mb-3 flex flex-wrap gap-2">
+                {CURRICULA.map(c => (
+                  <span key={c} className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${CURRICULUM_COLORS[c]}`}>{c}</span>
+                ))}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 leading-tight mb-3">
+                Physics simulations for every curriculum
+              </h1>
+              <p className="text-sm sm:text-base text-gray-500 leading-relaxed">
+                Interactive, AI-powered simulations built for WAEC, NECO, IGCSE, SAT and JUPEB students.
+                Type a prompt or pick a topic below.
+              </p>
+              <Link href="/mathematics"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition">
+                📐 Mathematics simulations →
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Simulations grid */}
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+
+          {/* Topic filter — scroll on mobile */}
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
+            {TOPICS.map(t => {
+              const count = t === 'All' ? SIMULATIONS.length : SIMULATIONS.filter(sim => sim.topic === t).length;
+              const active = selectedTopic === t;
+              return (
+                <button key={t} onClick={() => setSelectedTopic(t)}
+                  className={`shrink-0 flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-xs font-medium transition whitespace-nowrap ${active
+                    ? 'border-indigo-600 bg-indigo-600 text-white'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:text-indigo-700'
+                    }`}>
+                  {t}
+                  <span className={`rounded-full px-1.5 text-[10px] ${active ? 'bg-white/20' : 'bg-gray-100 text-gray-400'}`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Cards grid */}
+          {visibleSims.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-gray-200 py-16 text-center">
+              <p className="text-sm text-gray-400">No simulations in {selectedTopic} yet.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {visibleSims.map(sim => (
+                <div key={sim.slug} className={`group relative rounded-2xl border bg-white overflow-hidden transition ${sim.status === 'live'
+                  ? 'border-gray-200 hover:border-indigo-300 hover:shadow-md cursor-pointer'
+                  : 'border-gray-100 opacity-70'
+                  }`}>
+                  {sim.status === 'coming' && (
+                    <div className="absolute top-3 right-3 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-400">
+                      Coming soon
+                    </div>
+                  )}
+                  {sim.status === 'live' && (
+                    <div className="absolute top-3 right-3 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-[10px] font-medium text-emerald-600">Live</span>
+                    </div>
+                  )}
+
+                  <Link href={sim.status === 'live' ? sim.href : '#'}
+                    className={sim.status !== 'live' ? 'pointer-events-none' : ''}>
+                    <div className="p-5">
+                      {/* Icon + topic */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-2xl">{sim.icon}</span>
+                        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">{sim.topic}</span>
+                      </div>
+
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1.5 group-hover:text-indigo-700 transition">
+                        {sim.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 leading-relaxed mb-4">{sim.description}</p>
+
+                      {/* Curriculum tags */}
+                      <div className="flex flex-wrap gap-1">
+                        {sim.tags.map(tag => (
+                          <span key={tag} className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${CURRICULUM_COLORS[tag]}`}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {sim.status === 'live' && (
+                      <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between">
+                        <span className="text-xs font-medium text-indigo-600">Open simulation</span>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round">
+                          <path d="M2 7h10M8 3l4 4-4 4" />
+                        </svg>
+                      </div>
+                    )}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Coming soon note */}
+          <p className="text-center text-xs text-gray-400 mt-8">
+            More simulations being added weekly. Suggest a topic at{' '}
+            <a href="mailto:hello@a-factoredtechsolutions.com.ng" className="text-indigo-500 hover:underline">hello@a-factoredtechsolutions.com.ng</a>
+          </p>
+        </section>
+      </main>
+    </>
+  );
+}

@@ -7,6 +7,16 @@ const CURRICULA = ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'] as const;
 
 const SIMULATIONS = [
   {
+    slug: 'vectors',
+    href: '/simulations/vectors',
+    title: 'Vectors: components, addition & products',
+    description: 'Resolve vectors into components, add and subtract them, scale them, and explore dot and cross products in 2D and 3D, with worked steps and practice.',
+    icon: '➡️',
+    tags: ['WAEC', 'NECO', 'IGCSE', 'SAT', 'JUPEB'],
+    topic: 'Space and time',
+    status: 'live',
+  },
+  {
     slug: 'space',
     href: '/simulations/space',
     title: 'Space: position, distance & displacement',
