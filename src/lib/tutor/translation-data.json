@@ -1,0 +1,409 @@
+{
+  "en": {
+    "name": "English",
+    "ui": {
+      "heading": "Your STEM study companion",
+      "intro": "Learn a concept, explore an activity and practise in your preferred language.",
+      "badge": "Free guided demo · No API key",
+      "language": "Learning language",
+      "subject": "Subject",
+      "learn": "Learn",
+      "explore": "Explore",
+      "practise": "Practise",
+      "idea": "The idea",
+      "example": "Worked example",
+      "investigate": "Predict, investigate, explain",
+      "open": "Open activity",
+      "activityNote": "The activity opens in a new tab and may be in English. Return here to practise. This tutor cannot see its settings.",
+      "biologyNote": "Guided thought experiment; no Biology simulation is connected.",
+      "check": "Check answer",
+      "hint": "Give me a hint",
+      "correct": "Correct",
+      "review": "Needs review",
+      "retry": "Try again",
+      "record": "Your practice record",
+      "attempted": "Attempted",
+      "notAttempted": "Not attempted",
+      "download": "Download record",
+      "clear": "Clear record",
+      "confirm": "Clear all practice results on this browser?",
+      "saved": "Saved on this browser only. One question does not establish mastery.",
+      "storageError": "Browser storage is unavailable. Progress may not persist.",
+      "coach": "Ask the demo tutor",
+      "demoNotice": "This tutor selects prepared lesson responses on your device. It is not live generative AI. It does not send your questions to an AI service.",
+      "explain": "Explain this concept",
+      "showExample": "Show a worked example",
+      "showActivity": "Suggest an activity",
+      "showHint": "Give me a hint",
+      "showSolution": "Explain the answer",
+      "placeholder": "Ask for an explanation, example, activity, hint or solution…",
+      "send": "Ask",
+      "you": "You",
+      "tutor": "Demo tutor",
+      "fallback": "I can explain this selected lesson, show its worked example, suggest its activity, give a hint or explain the practice answer. Choose a suggestion above. I cannot answer arbitrary questions in this free demo.",
+      "translationNote": "Local-language wording is draft teaching content. Scientific terms are sometimes retained in English; a fluent subject teacher should review it before classroom use.",
+      "limit": "Four starter lessons, not a complete curriculum.",
+      "subjects": {
+        "Physics": "Physics",
+        "Chemistry": "Chemistry",
+        "Biology": "Biology",
+        "Mathematics": "Mathematics"
+      }
+    },
+    "lessons": {}
+  },
+  "yo": {
+    "name": "Yorùbá",
+    "ui": {
+      "heading": "Olùrànlọ́wọ́ ẹ̀kọ́ STEM rẹ",
+      "intro": "Kọ́ èrò kan, ṣe àyẹ̀wò ìṣe kan, kí o sì dán ìmọ̀ rẹ wò ní èdè tí o fẹ́.",
+      "badge": "Àpẹẹrẹ ọ̀fẹ́ · Kò nílò API key",
+      "language": "Èdè ẹ̀kọ́",
+      "subject": "Kókó ẹ̀kọ́",
+      "learn": "Kọ́ ẹ̀kọ́",
+      "explore": "Ṣe àyẹ̀wò",
+      "practise": "Dán ìmọ̀ wò",
+      "idea": "Èrò pàtàkì",
+      "example": "Àpẹẹrẹ pẹ̀lú ojútùú",
+      "investigate": "Sọ àsọtẹ́lẹ̀, ṣe àyẹ̀wò, ṣàlàyé",
+      "open": "Ṣí ohun èlò ìṣe",
+      "activityNote": "Ìṣe yìí yóò ṣí ní táàbù tuntun, ó sì lè wà ní Gẹ̀ẹ́sì. Padà síbí láti dán ìmọ̀ rẹ wò. Olùrànlọ́wọ́ yìí kò lè rí àwọn ètò rẹ.",
+      "biologyNote": "Àdánwò inú èrò ni èyí; a kò tíì so simulation Biology mọ́ ọn.",
+      "check": "Ṣàyẹ̀wò ìdáhùn",
+      "hint": "Fún mi ní ìtọ́nisọ́nà",
+      "correct": "Ó tọ́",
+      "review": "Tún un kà",
+      "retry": "Gbìyànjú lẹ́ẹ̀kan sí i",
+      "record": "Àkọsílẹ̀ ìdánwò rẹ",
+      "attempted": "Tí o ti gbìyànjú",
+      "notAttempted": "O kò tíì gbìyànjú",
+      "download": "Ṣe ìgbàsílẹ̀ àkọsílẹ̀",
+      "clear": "Pa àkọsílẹ̀ rẹ́",
+      "confirm": "Ṣé kí a pa gbogbo àbájáde ìdánwò inú browser yìí rẹ́?",
+      "saved": "Inú browser yìí nìkan la fi ń pa á mọ́. Ìbéèrè kan kò fi gbogbo ìmọ̀ rẹ hàn.",
+      "storageError": "Browser kò lè pa àkọsílẹ̀ mọ́ báyìí.",
+      "coach": "Béèrè lọ́wọ́ olùrànlọ́wọ́ àpẹẹrẹ",
+      "demoNotice": "Olùrànlọ́wọ́ yìí ń yan ìdáhùn tí a ti kọ sílẹ̀ lórí ẹ̀rọ rẹ. Kì í ṣe AI tó ń dá ìdáhùn tuntun. A kò fi ìbéèrè rẹ ránṣẹ́ sí ilé iṣẹ́ AI.",
+      "explain": "Ṣàlàyé èrò yìí",
+      "showExample": "Fi àpẹẹrẹ pẹ̀lú ojútùú hàn",
+      "showActivity": "Dábàá ìṣe kan",
+      "showHint": "Fún mi ní ìtọ́nisọ́nà",
+      "showSolution": "Ṣàlàyé ìdáhùn",
+      "placeholder": "Béèrè fún àlàyé, àpẹẹrẹ, ìṣe, ìtọ́nisọ́nà tàbí ojútùú…",
+      "send": "Béèrè",
+      "you": "Ìwọ",
+      "tutor": "Olùrànlọ́wọ́ àpẹẹrẹ",
+      "fallback": "Mo lè ṣàlàyé ẹ̀kọ́ yìí, fi àpẹẹrẹ hàn, dábàá ìṣe, fún ọ ní ìtọ́nisọ́nà tàbí ṣàlàyé ìdáhùn. Yan ọ̀kan nínú àwọn bọ́tìnì lókè. Àpẹẹrẹ ọ̀fẹ́ yìí kò lè dáhùn gbogbo irú ìbéèrè.",
+      "translationNote": "Àkọ́kọ́ ẹ̀dà ni ìtumọ̀ èdè yìí. A fi àwọn ọ̀rọ̀ sáyẹ́ǹsì kan sílẹ̀ ní Gẹ̀ẹ́sì. Kí olùkọ́ tó mọ èdè náà dáadáa ṣàyẹ̀wò rẹ̀ kí a tó lò ó ní kíláàsì.",
+      "limit": "Ẹ̀kọ́ mẹ́rin fún ìbẹ̀rẹ̀; kì í ṣe gbogbo syllabus.",
+      "subjects": {
+        "Physics": "Físíìsì (Physics)",
+        "Chemistry": "Kẹ́místrì (Chemistry)",
+        "Biology": "Báyọ́lọ́jì (Biology)",
+        "Mathematics": "Ìṣirò (Mathematics)"
+      }
+    },
+    "lessons": {
+      "projectiles": {
+        "title": "Ìṣípò ohun tí a ju (Projectile motion)",
+        "objective": "Ṣàlàyé bí igun ìfilọ́lẹ̀ ṣe ń yí ìjìnnà petele padà.",
+        "explanation": "Ohun tí a ju ń rìn ní ọ̀nà petele àti ní ọ̀nà inárọ̀ ní àkókò kan náà. Bí a kò bá ka ìdènà afẹ́fẹ́ sí, velocity petele kì í yí padà; acceleration inárọ̀ sì ń tọ́ sílẹ̀ pẹ̀lú g. Bí ibi ìfilọ́lẹ̀ àti ibi ìbalẹ̀ bá ga bákan náà, R = u² sin(2θ) / g. Ní ipò yìí, igun 45° ló ń fún wa ní ìjìnnà tó pọ̀ jù.",
+        "example": "Bí u = 20 m/s, θ = 45° àti g = 10 m/s²: R = (20² × sin 90°) / 10 = 40 m. Velocity inárọ̀ ní ìbẹ̀rẹ̀ jẹ́ 20 sin 45° ≈ 14.14 m/s.",
+        "investigation": "Ṣe àsọtẹ́lẹ̀: ṣé 30° tàbí 60° ni yóò fún wa ní ìjìnnà tó pọ̀ jù? Ṣí simulation, lo speed àti gravity kan náà fún igun méjèèjì. Jẹ́ kí ibi ìfilọ́lẹ̀ àti ibi ìbalẹ̀ ga bákan náà, má sì ka ìdènà afẹ́fẹ́ sí.",
+        "question": "Bí speed kò bá yí padà, ibi ìfilọ́lẹ̀ àti ibi ìbalẹ̀ sì ga bákan náà láìsí ìdènà afẹ́fẹ́, igun wo ló fún wa ní ìjìnnà tó pọ̀ jù?",
+        "options": [
+          "30°",
+          "45°",
+          "60°",
+          "90°"
+        ],
+        "hint": "Ìjìnnà sinmi lórí sin(2θ). Nígbà wo ni iye sine yìí jẹ́ 1?",
+        "solution": "45° ló tọ́: sin(2 × 45°) = sin 90° = 1. Speed gbọ́dọ̀ jẹ́ kan náà, ibi méjèèjì gbọ́dọ̀ ga bákan náà, kò sì gbọdọ̀ sí ìdènà afẹ́fẹ́."
+      },
+      "compounds": {
+        "title": "Àwọn element àti compound",
+        "objective": "Ṣe ìyàtọ̀ láàárín element àti compound, kí o sì túmọ̀ formula kẹ́míkà.",
+        "explanation": "Element ní àwọn atom tí iye proton wọn jẹ́ kan náà. Compound ní atom láti inú element tó yàtọ̀ tí wọ́n so pọ̀ ní ìpín tó dúró ṣinṣin. Nínú H₂O, ìpín hydrogen sí oxygen jẹ́ 2:1. O₂ ní element kan ṣoṣo; kì í ṣe compound.",
+        "example": "H₂O ní atom hydrogen méjì àti atom oxygen kan fún molecule kọ̀ọ̀kan. Molar mass rẹ̀ jẹ́ 2(1.008) + 15.999 = 18.015 g/mol ní ìsúnmọ́. NaCl jẹ́ ionic compound; formula rẹ̀ ń fi ìpín hàn, kì í ṣe molecule kan tó dá dúró.",
+        "investigation": "Ṣí compound builder. Ṣẹ̀dá H₂O, kí o sì fi formula àti molar mass rẹ̀ wé CO₂. Formula tí o bá kó jọ lórí playground kò fi hàn fúnra rẹ̀ pé compound náà lè dúró ṣinṣin tàbí pé ó wà ní tòótọ́.",
+        "question": "Èwo nínú àwọn formula wọ̀nyí jẹ́ compound?",
+        "options": [
+          "O₂",
+          "Fe",
+          "H₂O",
+          "N₂"
+        ],
+        "hint": "Wá formula tí ó ní àmì element méjì tó yàtọ̀.",
+        "solution": "H₂O ní hydrogen àti oxygen tí a so pọ̀ lọ́nà kẹ́míkà. O₂ àti N₂ ní element kan ṣoṣo; Fe jẹ́ iron."
+      },
+      "photosynthesis": {
+        "title": "Photosynthesis: bí ewéko ṣe ń ṣe oúnjẹ",
+        "objective": "Dá àwọn ohun tí photosynthesis nílò, ohun tí ó ń ṣe àti àwọn ohun tó lè dín iyára rẹ̀ kù mọ̀.",
+        "explanation": "Photosynthesis ń lo agbára ìmọ́lẹ̀ láti ṣe carbohydrate láti carbon dioxide àti omi. Nínú ewéko, ó ń ṣẹlẹ̀ ní chloroplast. Àkótán equation rẹ̀ ni 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂, pẹ̀lú ìmọ́lẹ̀ àti chlorophyll. Ìmọ́lẹ̀, CO₂ àti temperature lè dín iyára rẹ̀ kù.",
+        "example": "Ewéko kan ní ìmọ́lẹ̀ tó àti temperature tó yẹ, ṣùgbọ́n CO₂ rẹ̀ kéré. Fífi ìmọ́lẹ̀ kún un nìkan lè má ṣe pọ̀ sí iyára iṣẹ́ náà, nítorí CO₂ ni ohun tí kò tó. Fífi CO₂ kún un lè mú iyára pọ̀ sí i títí ohun mìíràn yóò fi di ààlà.",
+        "investigation": "Àdánwò inú èrò: fi ewéko méjì tó jọra wé ara wọn, ọ̀kan ní CO₂ díẹ̀, èkejì ní CO₂ púpọ̀. Jẹ́ kí ìmọ́lẹ̀, omi àti temperature jẹ́ kan náà. Sọ ohun tí o retí àti ìdí tí a fi gbọdọ̀ darí àwọn ohun wọ̀nyí.",
+        "question": "Gas wo ló ń pèsè carbon tí ewéko fi ń ṣe carbohydrate ní photosynthesis?",
+        "options": [
+          "Oxygen",
+          "Nitrogen",
+          "Carbon dioxide",
+          "Hydrogen"
+        ],
+        "hint": "Wo reactant tí ó ní carbon nínú equation photosynthesis.",
+        "solution": "Carbon dioxide ló ń pèsè carbon. Photosynthesis ń tú oxygen jáde; ewéko tún ń ṣe respiration."
+      },
+      "trigonometry": {
+        "title": "Sine àti cosine",
+        "objective": "So sine àti cosine pọ̀ mọ́ coordinates lórí unit circle.",
+        "explanation": "Unit circle ní radius 1. Point kan ní igun θ, tí a wọn ní ọ̀nà anticlockwise láti positive x-axis, ní coordinates (cos θ, sin θ). Cosine ń fi coordinate petele hàn, sine sì ń fi coordinate inárọ̀ hàn. Láti Pythagoras, sin²θ + cos²θ = 1.",
+        "example": "Ní 30°, (cos 30°, sin 30°) = (√3/2, 1/2). Fún velocity 20 m/s ní 30°, apá petele jẹ́ 20 cos 30° ≈ 17.32 m/s, apá inárọ̀ sì jẹ́ 20 sin 30° = 10 m/s.",
+        "investigation": "Ṣí unit circle explorer. Fi 30°, 90°, 150° àti 270° wé ara wọn. Kọ àmì positive tàbí negative fún sine àti cosine ní quadrant kọ̀ọ̀kan. Ṣàlàyé ìdí tí sin 30° = sin 150°.",
+        "question": "Kí ni iye sin 30°?",
+        "options": [
+          "0",
+          "1/2",
+          "√3/2",
+          "1"
+        ],
+        "hint": "Sine ni y-coordinate lórí unit circle. Ní 30°, coordinate yìí jẹ́ ìdajì radius.",
+        "solution": "sin 30° = 1/2. cos 30° = √3/2. Degree ni a ń lò fún ìbéèrè yìí."
+      }
+    }
+  },
+  "ha": {
+    "name": "Hausa",
+    "ui": {
+      "heading": "Abokin taimakonka na koyon STEM",
+      "intro": "Koyi bayani, binciki aiki, sannan ka gwada fahimtarka a harshen da ka zaɓa.",
+      "badge": "Samfurin kyauta · Ba ya buƙatar API key",
+      "language": "Harshen koyo",
+      "subject": "Fanni",
+      "learn": "Koyo",
+      "explore": "Bincike",
+      "practise": "Gwaji",
+      "idea": "Muhimmin bayani",
+      "example": "Misali da mafita",
+      "investigate": "Yi hasashe, bincika, bayyana",
+      "open": "Buɗe aikin gwaji",
+      "activityNote": "Aikin zai buɗe a sabon shafi kuma yana iya kasancewa da Turanci. Ka dawo nan don gwaji. Wannan mataimaki ba ya ganin saitunan aikin.",
+      "biologyNote": "Wannan gwajin tunani ne; ba a haɗa simulation na Biology ba tukuna.",
+      "check": "Duba amsa",
+      "hint": "Ba ni alamar taimako",
+      "correct": "Daidai",
+      "review": "Sake dubawa",
+      "retry": "Sake gwadawa",
+      "record": "Rikodin gwajinka",
+      "attempted": "An gwada",
+      "notAttempted": "Ba a gwada ba",
+      "download": "Sauke rikodi",
+      "clear": "Goge rikodi",
+      "confirm": "A goge duk sakamakon gwaji a wannan burauza?",
+      "saved": "Ana adanawa a wannan burauza kawai. Tambaya ɗaya ba ta tabbatar da cikakkiyar ƙwarewa ba.",
+      "storageError": "Burauza ba ta iya adana rikodi yanzu.",
+      "coach": "Tambayi mataimakin samfurin",
+      "demoNotice": "Wannan mataimaki yana zaɓar amsoshin darasin da aka riga aka shirya a na’urarka. Ba AI mai samar da sabbin amsoshi ba ne. Ba ya aika tambayoyinka zuwa sabis na AI.",
+      "explain": "Bayyana wannan darasi",
+      "showExample": "Nuna misali da mafita",
+      "showActivity": "Ba da shawarar aiki",
+      "showHint": "Ba ni alamar taimako",
+      "showSolution": "Bayyana amsar",
+      "placeholder": "Nemi bayani, misali, aiki, alamar taimako ko mafita…",
+      "send": "Tambaya",
+      "you": "Kai",
+      "tutor": "Mataimakin samfurin",
+      "fallback": "Zan iya bayyana wannan darasi, nuna misalinsa, ba da shawarar aiki, ba da alamar taimako ko bayyana amsar gwaji. Zaɓi ɗaya daga maɓallan da ke sama. Wannan samfurin kyauta ba ya amsa kowace irin tambaya.",
+      "translationNote": "Fassarar nan daftarin koyarwa ce. An bar wasu kalmomin kimiyya da Turanci. Malamin fannin da ya iya harshen ya kamata ya duba ta kafin amfani a aji.",
+      "limit": "Darussa huɗu na farko; ba cikakken tsarin karatu ba.",
+      "subjects": {
+        "Physics": "Fisiks (Physics)",
+        "Chemistry": "Kemistri (Chemistry)",
+        "Biology": "Ilimin halittu (Biology)",
+        "Mathematics": "Lissafi (Mathematics)"
+      }
+    },
+    "lessons": {
+      "projectiles": {
+        "title": "Motsin abin da aka jefa (Projectile motion)",
+        "objective": "Bayyana yadda kusurwar jefawa ke sauya nisan kwance.",
+        "explanation": "Abin da aka jefa yana motsi a kwance da kuma a tsaye a lokaci guda. Idan muka yi watsi da juriyar iska, gudun kwance ba ya sauyawa, yayin da acceleration a tsaye yake zuwa ƙasa da g. Idan tsayin farawa da na sauka ɗaya ne, R = u² sin(2θ) / g. A waɗannan sharuɗɗa, 45° tana ba da nisa mafi girma.",
+        "example": "Idan u = 20 m/s, θ = 45° da g = 10 m/s²: R = (20² × sin 90°) / 10 = 40 m. Gudun farko a tsaye shi ne 20 sin 45° ≈ 14.14 m/s.",
+        "investigation": "Yi hasashe: 30° ko 60° za ta ba da nisa mafi girma? Buɗe simulation, sa gudun farko da gravity iri ɗaya, sannan ka kwatanta kusurwoyin. Tsayin farawa da na sauka su zama ɗaya, kuma a yi watsi da juriyar iska.",
+        "question": "Idan gudun farko da tsayin farawa da sauka iri ɗaya ne ba tare da juriyar iska ba, wace kusurwa ce ke ba da nisa mafi girma?",
+        "options": [
+          "30°",
+          "45°",
+          "60°",
+          "90°"
+        ],
+        "hint": "Nisa ya dogara da sin(2θ). A wace kusurwa sine ɗin yake zama 1?",
+        "solution": "45° ce: sin(2 × 45°) = sin 90° = 1. Wannan yana buƙatar gudun farko ɗaya, tsayin farawa da sauka ɗaya, da rashin juriyar iska."
+      },
+      "compounds": {
+        "title": "Elements da compounds",
+        "objective": "Bambanta element da compound kuma ka fassara formula na sinadari.",
+        "explanation": "Element yana ƙunshe da atoms masu adadin proton iri ɗaya. Compound yana ƙunshe da atoms na elements daban-daban da suka haɗu ta chemical bond cikin daidaitaccen rabo. H₂O yana da hydrogen da oxygen a rabo 2:1. O₂ yana da element ɗaya kawai; ba compound ba ne.",
+        "example": "H₂O yana da atoms biyu na hydrogen da atom ɗaya na oxygen a kowane molecule. Molar mass ɗinsa kusan 2(1.008) + 15.999 = 18.015 g/mol ne. NaCl ionic compound ne; formulansa yana nuna rabo, ba molecule mai zaman kansa ba.",
+        "investigation": "Buɗe compound builder. Haɗa H₂O ka kwatanta formulansa da molar mass ɗinsa da CO₂. Haɗa formula a playground kaɗai ba ya tabbatar da cewa sinadarin yana da kwanciyar hankali ko yana wanzuwa a zahiri.",
+        "question": "Wace formula ce ta compound maimakon element?",
+        "options": [
+          "O₂",
+          "Fe",
+          "H₂O",
+          "N₂"
+        ],
+        "hint": "Nemi formula mai alamomin elements biyu daban-daban.",
+        "solution": "H₂O yana da hydrogen da oxygen da suka haɗu ta chemical bond. O₂ da N₂ suna da element ɗaya kowannensu; Fe shi ne iron."
+      },
+      "photosynthesis": {
+        "title": "Photosynthesis: yadda tsiro ke samar da abinci",
+        "objective": "Gano abubuwan da photosynthesis yake amfani da su, abin da yake samarwa da abubuwan da ke rage saurin sa.",
+        "explanation": "Photosynthesis yana amfani da makamashin haske wajen samar da carbohydrates daga carbon dioxide da ruwa. A tsire-tsire yana faruwa a chloroplasts. Taƙaitacciyar equation ita ce 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂, tare da haske da chlorophyll. Ƙarfin haske, yawan CO₂ da zafin jiki na iya iyakance saurin sa.",
+        "example": "Tsiro yana samun haske mai isa da zafin jiki mai kyau, amma CO₂ ya yi kaɗan. Ƙara haske kaɗai yana iya yin tasiri kaɗan saboda CO₂ ne bai isa ba. Ƙara CO₂ zai iya ƙara sauri har sai wani abu ya zama abin iyakancewa.",
+        "investigation": "Gwajin tunani: kwatanta tsire-tsire iri ɗaya, ɗaya yana samun CO₂ kaɗan, ɗayan mai yawa. A bar haske, ruwa da zafin jiki iri ɗaya. Yi hasashen sakamako ka bayyana dalilin da ya sa ake sarrafa waɗannan abubuwa.",
+        "question": "Wane gas ne yake samar da carbon da ake amfani da shi wajen yin carbohydrates a photosynthesis?",
+        "options": [
+          "Oxygen",
+          "Nitrogen",
+          "Carbon dioxide",
+          "Hydrogen"
+        ],
+        "hint": "Duba reactant mai carbon a cikin equation na photosynthesis.",
+        "solution": "Carbon dioxide ne yake samar da carbon. Ana sakin oxygen a photosynthesis; tsire-tsire kuma suna yin respiration."
+      },
+      "trigonometry": {
+        "title": "Sine da cosine",
+        "objective": "Haɗa sine da cosine da coordinates a kan unit circle.",
+        "explanation": "Unit circle yana da radius 1. Matsayi a kusurwar θ da aka auna akasin tafiyar agogo daga positive x-axis yana da coordinates (cos θ, sin θ). Cosine yana ba da coordinate na kwance, sine kuma na tsaye. Daga Pythagoras, sin²θ + cos²θ = 1.",
+        "example": "A 30°, (cos 30°, sin 30°) = (√3/2, 1/2). Gudun 20 m/s a 30° yana da ɓangaren kwance 20 cos 30° ≈ 17.32 m/s da na tsaye 20 sin 30° = 10 m/s.",
+        "investigation": "Buɗe unit circle explorer. Kwatanta 30°, 90°, 150° da 270°. Rubuta ko sine da cosine suna positive ko negative a kowanne quadrant. Bayyana dalilin da ya sa sin 30° = sin 150°.",
+        "question": "Menene sin 30°?",
+        "options": [
+          "0",
+          "1/2",
+          "√3/2",
+          "1"
+        ],
+        "hint": "Sine shi ne y-coordinate a unit circle. A 30° wannan coordinate rabin radius ne.",
+        "solution": "sin 30° = 1/2. cos 30° = √3/2. Wannan tambaya tana amfani da degrees."
+      }
+    }
+  },
+  "ig": {
+    "name": "Igbo",
+    "ui": {
+      "heading": "Onye enyemaka gị n’ịmụ STEM",
+      "intro": "Mụta otu echiche, nyochaa ọrụ, ma nwalee nghọta gị n’asụsụ ị họọrọ.",
+      "badge": "Ihe ngosi efu · Ọ chọghị API key",
+      "language": "Asụsụ mmụta",
+      "subject": "Ihe ọmụmụ",
+      "learn": "Mụta",
+      "explore": "Nyochaa",
+      "practise": "Nwalee",
+      "idea": "Echiche bụ isi",
+      "example": "Ihe atụ nwere ngwọta",
+      "investigate": "Buo amụma, nyochaa, kọwaa",
+      "open": "Mepee ọrụ",
+      "activityNote": "Ọrụ a ga-emeghe na taabụ ọhụrụ, ọ pụkwara ịdị na Bekee. Lọghachi ebe a ka ị nwalee nghọta gị. Onye enyemaka a anaghị ahụ ntọala simulation ahụ.",
+      "biologyNote": "Nke a bụ nnwale n’echiche; e jikọbeghị simulation Biology.",
+      "check": "Lelee azịza",
+      "hint": "Nye m ntụziaka",
+      "correct": "Ọ ziri ezi",
+      "review": "Leghachi anya",
+      "retry": "Gbalịa ọzọ",
+      "record": "Ndekọ nnwale gị",
+      "attempted": "A nwaleela",
+      "notAttempted": "A nwaleghị",
+      "download": "Budata ndekọ",
+      "clear": "Hichapụ ndekọ",
+      "confirm": "Hichapụ nsonaazụ nnwale niile dị na nchọgharị a?",
+      "saved": "A na-echekwa ya naanị na nchọgharị a. Otu ajụjụ anaghị egosi nghọta zuru oke.",
+      "storageError": "Nchọgharị enweghị ike ichekwa ndekọ ugbu a.",
+      "coach": "Jụọ onye enyemaka ihe ngosi",
+      "demoNotice": "Onye enyemaka a na-ahọrọ azịza edoziri tupu oge eruo n’elu ngwaọrụ gị. Ọ bụghị AI na-emepụta azịza ọhụrụ. Ọ naghị eziga ajụjụ gị na ọrụ AI.",
+      "explain": "Kọwaa echiche a",
+      "showExample": "Gosi ihe atụ nwere ngwọta",
+      "showActivity": "Tụpụta ọrụ",
+      "showHint": "Nye m ntụziaka",
+      "showSolution": "Kọwaa azịza",
+      "placeholder": "Rịọ nkọwa, ihe atụ, ọrụ, ntụziaka ma ọ bụ ngwọta…",
+      "send": "Jụọ",
+      "you": "Gị",
+      "tutor": "Onye enyemaka ihe ngosi",
+      "fallback": "Enwere m ike ịkọwa ihe ọmụmụ a, gosi ihe atụ ya, tụpụta ọrụ, nye ntụziaka ma ọ bụ kọwaa azịza nnwale. Họrọ otu bọtịnụ dị n’elu. Ihe ngosi efu a enweghị ike ịza ụdị ajụjụ niile.",
+      "translationNote": "Nsụgharị ndị a bụ ọdịnaya mmụta a ka na-enyocha. Ụfọdụ okwu sayensị ka dị na Bekee. Onye nkuzi maara asụsụ na ihe ọmụmụ ahụ kwesịrị inyocha ha tupu iji ha n’ụlọ akwụkwọ.",
+      "limit": "Ihe ọmụmụ anọ maka mmalite; ọ bụghị usoro ọmụmụ zuru oke.",
+      "subjects": {
+        "Physics": "Fiziks (Physics)",
+        "Chemistry": "Kemistri (Chemistry)",
+        "Biology": "Ihe gbasara ndụ (Biology)",
+        "Mathematics": "Mgbakọ na mwepụ (Mathematics)"
+      }
+    },
+    "lessons": {
+      "projectiles": {
+        "title": "Mmegharị ihe a tụbara (Projectile motion)",
+        "objective": "Kọwaa otú nkuku mbido si agbanwe anya ihe na-aga n’ụzọ kwụ ọtọ n’ala.",
+        "explanation": "Ihe a tụbara na-aga n’ụzọ kwụ ọtọ n’ala na n’ụzọ elu na ala n’otu oge. Ọ bụrụ na anyị eleghara mgbochi ikuku anya, velocity n’ụzọ kwụ ọtọ n’ala anaghị agbanwe; acceleration n’ụzọ elu na ala na-aga ala na g. Mgbe ebe mbido na ebe ọdịda nọ n’otu ịdị elu, R = u² sin(2θ) / g. N’ọnọdụ ndị a, 45° na-enye anya kachasị.",
+        "example": "Ọ bụrụ na u = 20 m/s, θ = 45° na g = 10 m/s²: R = (20² × sin 90°) / 10 = 40 m. Velocity mbido n’ụzọ elu bụ 20 sin 45° ≈ 14.14 m/s.",
+        "investigation": "Buo amụma: 30° ka ọ bụ 60° ga-enye anya kachasị? Mepee simulation, jiri otu speed na gravity tụnyere nkuku abụọ ahụ. Mee ka ebe mbido na ebe ọdịda nọrọ n’otu ịdị elu, ma leghara mgbochi ikuku anya.",
+        "question": "Mgbe speed mbido adịghị agbanwe, ebe mbido na ebe ọdịda nọ n’otu ịdị elu, na mgbochi ikuku adịghị, nkuku ole na-enye anya kachasị?",
+        "options": [
+          "30°",
+          "45°",
+          "60°",
+          "90°"
+        ],
+        "hint": "Anya ahụ dabere na sin(2θ). Olee mgbe sine a hà 1?",
+        "solution": "45° ziri ezi: sin(2 × 45°) = sin 90° = 1. Speed ga-abụ otu, ebe abụọ ahụ ga-anọ n’otu ịdị elu, mgbochi ikuku agaghịkwa adị."
+      },
+      "compounds": {
+        "title": "Elements na compounds",
+        "objective": "Kewaa element na compound ma kọwaa formula kemịkal.",
+        "explanation": "Element nwere atoms ndị ọnụ ọgụgụ proton ha bụ otu. Compound nwere atoms sitere na elements dị iche iche jikọtara site na chemical bonds n’oke a kapịrị ọnụ. H₂O nwere hydrogen na oxygen n’oke 2:1. O₂ nwere naanị otu element; ọ bụghị compound.",
+        "example": "H₂O nwere atoms hydrogen abụọ na atom oxygen otu n’ime molecule ọ bụla. Molar mass ya bụ ihe dịka 2(1.008) + 15.999 = 18.015 g/mol. NaCl bụ ionic compound; formula ya na-egosi oke ions, ọ bụghị molecule kwụụrụ onwe ya.",
+        "investigation": "Mepee compound builder. Rụpụta H₂O ma tụnyere formula na molar mass ya na CO₂. Ịchịkọta formula n’ime playground anaghị egosi n’onwe ya na compound ahụ kwụsiri ike ma ọ bụ na ọ dị n’eziokwu.",
+        "question": "Kedu formula na-anọchi anya compound kama element?",
+        "options": [
+          "O₂",
+          "Fe",
+          "H₂O",
+          "N₂"
+        ],
+        "hint": "Chọọ formula nwere akara elements abụọ dị iche iche.",
+        "solution": "H₂O nwere hydrogen na oxygen jikọtara site na chemical bonds. O₂ na N₂ nwere naanị otu element n’otu n’otu; Fe bụ iron."
+      },
+      "photosynthesis": {
+        "title": "Photosynthesis: otú osisi si eme nri",
+        "objective": "Mata ihe photosynthesis chọrọ, ihe ọ na-emepụta na ihe ndị na-egbochi ọsọ ya.",
+        "explanation": "Photosynthesis na-eji ike ọkụ mee carbohydrates site na carbon dioxide na mmiri. N’osisi, ọ na-eme na chloroplasts. Equation nchịkọta ya bụ 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂, site n’enyemaka ọkụ na chlorophyll. Ike ọkụ, ọnụọgụ CO₂ na temperature nwere ike igbochi ọsọ ya.",
+        "example": "Otu osisi nwere ọkụ zuru oke na temperature kwesịrị ekwesị, ma CO₂ dị ntakịrị. Ịgbakwunye naanị ọkụ nwere ike ịgbanwe ọsọ ahụ obere n’ihi na CO₂ ezughị. Ịgbakwunye CO₂ nwere ike ime ka ọsọ bawanye ruo mgbe ihe ọzọ ghọrọ ihe na-egbochi ya.",
+        "investigation": "Nnwale n’echiche: tụnyere osisi abụọ yiri ibe ha, otu nwere CO₂ ntakịrị, nke ọzọ nwere ọtụtụ. Debe ọkụ, mmiri na temperature ka ha bụrụ otu. Buo amụma ihe ga-eme ma kọwaa ihe mere a ga-eji debe ihe ndị ahụ otu.",
+        "question": "Kedu gas na-enye carbon a na-eji emepụta carbohydrates n’oge photosynthesis?",
+        "options": [
+          "Oxygen",
+          "Nitrogen",
+          "Carbon dioxide",
+          "Hydrogen"
+        ],
+        "hint": "Lee reactant nwere carbon n’ime equation photosynthesis.",
+        "solution": "Carbon dioxide na-enye carbon. Photosynthesis na-ahapụ oxygen; osisi na-emekwa respiration."
+      },
+      "trigonometry": {
+        "title": "Sine na cosine",
+        "objective": "Jikọta sine na cosine na coordinates n’elu unit circle.",
+        "explanation": "Unit circle nwere radius 1. Ebe dị na nkuku θ a tụrụ megide ụzọ elekere si aga, malite na positive x-axis, nwere coordinates (cos θ, sin θ). Cosine bụ coordinate kwụ ọtọ n’ala, sine bụ coordinate elu na ala. Site na Pythagoras, sin²θ + cos²θ = 1.",
+        "example": "Na 30°, (cos 30°, sin 30°) = (√3/2, 1/2). Velocity 20 m/s na 30° nwere akụkụ kwụ ọtọ n’ala 20 cos 30° ≈ 17.32 m/s, na akụkụ elu 20 sin 30° = 10 m/s.",
+        "investigation": "Mepee unit circle explorer. Tụnyere 30°, 90°, 150° na 270°. Dee ma sine na cosine bụ positive ma ọ bụ negative na quadrant ọ bụla. Kọwaa ihe mere sin 30° = sin 150°.",
+        "question": "Gịnị bụ sin 30°?",
+        "options": [
+          "0",
+          "1/2",
+          "√3/2",
+          "1"
+        ],
+        "hint": "Sine bụ y-coordinate n’elu unit circle. Na 30°, coordinate a bụ ọkara radius.",
+        "solution": "sin 30° = 1/2. cos 30° = √3/2. Ajụjụ a na-eji degrees."
+      }
+    }
+  }
+}

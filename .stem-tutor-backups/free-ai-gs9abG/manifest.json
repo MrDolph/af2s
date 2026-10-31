@@ -1,0 +1,26 @@
+[
+  {
+    "file": "src/lib/ai/demo-simulation.ts",
+    "existed": false
+  },
+  {
+    "file": "src/lib/ai/parse-prompt.ts",
+    "existed": true
+  },
+  {
+    "file": "src/app/api/ai/route.ts",
+    "existed": true
+  },
+  {
+    "file": "src/components/ai/PromptBar.tsx",
+    "existed": true
+  },
+  {
+    "file": "capstone/FREE_SIMULATION_PROMPTS.md",
+    "existed": false
+  },
+  {
+    "file": "src/app/page.tsx",
+    "existed": true
+  }
+]

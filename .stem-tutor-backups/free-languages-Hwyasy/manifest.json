@@ -1,0 +1,18 @@
+[
+  {
+    "file": "src/app/tutor/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/lib/tutor/local-demo.ts",
+    "existed": false
+  },
+  {
+    "file": "src/lib/tutor/translation-data.json",
+    "existed": false
+  },
+  {
+    "file": "capstone/FREE_LANGUAGE_DEMO.md",
+    "existed": false
+  }
+]

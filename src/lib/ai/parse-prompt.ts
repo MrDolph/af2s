@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { AIPromptRequest, AIPromptResponse } from '@/types/ai';
 
-const client = new Anthropic();
+import { parseDemoSimulation } from './demo-simulation';
 
 const SYSTEM_PROMPT = `You are the AI engine for A-Factor STEM Studio, a STEM simulation platform for African secondary schools (WAEC/NECO/JAMB curriculum).
 
@@ -24,7 +24,16 @@ For newtons_second_law params: mass (kg), force (N), friction (0-1)
 
 If the user writes in Yoruba, Hausa, or Igbo, respond with explanation in that language but keep JSON keys in English.`;
 
-export async function parseSimulationPrompt(request: AIPromptRequest): Promise<AIPromptResponse> {
+export async function parseSimulationPrompt(request: AIPromptRequest): Promise<AIPromptResponse & { mode: 'demo' | 'live' }> {
+  // Free local parsing is the default, even when an old/invalid key exists.
+  if (process.env.SIMULATION_AI_MODE !== 'live') return parseDemoSimulation(request);
+  if (!process.env.ANTHROPIC_API_KEY) throw new Error('LIVE_AI_NOT_CONFIGURED');
+  const result = await parseLiveSimulationPrompt(request);
+  return { ...result, mode: 'live' };
+}
+
+async function parseLiveSimulationPrompt(request: AIPromptRequest): Promise<AIPromptResponse> {
+  const client = new Anthropic({ timeout: 22000, maxRetries: 0 });
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,

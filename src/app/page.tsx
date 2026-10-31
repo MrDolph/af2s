@@ -81,7 +81,7 @@ export default function HomePage() {
               Describe your simulation
             </h2>
             <p className="text-xs text-gray-400 mb-4">
-              Type in English, Yoruba, Hausa, or Igbo — AI generates parameters instantly.
+              Choose English, Yoruba, Hausa or Igbo. The free demo reads supported projectile prompts without an AI API.
             </p>
             <PromptBar onResult={handleAIResult} />
           </div>
