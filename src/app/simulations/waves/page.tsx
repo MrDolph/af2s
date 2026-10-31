@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -130,6 +132,12 @@ export default function WavesPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 300, 980);
 
+  useTopicPreset("simulations-waves", { "A": setA,
+    "f": setF,
+    "lambda": setLambda,
+    "A2": setA2,
+    "f2": setF2,
+    "phase2": setPhase2 }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

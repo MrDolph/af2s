@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { BoylesCanvas } from '@/components/simulation/BoylesCanvas';
@@ -140,6 +142,10 @@ export default function GasLawsPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 280, 240, 460);
 
+  useTopicPreset("simulations-gas-laws", { "pressure": setPressure,
+    "volume": setVolume,
+    "moles": setMoles,
+    "temperature": setTemperature }, { "law": (value: string) => setLaw(value as typeof law) });
   return (
     <>
       <AppHeader />

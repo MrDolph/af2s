@@ -1,5 +1,9 @@
 // src/app/simulations/pn-junction/page.tsx
 'use client';
+import { TopicContext } from '@/components/explorer/TopicContext';
+
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -22,8 +26,13 @@ export default function PnJunctionPage() {
 
   const isRectifier = params.circuitMode !== 'diode';
 
+  useTopicPreset("simulations-pn-junction", { "params.appliedBias": (value: number) => setParams(current => ({ ...current, appliedBias: value })),
+    "params.Vin": (value: number) => setParams(current => ({ ...current, Vin: value })),
+    "params.Rload": (value: number) => setParams(current => ({ ...current, Rload: value })),
+    "params.freq": (value: number) => setParams(current => ({ ...current, freq: value })),
+    "params.temperature": (value: number) => setParams(current => ({ ...current, temperature: value })) }, {  });
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="af-device min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -39,6 +48,7 @@ export default function PnJunctionPage() {
           </div>
         </div>
       </header>
+      <TopicContext />
 
       <main className="flex-1 p-6">
         <div className="max-w-6xl mx-auto">

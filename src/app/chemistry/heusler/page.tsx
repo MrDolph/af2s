@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -102,6 +104,7 @@ export default function HeuslerPage() {
 
   const tone = { good: 'bg-emerald-50 text-emerald-900', info: 'bg-gray-50 text-gray-700', warn: 'bg-amber-50 text-amber-900' } as const;
 
+  useTopicPreset("chemistry-heusler", { "a": setA }, {  });
   return (
     <>
       <AppHeader />

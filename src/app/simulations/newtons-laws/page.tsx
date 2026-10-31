@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { NewtonsFirstCanvas } from '@/components/simulation/NewtonsFirstCanvas';
@@ -189,6 +191,16 @@ export default function NewtonsLawsPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 210, 980);
 
+  useTopicPreset("simulations-newtons-laws", { "mass1": setMass1,
+    "initV": setInitV,
+    "friction1": setFriction1,
+    "force1": setForce1,
+    "mass2": setMass2,
+    "applied": setApplied,
+    "friction2": setFriction2,
+    "mass3a": setMass3a,
+    "mass3b": setMass3b,
+    "force3": setForce3 }, { "law": (value: string) => setLaw(value as typeof law) });
   return (
     <>
       <AppHeader />

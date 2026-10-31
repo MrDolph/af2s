@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -185,6 +187,16 @@ export default function ACCircuitsPage() {
   const resQ = resonanceCircuit === 'series' ? qFactorSeries(resR, resL, resCapF) : qFactorParallel(resR, resL, resCapF);
   const resBW = bandwidthHz(resF0, resQ);
 
+  useTopicPreset("simulations-ac-circuits", { "speedMultiplier": setSpeedMultiplier,
+    "vPeak": setVPeak,
+    "frequency": setFrequency,
+    "resistance": setResistance,
+    "inductance": setInductance,
+    "capacitance": setCapacitance,
+    "rlcFrequency": setRlcFrequency,
+    "parallelResistance": setParallelResistance,
+    "resL": setResL,
+    "resC": setResC }, {  });
   return (
     <>
       <AppHeader />

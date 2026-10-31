@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -226,6 +228,16 @@ export default function DoublePendulumPage() {
     liveMeta.bandwidth < 0.001 ? '~0' :
     liveMeta.bandwidth.toFixed(3);
 
+  useTopicPreset("simulations-double-pendulum", { "m1": setM1,
+    "L1": setL1,
+    "theta1Deg": setTheta1Deg,
+    "omega1": setOmega1,
+    "m2": setM2,
+    "L2": setL2,
+    "theta2Deg": setTheta2Deg,
+    "omega2": setOmega2,
+    "damping": setDamping,
+    "trailLength": setTrailLength }, {  });
   return (
     <>
       <AppHeader />

@@ -1,5 +1,9 @@
 // src/app/simulations/bjt-transistor/page.tsx
 'use client';
+import { TopicContext } from '@/components/explorer/TopicContext';
+
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -22,8 +26,17 @@ export default function BjtTransistorPage() {
 
   const region = params.Vbe < (params.material === 'Si' ? 0.5 : 0.2) ? 'cutoff' : params.Vbe - params.Vce < 0.3 ? 'active' : 'saturation';
 
+  useTopicPreset("simulations-bjt-transistor", { "params.Vcc": (value: number) => setParams(current => ({ ...current, Vcc: value })),
+    "params.Vbe": (value: number) => setParams(current => ({ ...current, Vbe: value })),
+    "params.Vce": (value: number) => setParams(current => ({ ...current, Vce: value })),
+    "params.Rb": (value: number) => setParams(current => ({ ...current, Rb: value })),
+    "params.Rc": (value: number) => setParams(current => ({ ...current, Rc: value })),
+    "params.Re": (value: number) => setParams(current => ({ ...current, Re: value })),
+    "params.Rload": (value: number) => setParams(current => ({ ...current, Rload: value })),
+    "params.beta": (value: number) => setParams(current => ({ ...current, beta: value })),
+    "params.temperature": (value: number) => setParams(current => ({ ...current, temperature: value })) }, {  });
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="af-device min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -37,6 +50,7 @@ export default function BjtTransistorPage() {
           </div>
         </div>
       </header>
+      <TopicContext />
 
       <main className="flex-1 p-6">
         <div className="max-w-6xl mx-auto">

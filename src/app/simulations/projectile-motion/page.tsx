@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { PromptBar } from '@/components/ai/PromptBar';
@@ -176,6 +178,17 @@ export default function ProjectileMotionPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 290, 980);
 
+  useTopicPreset("simulations-projectile-motion", { "g": setG,
+    "v0": setV0,
+    "angle": setAngle,
+    "h0": setH0,
+    "hV0": setHV0,
+    "hH": setHH,
+    "vV0": setVV0,
+    "vH0": setVH0,
+    "iV0": setIV0,
+    "iAlpha": setIAlpha,
+    "iBeta": setIBeta }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

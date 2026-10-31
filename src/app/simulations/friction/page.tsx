@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceDot, ReferenceLine } from 'recharts';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -152,6 +154,12 @@ export default function FrictionPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
 
+  useTopicPreset("simulations-friction", { "mass": setMass,
+    "applied": setApplied,
+    "angle": setAngle,
+    "appliedIncline": setAppliedIncline,
+    "muS": setMuS,
+    "muK": setMuK }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

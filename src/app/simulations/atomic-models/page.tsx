@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -149,6 +151,13 @@ export default function AtomicModelsPage() {
   const spectrum = useMemo(() => generateHydrogenSpectrum(7), []);
   const modelLabels: Record<AtomicModel, string> = { thomson: 'Thomson (1897)', rutherford: 'Rutherford (1911)', bohr: 'Bohr (1913)', quantum: 'Quantum (1926)' };
 
+  useTopicPreset("simulations-atomic-models", { "speed": setSpeed,
+    "zoom": setZoom,
+    "protonCount": setProtonCount,
+    "neutronCount": setNeutronCount,
+    "alphaEnergy": setAlphaEnergy,
+    "magneticField": setMagneticField,
+    "nQuantum": setNQuantum }, {  });
   return (
     <>
       <AppHeader />

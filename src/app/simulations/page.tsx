@@ -26,13 +26,13 @@ const SIMULATIONS = [
     topic: 'Space and time',
     status: 'live',
   },
-  {'slug': 'geophysics-field-lab', 'href': '/geophysics/index.html', 'title': 'Geophysics field lab', 'description': 'Gravity contours, resistivity, seismic arrivals, EM attenuation and well logging.', 'icon': '📈', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
+  {'slug': 'geophysics-field-lab', 'href': '/geophysics/lab', 'title': 'Geophysics field lab', 'description': 'Gravity contours, resistivity, seismic arrivals, EM attenuation and well logging.', 'icon': '📈', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
 
-  {'slug': 'earth-explorer', 'href': '/geophysics/earth.html', 'title': 'Earth Explorer', 'description': 'Rotate and open the Earth from the inner core to the exosphere.', 'icon': '🌍', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
+  {'slug': 'earth-explorer', 'href': '/geophysics/earth', 'title': 'Earth Explorer', 'description': 'Rotate and open the Earth from the inner core to the exosphere.', 'icon': '🌍', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
 
-  {'slug': 'solar-system-explorer', 'href': '/geophysics/solar.html', 'title': 'Solar System Explorer', 'description': 'Planet families, nebular formation and Kepler’s laws.', 'icon': '☀️', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
+  {'slug': 'solar-system-explorer', 'href': '/geophysics/solar', 'title': 'Solar System Explorer', 'description': 'Planet families, nebular formation and Kepler’s laws.', 'icon': '☀️', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
 
-  {'slug': 'plate-tectonics-explorer', 'href': '/geophysics/tectonics.html', 'title': 'Tectonics and Earth’s shape', 'description': 'World plates, continental drift, magnetic stripes, triple junctions and flattening.', 'icon': '🧩', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
+  {'slug': 'plate-tectonics-explorer', 'href': '/geophysics/tectonics', 'title': 'Tectonics and Earth’s shape', 'description': 'World plates, continental drift, magnetic stripes, triple junctions and flattening.', 'icon': '🧩', 'tags': ['Undergraduate'], 'topic': 'Earth & Space', 'status': 'live'},
 
   {
     slug: 'projectile-motion',

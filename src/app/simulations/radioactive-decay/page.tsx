@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -91,6 +93,8 @@ export default function RadioactiveDecayPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
 
+  useTopicPreset("simulations-radioactive-decay", { "n0": setN0,
+    "halfLife": setHalfLife }, {  });
   return (
     <>
       <AppHeader />

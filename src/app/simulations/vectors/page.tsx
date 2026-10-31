@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useRef, useState } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { EmbedButton } from '@/components/ui/EmbedButton';
@@ -207,6 +209,7 @@ export default function VectorsPage() {
 
   const unitA = unit(A);
 
+  useTopicPreset("simulations-vectors", { "k": setK }, {  });
   return (
     <>
       <AppHeader />

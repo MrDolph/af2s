@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -210,6 +212,10 @@ export default function BandTheoryPage() {
   const scenarioNote = SCENARIO_NOTES[matType];
   const dopingLabel = dopingType === 'intrinsic' ? 'Intrinsic' : dopingType === 'n-type' ? 'n-type' : 'p-type';
 
+  useTopicPreset("simulations-band-theory", { "temperature": setTemperature,
+    "dopingConcentration": setDopingConcentration,
+    "speed": setSpeed,
+    "zoom": setZoom }, {  });
   return (
     <>
       <AppHeader />

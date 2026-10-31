@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -189,6 +191,19 @@ export default function EquilibriumOfForcesPage() {
   const netM = netMoment(weights);
   const balanced = isBalanced(weights);
 
+  useTopicPreset("simulations-equilibrium-of-forces", { "sdF1": setSdF1,
+    "sdF2": setSdF2,
+    "sdMass": setSdMass,
+    "magA": setMagA,
+    "angleA": setAngleA,
+    "magB": setMagB,
+    "angleB": setAngleB,
+    "w1Force": setW1Force,
+    "w1Pos": setW1Pos,
+    "w2Force": setW2Force,
+    "w2Pos": setW2Pos,
+    "objDensity": setObjDensity,
+    "blockHeight": setBlockHeight }, {  });
   return (
     <>
       <AppHeader />

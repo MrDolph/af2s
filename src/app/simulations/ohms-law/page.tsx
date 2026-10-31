@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceDot, Legend } from 'recharts';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -193,6 +195,10 @@ export default function OhmsLawPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
 
+  useTopicPreset("simulations-ohms-law", { "V": setV,
+    "r1": setR1,
+    "r2": setR2,
+    "r3": setR3 }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

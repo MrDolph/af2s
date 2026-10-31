@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceLine } from 'recharts';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -103,6 +105,8 @@ export default function XraysPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
 
+  useTopicPreset("simulations-x-rays", { "kV": setKV,
+    "current": setCurrent }, {  });
   return (
     <>
       <AppHeader />

@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { DivStokesCanvas } from '@/components/simulation/DivStokesCanvas';
@@ -32,6 +34,7 @@ export default function DivStokesPage() {
   const { circulation, flux } = boundaryIntegrals(field, disk.cx, disk.cy, disk.r);
   const { divIntegral, curlIntegral } = areaIntegrals(field, disk.cx, disk.cy, disk.r);
 
+  useTopicPreset("minitab-div-stokes", { "disk.r": (value: number) => setDisk(current => ({ ...current, r: value })) }, {  });
   return (
     <>
       <AppHeader />

@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { FourierSeriesGraph } from '@/components/simulation/FourierSeriesGraph';
@@ -43,6 +45,7 @@ export default function FourierSeriesPage() {
 
   const overshoot = peakOvershoot(target, n);
 
+  useTopicPreset("minitab-fourier-series", { "n": setN }, {  });
   return (
     <>
       <AppHeader />

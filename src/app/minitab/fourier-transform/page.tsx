@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { FourierTransformGraph } from '@/components/simulation/FourierTransformGraph';
@@ -25,6 +27,7 @@ export default function FourierTransformPage() {
 
   const pair = PAIRS[pairIndex];
 
+  useTopicPreset("minitab-fourier-transform", { "a": setA }, {  });
   return (
     <>
       <AppHeader />

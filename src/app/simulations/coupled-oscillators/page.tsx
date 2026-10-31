@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -212,6 +214,18 @@ export default function CoupledOscillatorsPage() {
     liveMeta.bandwidth < 0.001 ? '~0' :
     liveMeta.bandwidth.toFixed(3);
 
+  useTopicPreset("simulations-coupled-oscillators", { "m1": setM1,
+    "k1": setK1,
+    "x1": setX1,
+    "v1": setV1,
+    "damping1": setDamping1,
+    "m2": setM2,
+    "k3": setK3,
+    "x2": setX2,
+    "v2": setV2,
+    "damping2": setDamping2,
+    "k2": setK2,
+    "trailLength": setTrailLength }, {  });
   return (
     <>
       <AppHeader />

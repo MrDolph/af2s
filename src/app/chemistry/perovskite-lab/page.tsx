@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -170,6 +172,7 @@ export default function PerovskiteLabPage() {
 
   const fmt = (v: number | null, d = 3) => (v == null ? '—' : v.toFixed(d));
 
+  useTopicPreset("chemistry-perovskite-lab", { "aCustom": setACustom }, {  });
   return (
     <>
       <AppHeader />

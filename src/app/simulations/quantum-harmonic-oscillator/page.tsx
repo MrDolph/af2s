@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -189,6 +191,16 @@ export default function QuantumHarmonicOscillatorPage() {
   const deltaX = Math.sqrt(Math.max(0, liveStats.x2 - liveStats.x * liveStats.x));
   const deltaP = Math.sqrt(Math.max(0, liveStats.p2 - liveStats.p * liveStats.p));
 
+  useTopicPreset("simulations-quantum-harmonic-oscillator", { "c0": setC0,
+    "c1": setC1,
+    "c2": setC2,
+    "c3": setC3,
+    "c4": setC4,
+    "c5": setC5,
+    "speed": setSpeed,
+    "xMax": setXMax,
+    "eMax": setEMax,
+    "nMax": setNMax }, {  });
   return (
     <>
       <AppHeader />

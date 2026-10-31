@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { LegendreBesselGraph } from '@/components/simulation/LegendreBesselGraph';
@@ -35,6 +37,7 @@ export default function LegendreBesselPage() {
   const Jn = besselJ(besN, besX), Jm1 = besselJ(besN - 1, besX), Jp1 = besselJ(besN + 1, besX);
   const lhs = Jm1 + Jp1, rhs = (2 * besN / besX) * Jn;
 
+  useTopicPreset("minitab-legendre-bessel", { "besX": setBesX }, {  });
   return (
     <>
       <AppHeader />

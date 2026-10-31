@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -234,6 +236,26 @@ export default function OscillationsPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, oscBase.w, oscBase.h, 650);
 
+  useTopicPreset("simulations-oscillations", { "pendL": setPendL,
+    "pendA": setPendA,
+    "pendM": setPendM,
+    "pendG": setPendG,
+    "spK": setSpK,
+    "spM": setSpM,
+    "spA": setSpA,
+    "conL": setConL,
+    "conTheta": setConTheta,
+    "conM": setConM,
+    "physL": setPhysL,
+    "physM": setPhysM,
+    "physPF": setPhysPF,
+    "bifM": setBifM,
+    "bifL": setBifL,
+    "bifWire": setBifWire,
+    "bifSep": setBifSep,
+    "cantL": setCantL,
+    "cantH": setCantH,
+    "cantLoad": setCantLoad }, {  });
   return (
     <>
       <AppHeader />

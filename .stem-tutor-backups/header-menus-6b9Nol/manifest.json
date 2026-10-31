@@ -1,0 +1,18 @@
+[
+  {
+    "file": "src/app/simulations/all/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/explore/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "capstone/HEADER_MENU_UPDATE.md",
+    "existed": false
+  },
+  {
+    "file": "src/components/layout/AppHeader.tsx",
+    "existed": true
+  }
+]

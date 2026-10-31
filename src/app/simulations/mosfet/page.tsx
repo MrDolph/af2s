@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -133,6 +135,18 @@ export default function MosfetPage() {
     'common-gate': 'Common Gate',
   };
 
+  useTopicPreset("simulations-mosfet", { "Vgs": setVgs,
+    "Vds": setVds,
+    "Vth": setVth,
+    "Vdd": setVdd,
+    "Rd": setRd,
+    "Rs": setRs,
+    "Rg": setRg,
+    "Rload": setRload,
+    "W": setW,
+    "L": setL,
+    "tox": setTox,
+    "temperature": setTemperature }, {  });
   return (
     <>
       <AppHeader />

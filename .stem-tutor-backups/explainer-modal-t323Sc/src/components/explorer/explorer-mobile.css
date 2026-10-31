@@ -1,0 +1,22 @@
+/* Scoped layout rules: keep the explorer inside its container without hiding overflow. */
+.af-explorer, .af-tutor { min-width: 0; max-width: 100%; }
+.af-explorer *, .af-tutor * { box-sizing: border-box; }
+.af-explorer :is(p,h1,h2,h3,h4,summary,button,a,label,code,th,td),
+.af-tutor :is(p,h1,h2,h3,h4,summary,button,a,label,code) {
+  overflow-wrap: anywhere;
+}
+.af-explorer :is(input,select,textarea), .af-tutor :is(input,select,textarea) {
+  max-width: 100%;
+}
+.af-explorer :is(section,article,fieldset,details),
+.af-tutor :is(section,article,fieldset,aside) { min-width: 0; }
+@media (max-width: 767px) {
+  /* 16px fields avoid automatic zoom on mobile Safari. */
+  .af-explorer :is(input,select,textarea), .af-tutor :is(input,select,textarea) { font-size: 16px; }
+  .af-explorer summary { line-height: 1.6; }
+  .af-explorer :is(th,td) { overflow-wrap: anywhere; }
+  .af-device > header > div { height: auto; min-height: 4rem; flex-wrap: wrap; gap: .75rem; padding-block: .75rem; }
+  .af-device > header > div > div { min-width: 0; max-width: 100%; flex-wrap: wrap; gap: .5rem; }
+  .af-device > header h1 { font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
+  .af-device > main { padding: .75rem; }
+}

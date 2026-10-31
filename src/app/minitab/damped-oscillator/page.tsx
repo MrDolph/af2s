@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -102,6 +104,10 @@ export default function DampedOscillatorPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 380, 300, 500);
 
+  useTopicPreset("minitab-damped-oscillator", { "gamma": setGamma,
+    "omega0": setOmega0,
+    "y0": setY0,
+    "yp0": setYp0 }, {  });
   return (
     <>
       <AppHeader />

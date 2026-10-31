@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { HermiteLaguerreGraph, DiracDeltaGraph } from '@/components/simulation/HermiteLaguerreDeltaGraph';
@@ -38,6 +40,7 @@ export default function HermiteLaguerreDeltaPage() {
   const eps = Math.pow(10, epsExp);
   const { area, sift } = mode === 'delta' ? deltaIntegrals(eps, fname) : { area: 0, sift: 0 };
 
+  useTopicPreset("minitab-hermite-laguerre-delta", { "epsExp": setEpsExp }, {  });
   return (
     <>
       <AppHeader />

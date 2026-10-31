@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -109,6 +111,11 @@ export default function ElectrostaticsFieldsPage() {
 
   const staticForceN = coulombForceSigned(q1nC * 1e-9, q2nC * 1e-9, separationCm / 100);
 
+  useTopicPreset("simulations-electrostatics-fields", { "q1nC": setQ1nC,
+    "q2nC": setQ2nC,
+    "separationCm": setSeparationCm,
+    "testX": setTestX,
+    "testY": setTestY }, {  });
   return (
     <>
       <AppHeader />

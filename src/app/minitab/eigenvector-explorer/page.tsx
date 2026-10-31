@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { EigenvectorCanvas } from '@/components/simulation/EigenvectorCanvas';
@@ -55,6 +57,7 @@ export default function EigenvectorExplorerPage() {
 
   const eig = eigen(matrix);
 
+  useTopicPreset("minitab-eigenvector-explorer", { "t": setT }, {  });
   return (
     <>
       <AppHeader />

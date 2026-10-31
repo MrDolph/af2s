@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceDot, ReferenceLine } from 'recharts';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -106,6 +108,8 @@ export default function PhotoelectricPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
 
+  useTopicPreset("simulations-photoelectric-effect", { "f14": setF14,
+    "intensity": setIntensity }, {  });
   return (
     <>
       <AppHeader />

@@ -65,7 +65,7 @@ export default function TutorPage() {
     const a = document.createElement('a'); a.href = url; a.download = 'A-Factor_STEM_Practice_Record.txt';
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return <div data-stem-tutor-contrast lang={language} style={{ backgroundColor: '#f1f5f9', color: '#111827', colorScheme: 'light', minHeight: '100vh' }}><AppHeader />
+  return <div className="af-tutor" data-stem-tutor-contrast lang={language} style={{ backgroundColor: '#f1f5f9', color: '#111827', colorScheme: 'light', minHeight: '100vh' }}><AppHeader />
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-5">
         <div className="max-w-2xl"><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-indigo-700">A-Factor STEM Studio</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{ui.heading}</h1><p className="mt-3 text-sm leading-6 text-gray-700">{ui.intro}</p></div>

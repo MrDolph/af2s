@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -127,6 +129,15 @@ export default function ElectromagneticInductionPage() {
   const vs = transformerSecondaryVoltage(primaryVoltage, primaryTurns, secondaryTurns);
   const isPer1A = transformerSecondaryCurrent(1, primaryTurns, secondaryTurns);
 
+  useTopicPreset("simulations-electromagnetic-induction", { "turns": setTurns,
+    "speed": setSpeed,
+    "genTurns": setGenTurns,
+    "genFieldB": setGenFieldB,
+    "genArea": setGenArea,
+    "genOmega": setGenOmega,
+    "primaryVoltage": setPrimaryVoltage,
+    "primaryTurns": setPrimaryTurns,
+    "secondaryTurns": setSecondaryTurns }, {  });
   return (
     <>
       <AppHeader />

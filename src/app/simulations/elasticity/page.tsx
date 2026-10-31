@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceDot, ReferenceLine } from 'recharts';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -141,6 +143,12 @@ export default function ElasticityPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 320, 980);
 
+  useTopicPreset("simulations-elasticity", { "load": setLoad,
+    "k": setK,
+    "elasticLimitF": setElasticLimitF,
+    "wireLoad": setWireLoad,
+    "wireLength": setWireLength,
+    "wireDiamMm": setWireDiamMm }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

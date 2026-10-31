@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -118,6 +120,10 @@ export default function DiffractionPage() {
   const maxOrder = maxGratingOrder(wavelengthNm, slitSpacingNm);
   const maxFringeN = maxFringeOrder(wavelengthNm, doubleSlitSepNm);
 
+  useTopicPreset("simulations-diffraction", { "wavelengthNm": setWavelengthNm,
+    "slitWidthNm": setSlitWidthNm,
+    "slitSpacingNm": setSlitSpacingNm,
+    "doubleSlitSepUm": setDoubleSlitSepUm }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

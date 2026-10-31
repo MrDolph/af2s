@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -70,6 +72,7 @@ export default function UnitCirclePage() {
     setAngleDeg(unit === 'deg' ? v : rad2deg(v));
   };
 
+  useTopicPreset("mathematics-unit-circle", { angleDeg: setAngleDeg });
   return (
     <>
       <AppHeader />

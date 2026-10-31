@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label, ReferenceDot } from 'recharts';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -120,6 +122,8 @@ export default function PolarizationPage() {
 
   const transmitted = malusIntensity(100, analyzerAngle);
 
+  useTopicPreset("simulations-polarization", { "polarizerAngle": setPolarizerAngle,
+    "analyzerAngle": setAnalyzerAngle }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

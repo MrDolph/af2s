@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -124,6 +126,11 @@ export default function MagneticEffectsPage() {
   const solenoidFieldStatic = fieldSolenoid(current, turnsPerMetre);
   const forceStatic = forceOnConductor(fieldB, current, wireLengthCm / 100, 90);
 
+  useTopicPreset("simulations-magnetic-effects", { "current": setCurrent,
+    "testDistanceCm": setTestDistanceCm,
+    "turnsPerMetre": setTurnsPerMetre,
+    "fieldB": setFieldB,
+    "wireLengthCm": setWireLengthCm }, {  });
   return (
     <>
       <AppHeader />

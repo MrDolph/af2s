@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { OpticsCanvas, OpticsMode } from '@/components/simulation/OpticsCanvas';
@@ -102,6 +104,11 @@ export default function RefractionPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 320, 980);
 
+  useTopicPreset("simulations-refraction", { "theta1": setTheta1,
+    "n1": setN1,
+    "n2": setN2,
+    "focal": setFocal,
+    "objectDist": setObjectDist }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

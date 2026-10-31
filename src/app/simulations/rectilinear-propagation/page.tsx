@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -132,6 +134,14 @@ export default function RectilinearPropagationPage() {
   const imgH = pinholeImageHeight(objectHeight, pinholeObjectDist, pinholeScreenDist);
   const mag = pinholeMagnification(pinholeObjectDist, pinholeScreenDist);
 
+  useTopicPreset("simulations-rectilinear-propagation", { "sourceRadius": setSourceRadius,
+    "objectRadius": setObjectRadius,
+    "objectDist": setObjectDist,
+    "orbitAngleDeg": setOrbitAngleDeg,
+    "objectHeight": setObjectHeight,
+    "pinholeObjectDist": setPinholeObjectDist,
+    "pinholeScreenDist": setPinholeScreenDist,
+    "pinholeRadius": setPinholeRadius }, {  });
   return (
     <>
       <AppHeader />

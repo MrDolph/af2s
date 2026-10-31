@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -114,6 +116,10 @@ export default function HeatTransferPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
 
+  useTopicPreset("simulations-heat-transfer", { "hotTemp": setHotTemp,
+    "coldTemp": setColdTemp,
+    "areaCm2": setAreaCm2,
+    "lengthCm": setLengthCm }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />

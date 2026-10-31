@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -208,6 +210,18 @@ export default function ConsequencesPage() {
     setLiveFall({ t, distance });
   }, []);
 
+  useTopicPreset("simulations-consequences-of-motion", { "elevMass": setElevMass,
+    "elevAccel": setElevAccel,
+    "wlHeight": setWlHeight,
+    "rocketMass": setRocketMass,
+    "fuelFraction": setFuelFraction,
+    "exhaustSpeed": setExhaustSpeed,
+    "massFlowRate": setMassFlowRate,
+    "collM1": setCollM1,
+    "collU1": setCollU1,
+    "collM2": setCollM2,
+    "collU2": setCollU2,
+    "collE": setCollE }, {  });
   return (
     <>
       <AppHeader />

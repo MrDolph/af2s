@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -106,6 +108,7 @@ export default function NuclearPage() {
   const choose = (zz: number, aa: number) => setNuc({ z: zz, a: Math.max(aa, zz, 1) });
   const setMode = (m: Mode) => setModeState({ key, mode: m });
 
+  useTopicPreset("chemistry-nuclear", { "targetPct": setTargetPct }, {  });
   return (
     <>
       <AppHeader />

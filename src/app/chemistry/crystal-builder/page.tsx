@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -89,6 +91,7 @@ export default function CrystalBuilderPage() {
   const groups = ['Elements', 'AX compounds', 'AX₂ compounds', 'Ordered alloys'] as const;
   const rr = rep.radius;
 
+  useTopicPreset("chemistry-crystal-builder", { "a": setA }, {  });
   return (
     <>
       <AppHeader />

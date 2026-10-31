@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -192,6 +194,14 @@ export default function QuantumTunnelingPage() {
     return liveStats.theoreticalT;
   }, [potentialType, particleEnergy, barrierHeight, barrierWidth, particleMass, liveStats.theoreticalT]);
 
+  useTopicPreset("simulations-quantum-tunneling", { "particleEnergy": setParticleEnergy,
+    "packetWidth": setPacketWidth,
+    "particleMass": setParticleMass,
+    "barrierHeight": setBarrierHeight,
+    "barrierWidth": setBarrierWidth,
+    "barrierPosition": setBarrierPosition,
+    "speed": setSpeed,
+    "zoom": setZoom }, {  });
   return (
     <>
       <AppHeader />

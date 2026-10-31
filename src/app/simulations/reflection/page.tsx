@@ -1,4 +1,6 @@
 'use client';
+import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -126,6 +128,10 @@ export default function ReflectionPage() {
   const canvasBoxRef = useRef<HTMLDivElement>(null);
   const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 320, 980);
 
+  useTopicPreset("simulations-reflection", { "incidenceAngle": setIncidenceAngle,
+    "focal": setFocal,
+    "objectDist": setObjectDist,
+    "rotationAngle": setRotationAngle }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
       <AppHeader />
