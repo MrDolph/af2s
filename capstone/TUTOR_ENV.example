@@ -1,0 +1,9 @@
+# Append these to .env.local. Never commit real credentials.
+# Demo lessons require none of these variables.
+STEM_TUTOR_ENABLED=false
+ANTHROPIC_API_KEY=
+STEM_TUTOR_MODEL=claude-sonnet-4-6
+# Reuse your existing Upstash/Vercel Redis if configured.
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
+# KV_REST_API_URL and KV_REST_API_TOKEN are also accepted.

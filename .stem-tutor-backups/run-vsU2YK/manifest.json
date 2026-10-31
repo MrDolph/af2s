@@ -1,0 +1,38 @@
+[
+  {
+    "file": "src/lib/tutor/lessons.ts",
+    "existed": false
+  },
+  {
+    "file": "src/app/tutor/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/api/tutor/route.ts",
+    "existed": false
+  },
+  {
+    "file": "capstone/DEMO_AND_TESTING.md",
+    "existed": false
+  },
+  {
+    "file": "capstone/PROJECT_BRIEF.md",
+    "existed": false
+  },
+  {
+    "file": "capstone/START_HERE.md",
+    "existed": false
+  },
+  {
+    "file": "capstone/TUTOR_ENV.example",
+    "existed": false
+  },
+  {
+    "file": "capstone/VALIDATION.md",
+    "existed": false
+  },
+  {
+    "file": "src/components/layout/AppHeader.tsx",
+    "existed": true
+  }
+]
