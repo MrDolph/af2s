@@ -39,7 +39,13 @@ export function TopicContext(){
      <button type="button" autoFocus aria-label={text.close} onClick={()=>setOpen(false)} className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-white text-2xl text-gray-800 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-indigo-700">×</button>
     </div>
     <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-5 pt-4 sm:px-6">
-     <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"><label className="min-w-0 text-sm font-medium">{s.language}<select aria-label={s.language} value={result.language} onChange={event=>{const language=event.target.value as Language;setResult(prepare({topicId:result.topicId,language,params:result.params,modes:result.modes}));}} className="mt-2 min-h-11 w-full min-w-0 rounded-xl border border-gray-300 bg-white px-3 py-2 text-base text-gray-900">{Object.entries(languageNames).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label><a href={'/explore?topic='+encodeURIComponent(result.topicId)+'&lang='+result.language} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-900">{s.review}</a></div>
+     <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"><label className="min-w-0 text-sm font-medium">{s.language}<select aria-label={s.language} value={result.language} onChange={event=>{
+      const language=event.target.value;if(!isLanguage(language))return;
+      // af-explainer-language-persistence: keep the preference and current link aligned.
+      try{localStorage.setItem('afactor-simulation-language-v1',language);}catch{}
+      try{const url=new URL(window.location.href);url.searchParams.set('afLang',language);window.history.replaceState(window.history.state,'',url.toString());}catch{}
+      setResult(prepare({topicId:result.topicId,language,params:result.params,modes:result.modes}));
+     }} className="mt-2 min-h-11 w-full min-w-0 rounded-xl border border-gray-300 bg-white px-3 py-2 text-base text-gray-900">{Object.entries(languageNames).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label><a href={'/explore?topic='+encodeURIComponent(result.topicId)+'&lang='+result.language} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-900">{s.review}</a></div>
      <ResultCard result={result} showOpen={false}/>
     </div>
    </div>
