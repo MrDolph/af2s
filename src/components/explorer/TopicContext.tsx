@@ -6,6 +6,7 @@ import { topics, isLanguage, type Language } from '@/lib/explorer/catalog';
 import { prepare, presetFromSearch, type ExplorerResult } from '@/lib/explorer/prepare';
 import { languageNames, ui } from '@/lib/explorer/locales';
 import { ResultCard } from './ResultCard';
+import { PageTools } from '@/components/layout/PageTools';
 const labels={en:{open:'AI explainer',close:'Close explainer'},yo:{open:'Olùṣàlàyé AI',close:'Pa àlàyé dé'},ha:{open:'Mai bayanin AI',close:'Rufe bayani'},ig:{open:'Onye nkọwa AI',close:'Mechie nkọwa'}};
 export function TopicContext(){
  const pathname=usePathname(),titleId=useId(),noticeId=useId(),dialogId=useId();
@@ -28,10 +29,10 @@ export function TopicContext(){
   document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';
   return()=>{if(dialog.open)dialog.close();document.body.style.overflow=oldBodyOverflow;document.documentElement.style.overflow=oldHtmlOverflow;};
  },[open,visible]);
- if(!result||!visible)return null;
+ if(!result||!visible)return <PageTools/>;
  const s=ui[result.language],text=labels[result.language];
  return <>
-  <button type="button" aria-haspopup="dialog" aria-controls={dialogId} aria-expanded={open} onClick={()=>setOpen(true)} className="af-explainer-launcher fixed z-[60] inline-flex min-h-12 max-w-[calc(100vw-2rem)] items-center justify-center gap-2 rounded-full bg-indigo-700 px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-indigo-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-indigo-700" style={{right:'max(1rem, env(safe-area-inset-right))',bottom:'max(1rem, env(safe-area-inset-bottom))'}}><span aria-hidden="true">✦</span>{text.open}</button>
+  <PageTools explainer={{label:text.open,dialogId,open,onOpen:()=>setOpen(true)}}/>
   {createPortal(<dialog id={dialogId} ref={dialogRef} aria-labelledby={titleId} aria-describedby={noticeId} className="af-explainer-modal af-explorer" onCancel={event=>{event.preventDefault();setOpen(false);}} onClick={event=>{if(event.target!==event.currentTarget)return;const box=event.currentTarget.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)setOpen(false);}}>
    <div className="af-explainer-shell flex min-h-0 min-w-0 flex-col bg-slate-50 text-gray-900" style={{colorScheme:'light'}}>
     <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-200 bg-white px-4 py-4 sm:px-6">

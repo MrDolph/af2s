@@ -1,0 +1,12 @@
+/* No page/header space is reserved. The wrapper itself never captures touches. */
+.af-floating-tools { position: fixed; inset: 0; z-index: 65; pointer-events: none; opacity: 1; transition: opacity 180ms ease; }
+.af-floating-tools .af-tool-button { position: absolute; bottom: max(1rem,env(safe-area-inset-bottom)); display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 48px; pointer-events: auto; cursor: pointer; box-shadow: 0 4px 20px rgb(15 23 42 / .25); }
+.af-tool-explainer { right: max(1rem,env(safe-area-inset-right)); max-width: calc(100vw - 7rem); gap: .5rem; border: 1px solid #fff; border-radius: 999px; padding: .75rem 1.25rem; background: #4338ca; color: #fff; font-size: .875rem; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.af-tool-accessibility { left: max(1rem,env(safe-area-inset-left)); width: 3.25rem; height: 3.25rem; border: 2px solid #fff; border-radius: 999px; background: #1e293b; color: #fff; }
+.af-floating-tools.af-tools-hidden { opacity: 0; }
+.af-floating-tools.af-tools-hidden .af-tool-button { pointer-events: none; }
+/* Keyboard users retain visible, usable controls while focus is on a tool. */
+.af-floating-tools:has(:focus-visible) { opacity: 1; }
+.af-floating-tools:has(:focus-visible) .af-tool-button { pointer-events: auto; }
+.af-tool-button:focus-visible { outline: 3px solid #f59e0b; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .af-floating-tools { transition: none; } }

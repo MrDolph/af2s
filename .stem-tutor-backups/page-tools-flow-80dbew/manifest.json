@@ -1,0 +1,18 @@
+[
+  {
+    "file": "src/components/layout/PageTools.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/explorer/TopicContext.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/accessibility/AccessibilityPanel.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/accessibility/AccessibilityProvider.tsx",
+    "existed": true
+  }
+]

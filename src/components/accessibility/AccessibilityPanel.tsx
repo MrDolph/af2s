@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { ReadAloud } from './ReadAloud';
 import { useAccessibility } from './AccessibilityProvider';
 import { DEFAULT_SETTINGS,type AccessibilitySettings } from '@/lib/accessibility/settings';
-export function AccessibilityPanel({open,onClose,onOpen}:{open:boolean;onClose:()=>void;onOpen:()=>void}){
+export function AccessibilityPanel({open,onClose}:{open:boolean;onClose:()=>void}){
  const access=useAccessibility(),dialog=useRef<HTMLDialogElement>(null),title=useId(),notice=useId(),id=useId();const [mounted,setMounted]=useState(false),[pageText,setPageText]=useState(''),[pageLanguage,setPageLanguage]=useState('en');
  useEffect(()=>setMounted(true),[]);
  useEffect(()=>{if(!open)return;const main=document.querySelector('main');if(main instanceof HTMLElement){setPageText(main.innerText.slice(0,12000));setPageLanguage(main.closest('[lang]')?.getAttribute('lang')||'en');}},[open]);
@@ -15,9 +15,9 @@ export function AccessibilityPanel({open,onClose,onOpen}:{open:boolean;onClose:(
  },[open,mounted]);
  const settings=access.settings,field='mt-2 min-h-11 w-full min-w-0 rounded-xl border border-gray-300 bg-white px-3 py-2 text-base text-gray-900';
  const available=access.voices.filter(v=>!settings.localVoicesOnly||v.localService);
- const checks:[keyof AccessibilitySettings,string,string][]=[['readingSpace','More reading space','Increase line and letter spacing for paragraphs.'],['strongFocus','Clearer keyboard focus','Show a stronger outline around the control you are using.'],['underlineLinks','Underline links','Make links easier to distinguish from ordinary text.'],['reduceMotion','Reduce interface motion','Reduce CSS animations and transitions. Simulations keep their own Run/Pause controls.']];
+ const checks:[keyof AccessibilitySettings,string,string][]=[['readingSpace','More reading space','Increase line and letter spacing for paragraphs.'],['strongFocus','Clearer keyboard focus','Show a stronger outline around the control you are using.'],['underlineLinks','Underline links','Make links easier to distinguish from ordinary text.'],['reduceMotion','Reduce interface motion','Reduce CSS animations and transitions. Simulations keep their own Run/Pause controls.'],['autoHideTools','Hide floating tools when idle on mobile','Tap or swipe the page to reveal them for four seconds. Turn this off to keep the floating buttons visible.']];
  return <>
-  <button type="button" onClick={onOpen} aria-label="Accessibility settings" title="Accessibility settings" aria-haspopup="dialog" aria-controls={id} aria-expanded={open} className="af-access-launcher"><svg aria-hidden="true" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="4" r="2"/><path d="M4 8l8 2 8-2M12 10v5M12 15l-5 6M12 15l5 6"/></svg></button>
+
   {mounted&&createPortal(<dialog id={id} ref={dialog} aria-labelledby={title} aria-describedby={notice} className="af-access-modal" onCancel={e=>{e.preventDefault();onClose();}} onClick={e=>{if(e.target!==e.currentTarget)return;const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)onClose();}}>
    <div className="af-access-panel">
     <div className="af-access-panel-head"><div><h2 id={title} className="text-xl font-semibold">Accessibility settings</h2><p id={notice} className="mt-1 text-sm leading-6 text-gray-700">Adjust these settings any time. Saved on this browser only.</p></div><button type="button" autoFocus onClick={onClose} aria-label="Close accessibility settings" className="af-access-close">×</button></div>

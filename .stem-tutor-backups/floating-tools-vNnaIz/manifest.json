@@ -1,0 +1,18 @@
+[
+  {
+    "file": "src/components/layout/PageTools.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/layout/floating-tools.css",
+    "existed": false
+  },
+  {
+    "file": "src/lib/accessibility/settings.ts",
+    "existed": true
+  },
+  {
+    "file": "src/components/accessibility/AccessibilityPanel.tsx",
+    "existed": true
+  }
+]
