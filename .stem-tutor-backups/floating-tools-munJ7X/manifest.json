@@ -1,0 +1,10 @@
+[
+  {
+    "file": "src/components/layout/PageTools.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/accessibility/AccessibilityPanel.tsx",
+    "existed": true
+  }
+]
