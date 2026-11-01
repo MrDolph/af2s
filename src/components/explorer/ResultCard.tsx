@@ -1,11 +1,13 @@
 'use client';
+import { ReadAloud } from '@/components/accessibility/ReadAloud';
+
 import { getTopic, topics } from '@/lib/explorer/catalog';
 import { ui } from '@/lib/explorer/locales';
 import type { ExplorerResult } from '@/lib/explorer/prepare';
 export function ResultCard({result,showOpen=true}:{result:ExplorerResult;showOpen?:boolean}) {
  const topic=getTopic(result.topicId);if(!topic)return null;const s=ui[result.language];
  return <article lang={result.language} className="af-explorer mt-4 min-w-0 max-w-full rounded-2xl border border-indigo-200 bg-white p-3 sm:p-5 text-gray-900 shadow-sm">
-  <p className="text-xs font-semibold text-indigo-700">{s.free}</p><h2 className="mt-2 text-xl font-semibold">{topic.title}</h2><p className="mt-3 text-sm leading-7">{result.explanation}</p>
+  <p className="text-xs font-semibold text-indigo-700">{s.free}</p><h2 className="mt-2 text-xl font-semibold">{topic.title}</h2><p className="mt-3 text-sm leading-7">{result.explanation}</p><ReadAloud language={result.language} text={[topic.title,result.explanation,topic.principle,result.calculation||''].join('. ')}/>
   <div className="mt-4 rounded-xl bg-indigo-50 p-4"><h3 className="text-xs font-semibold text-indigo-900">{s.principle}</h3><p className="mt-2 text-sm leading-7 text-indigo-950">{topic.principle}</p></div>
   {result.calculation&&<div className="mt-3 rounded-xl bg-emerald-50 p-4"><h3 className="text-xs font-semibold text-emerald-900">{s.numerical}</h3><p className="mt-2 text-sm leading-7 text-emerald-950">{result.calculation}</p><p className="mt-2 text-xs text-emerald-900">Formulae, units and calculation assumptions: English.</p></div>}
   {result.language!=='en'&&<details className="mt-3 text-sm"><summary className="cursor-pointer min-h-11 py-2 text-indigo-800">{s.source}</summary><p className="mt-2 leading-7">{topic.description}</p></details>}

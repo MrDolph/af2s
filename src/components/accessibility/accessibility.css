@@ -1,0 +1,26 @@
+html.af-access-text { font-size: var(--af-access-font-size); }
+html.af-access-reading :where(main p, article p, dialog p) { line-height: 1.9 !important; letter-spacing: .03em; }
+html.af-access-focus :focus-visible { outline: 3px solid #f59e0b !important; outline-offset: 3px !important; box-shadow: 0 0 0 5px #111827 !important; }
+html.af-access-links a { text-decoration-line: underline; text-underline-offset: .2em; }
+html.af-access-motion *, html.af-access-motion *::before, html.af-access-motion *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+.af-access-skip { position: fixed; top: .5rem; left: .5rem; z-index: 10000; transform: translateY(-200%); padding: .75rem 1rem; background: #fff; color: #111827; border: 2px solid #4338ca; border-radius: .5rem; font-weight: 600; }
+.af-access-skip:focus { transform: translateY(0); }
+.af-access-launcher { position: fixed; left: max(1rem,env(safe-area-inset-left)); bottom: max(1rem,env(safe-area-inset-bottom)); z-index: 65; display: flex; align-items: center; justify-content: center; width: 3.25rem; height: 3.25rem; min-width: 44px; min-height: 44px; border: 2px solid #fff; border-radius: 999px; background: #1e293b; color: #fff; box-shadow: 0 4px 20px rgb(15 23 42 / .3); }
+dialog.af-access-modal { width: min(42rem,calc(100vw - 1rem)); max-width: none; max-height: calc(100dvh - 1rem); margin: auto; padding: 0; border: 0; border-radius: 1rem; overflow: hidden; background: #fff; color: #111827; color-scheme: light; }
+dialog.af-access-modal::backdrop { background: rgb(15 23 42 / .6); }
+.af-access-panel { display: flex; flex-direction: column; max-height: calc(100dvh - 1rem); min-height: 0; min-width: 0; }
+.af-access-panel *, .af-access-read *, .af-access-dictation * { box-sizing: border-box; }
+.af-access-panel :where(p,label,span,strong,h2,h3,button) { overflow-wrap: anywhere; }
+.af-access-panel-head { display: flex; flex-shrink: 0; justify-content: space-between; align-items: flex-start; gap: .75rem; padding: 1rem; border-bottom: 1px solid #e2e8f0; }
+.af-access-close { display: flex; flex-shrink: 0; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; border: 1px solid #cbd5e1; border-radius: .75rem; font-size: 1.5rem; background: #fff; color: #111827; }
+.af-access-panel-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 1rem; }
+.af-access-panel input, .af-access-panel select { max-width: 100%; min-width: 0; }
+.af-access-panel-footer { display: flex; flex-shrink: 0; flex-wrap: wrap; gap: .75rem; padding: 1rem; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+.af-access-text-button { min-height: 44px; text-decoration: underline; color: #3730a3; font-size: .875rem; }
+@media (max-width: 639px) { .af-access-panel-footer > button { width: 100%; } .af-access-panel :where(input,select) { font-size: 16px; } }
+/* Keep both floating helpers apart when text is enlarged. */
+.af-explainer-launcher { max-width: calc(100vw - 7rem) !important; white-space: normal; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) {
+  :root * { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+html.af-access-text :where(input,select,textarea) { font-size: max(16px,1rem) !important; }

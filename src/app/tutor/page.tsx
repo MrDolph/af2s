@@ -1,4 +1,8 @@
 'use client';
+import { SpeechInput } from '@/components/accessibility/SpeechInput';
+
+import { ReadAloud } from '@/components/accessibility/ReadAloud';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -74,7 +78,7 @@ export default function TutorPage() {
       <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label={ui.subject}>{lessons.map(l => <button key={l.id} onClick={() => changeLesson(l.id)} aria-pressed={lesson.id === l.id} className={`${button} py-4 ${lesson.id === l.id ? '!border-indigo-600 !bg-indigo-600 !text-white' : ''}`}>{subjectName(l.subject)}</button>)}</div>
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_300px]">
         <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-          <div className="border-b border-gray-200 p-6"><p className="text-xs font-semibold text-indigo-700">{subjectName(lesson.subject)}</p><h2 className="mt-2 text-2xl font-semibold">{lesson.title}</h2><p className="mt-2 text-sm leading-6 text-gray-700">{lesson.objective}</p></div>
+          <div className="border-b border-gray-200 p-6"><p className="text-xs font-semibold text-indigo-700">{subjectName(lesson.subject)}</p><h2 className="mt-2 text-2xl font-semibold">{lesson.title}</h2><p className="mt-2 text-sm leading-6 text-gray-700">{lesson.objective}</p><ReadAloud language={language} text={stage==='learn'?[lesson.title,lesson.explanation,lesson.example].join('. '):stage==='explore'?lesson.investigation:[lesson.question,...lesson.options,result?lesson.solution:''].join('. ')}/></div>
           <div className="flex flex-wrap gap-2 border-b border-gray-200 px-6 py-3">{(['learn', 'explore', 'practise'] as const).map((s, i) => <button key={s} onClick={() => setStage(s)} aria-pressed={stage === s} className={`rounded-lg px-3 py-2 text-sm ${stage === s ? 'bg-indigo-100 font-semibold text-indigo-900' : 'text-gray-700 hover:bg-gray-100'}`}>{i + 1}. {ui[s]}</button>)}</div>
           <div className="min-h-80 p-6">
             {stage === 'learn' && <><h3 className="font-semibold">{ui.idea}</h3><p className="mt-3 text-sm leading-7 text-gray-700">{lesson.explanation}</p><div className="my-6 rounded-xl bg-indigo-50 p-5"><h3 className="text-sm font-semibold text-indigo-900">{ui.example}</h3><p className="mt-2 text-sm leading-7 text-indigo-950">{lesson.example}</p></div><button className={button} onClick={() => setStage('explore')}>{ui.explore} →</button></>}
@@ -88,8 +92,8 @@ export default function TutorPage() {
       </div>
       <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-6"><h2 className="text-xl font-semibold">{ui.coach}</h2><p className="mt-3 rounded-xl bg-emerald-50 p-4 text-sm leading-7 text-emerald-950">{ui.demoNotice}</p>
         <div className="my-4 flex flex-wrap gap-2">{intents.map(intent => <button key={intent} className={button} onClick={() => addMessage(intent, '')}>{promptLabels[intent]}</button>)}</div>
-        <div role="log" aria-live="polite" aria-label={ui.coach} className="max-h-96 space-y-3 overflow-y-auto">{messages.map((m, i) => <div key={i}><div className="ml-4 rounded-xl bg-indigo-50 p-3 text-sm leading-7"><strong>{ui.you}: </strong>{m.question || (m.intent ? promptLabels[m.intent] : '')}</div><div className="mr-4 mt-2 whitespace-pre-wrap rounded-xl bg-gray-100 p-4 text-sm leading-7"><strong className="mb-1 block text-xs">{ui.tutor}</strong>{demoAnswer(lesson.id, language, m.intent)}</div></div>)}</div>
-        <form onSubmit={ask} className="mt-4 flex flex-wrap gap-2"><label htmlFor="tutor-question" className="sr-only">{ui.placeholder}</label><textarea id="tutor-question" value={question} onChange={e => setQuestion(e.target.value)} maxLength={1200} rows={2} placeholder={ui.placeholder} className="min-w-0 flex-1 rounded-xl border border-gray-300 bg-white p-3 text-sm text-gray-900 placeholder:text-gray-600 focus:outline-indigo-600" /><button className={button} disabled={!question.trim()}>{ui.send}</button></form>
+        <div role="log" aria-live="polite" aria-label={ui.coach} className="max-h-96 space-y-3 overflow-y-auto">{messages.map((m, i) => <div key={i}><div className="ml-4 rounded-xl bg-indigo-50 p-3 text-sm leading-7"><strong>{ui.you}: </strong>{m.question || (m.intent ? promptLabels[m.intent] : '')}</div><div className="mr-4 mt-2 whitespace-pre-wrap rounded-xl bg-gray-100 p-4 text-sm leading-7"><strong className="mb-1 block text-xs">{ui.tutor}</strong>{demoAnswer(lesson.id, language, m.intent)}<ReadAloud language={language} text={demoAnswer(lesson.id, language, m.intent)}/></div></div>)}</div>
+        <SpeechInput language={language} onTranscript={text=>setQuestion(current=>(current+' '+text).trim().slice(0,1200))}/><form onSubmit={ask} className="mt-4 flex flex-wrap gap-2"><label htmlFor="tutor-question" className="sr-only">{ui.placeholder}</label><textarea id="tutor-question" value={question} onChange={e => setQuestion(e.target.value)} maxLength={1200} rows={2} placeholder={ui.placeholder} className="min-w-0 flex-1 rounded-xl border border-gray-300 bg-white p-3 text-sm text-gray-900 placeholder:text-gray-600 focus:outline-indigo-600" /><button className={button} disabled={!question.trim()}>{ui.send}</button></form>
       </section>
       <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs leading-6 text-amber-950">{ui.translationNote}</p><p className="mt-5 text-center text-xs leading-6 text-gray-700">Mr Dawodu O.F. · A-Factor EdTech Solutions · {ui.limit}</p>
     </main></div>;

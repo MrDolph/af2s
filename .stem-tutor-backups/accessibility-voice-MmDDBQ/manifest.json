@@ -1,0 +1,46 @@
+[
+  {
+    "file": "src/components/accessibility/accessibility.css",
+    "existed": false
+  },
+  {
+    "file": "src/components/accessibility/ReadAloud.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/accessibility/AccessibilityProvider.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/accessibility/SpeechInput.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/accessibility/AccessibilityPanel.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/lib/accessibility/settings.ts",
+    "existed": false
+  },
+  {
+    "file": "capstone/ACCESSIBILITY_START_HERE.md",
+    "existed": false
+  },
+  {
+    "file": "src/app/layout.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/explorer/ResultCard.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/ai/PromptBar.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/tutor/page.tsx",
+    "existed": true
+  }
+]
