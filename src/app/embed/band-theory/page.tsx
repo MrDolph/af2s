@@ -79,7 +79,7 @@ function BandTheoryEmbedInner() {
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey((k) => k + 1); }, []);
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="parameters" className="flex gap-1 overflow-x-auto pb-1">
         {Object.entries(MATERIALS).map(([key, m]) => (
           <button key={key} onClick={() => { setMaterial(key); setIsRunning(false); setResetKey((k) => k + 1); }}

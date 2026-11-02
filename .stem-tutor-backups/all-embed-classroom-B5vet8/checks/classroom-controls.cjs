@@ -1,0 +1,18 @@
+const fs=require('fs'),path=require('path'),vm=require('vm'),ts=require('typescript'),assert=require('assert'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+let initial=[];const cache=new Map();
+function load(file){file=path.resolve(file);if(file.endsWith('.json'))return JSON.parse(fs.readFileSync(file,'utf8'));if(cache.has(file))return cache.get(file).exports;
+ const module={exports:{}};cache.set(file,module);
+ const requireFile=id=>{if(id==='react'){let i=0;return {...React,useState:v=>[initial[i++]??v,()=>{}],useRef:v=>({current:v}),useEffect:()=>{},useId:()=> 'topic-test'};}if(id.startsWith('@/')){const base='src/'+id.slice(2);return load(fs.existsSync(base+'.ts')?base+'.ts':base+'.tsx');}if(id.endsWith('.css'))return {};if(id.startsWith('.')){let p=path.resolve(path.dirname(file),id);if(!path.extname(p))p+='.ts';return load(p);}return require(id);};
+ const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;
+ vm.runInNewContext(code,{module,exports:module.exports,require:requireFile,console});return module.exports;
+}
+const catalog=JSON.parse(fs.readFileSync('src/lib/explorer/topics-data.json','utf8'));
+for(const topic of catalog){const s=fs.readFileSync('src/app'+topic.route+'/page.tsx','utf8');assert(s.includes('SimulationStage')||s.includes('GeophysicsFrame'),'fullscreen missing at '+topic.route);}
+function nodes(tree){let out=[];function visit(n){if(!React.isValidElement(n))return;out.push(n);React.Children.forEach(n.props.children,visit);}visit(tree);return out;}
+initial=[false,''];const picker=load('src/components/explorer/TopicPicker.tsx');let chosen;
+let tree=picker.TopicPicker({value:'',label:'Topic',automatic:'Automatic',onChange:id=>chosen=id});let buttons=nodes(tree).filter(n=>n.type==='button'&&n.props.className==='af-topic-choice');assert.equal(buttons.length,catalog.length+1);for(const b of buttons){assert.equal(b.props.style.color,'#111827');assert.equal(b.props.style.backgroundColor,'#fff');}
+buttons[1].props.onClick();assert.equal(chosen,catalog.filter(t=>t.subject==='Physics')[0].id);
+initial=[false,'pendulum'];cache.delete(path.resolve('src/components/explorer/TopicPicker.tsx'));tree=load('src/components/explorer/TopicPicker.tsx').TopicPicker({value:'',label:'Topic',automatic:'Automatic',onChange:()=>{}});buttons=nodes(tree).filter(n=>n.type==='button'&&n.props.className==='af-topic-choice');assert(buttons.length>1&&buttons.length<catalog.length);assert(!nodes(tree).some(n=>n.type==='select'));
+const canvas=React.createElement('div',{'data-stage-role':'canvas',key:'canvas'},'Canvas');const controls=React.createElement('div',{'data-stage-role':'parameters',key:'parameters'},'Parameters');
+for(const expanded of [false,true]){initial=[expanded];cache.delete(path.resolve('src/components/simulation/SimulationStage.tsx'));const stage=load('src/components/simulation/SimulationStage.tsx').SimulationStage({children:[canvas,controls]});const list=nodes(stage);assert(list.find(n=>n.props.className==='af-stage-main').props.children[0].props.children==='Canvas');assert(list.find(n=>n.type==='aside').props.children[0].props.children==='Parameters');assert.equal(stage.props['data-expanded'],expanded);assert(renderToStaticMarkup(stage).includes('Simulation parameters'));}
+console.log(`PASS: all ${catalog.length} catalogue activities have fullscreen; picker lists/searches/selects topics with explicit contrast; scene/sidebar structure remains stable across expansion.`);

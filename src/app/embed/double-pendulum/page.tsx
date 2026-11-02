@@ -1,4 +1,6 @@
 'use client';
+import { useRef as useEmbedRef } from 'react';
+import { useResponsiveCanvasSize as useEmbedSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { Suspense, useState, useCallback, useRef } from 'react';
@@ -40,6 +42,9 @@ function PoweredBy() {
 }
 
 function DoublePendulumEmbedInner() {
+  const embedBoxRef = useEmbedRef<HTMLDivElement>(null);
+  const embedSize = useEmbedSize(embedBoxRef, 640, 360, 1100);
+
   const sp = useSearchParams();
   const showControls = sp.get('controls') !== '0';
 
@@ -64,7 +69,7 @@ function DoublePendulumEmbedInner() {
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage containerRef={embedBoxRef} className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas"><DoublePendulumCanvas
         key={resetKey}
         theta1Deg={theta1Deg}
@@ -77,8 +82,8 @@ function DoublePendulumEmbedInner() {
         showTrail={showTrail}
         showEnergy={showEnergy}
         trailLength={trailLength}
-        width={640}
-        height={400}
+        width={Math.max(160, embedSize.width - 24)}
+        height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(1.6, 1.6) : 1.6))}
       /></div>
       <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}

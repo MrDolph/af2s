@@ -1,0 +1,162 @@
+[
+  {
+    "file": "src/app/embed/debroglie/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/quantum-harmonic-oscillator/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/unit-circle/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/space/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/magnetic-effects/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/polarization/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/waves/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/electrostatics-potential/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/decay/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/diffraction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/rectilinear-propagation/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/electromagnetic-induction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/bjt-transistor/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/reflection/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/pn-junction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/vectors/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/photoelectric/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/elasticity/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/electrostatics-charging/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/atomic-models/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/coupled-oscillators/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/friction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/circuits/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/quantum-tunneling/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/oscillations/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/ac-circuits/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/projectile/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/electrostatics-fields/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/equilibrium/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/xrays/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/band-theory/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/optics/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/double-pendulum/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/heat/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/mosfet/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/SimulationStage.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/BjtCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/PnJunctionCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "checks/classroom-controls.cjs",
+    "existed": true
+  },
+  {
+    "file": "checks/embed-layout.cjs",
+    "existed": false
+  }
+]

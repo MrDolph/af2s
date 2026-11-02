@@ -18,7 +18,7 @@ export default function MosfetEmbedPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4">
-      <SimulationStage className="af-stage-dark max-w-5xl mx-auto">
+      <SimulationStage className="af-embed-stage af-stage-dark mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
         <div data-stage-role="canvas"><MosfetCanvas
           params={params}
           activeTab="schematic"

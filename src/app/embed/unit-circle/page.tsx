@@ -65,7 +65,7 @@ function UnitCircleEmbedInner() {
   const reset = () => { cancelAnimationFrame(animRef.current); setAnimating(false); lastTsRef.current = null; setAngleDeg(num(sp, 'angleDeg', 45, 0, 360)); };
 
   return (
-    <SimulationStage className="af-unit-circle-stage mx-auto max-w-4xl space-y-3 p-3">
+    <SimulationStage className="af-embed-stage af-unit-circle-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas" ref={boxRef} className="flex min-w-0 justify-center rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
         <UnitCircleCanvas angleDeg={angleDeg} onAngleChange={showControls ? setAngleDeg : () => {}}
           width={size.width} height={size.height} />

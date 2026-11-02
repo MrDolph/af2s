@@ -27,7 +27,7 @@ function SpaceEmbedInner() {
   const width = size.width, height = width < 560 ? Math.round(width * (dim === '1d' ? 0.62 : 1.0)) : size.height;
 
   return (
-    <SimulationStage className="mx-auto max-w-3xl p-3">
+    <SimulationStage className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas" ref={boxRef} className="overflow-hidden rounded-xl border border-gray-200 p-1">
         <SpaceCanvas dim={dim} activity={act} width={width} height={height} points={act === 'journey' ? pts : [pts[0]]} labels={act === 'journey' ? LABELS : ['P']}
           selected={sel} onMove={(i, p) => setPts(s => s.map((q, k) => (k === i ? p : q)))} onSelect={setSel} snap={1} view={view} onView={setView} dragAxis="floor"

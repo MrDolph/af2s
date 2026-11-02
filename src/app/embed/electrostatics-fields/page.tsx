@@ -71,7 +71,7 @@ function ElectrostaticsFieldsEmbedInner() {
   }, [topic, q1nC, q2nC, separationCm, fieldConfig, reset]);
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas" ref={canvasBoxRef}>
       {topic === 'coulomb' && (
         <CoulombsLawCanvas key={resetKey} q1nC={q1nC} q2nC={q2nC} initialSeparationCm={separationCm}

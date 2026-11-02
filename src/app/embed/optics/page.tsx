@@ -1,4 +1,6 @@
 'use client';
+import { useRef as useEmbedRef } from 'react';
+import { useResponsiveCanvasSize as useEmbedSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { Suspense, useState } from 'react';
@@ -38,6 +40,9 @@ function PoweredBy() {
 }
 
 function OpticsEmbedInner() {
+  const embedBoxRef = useEmbedRef<HTMLDivElement>(null);
+  const embedSize = useEmbedSize(embedBoxRef, 640, 360, 1100);
+
   const sp = useSearchParams();
   const mode = ((): OpticsMode => (sp.get('mode') === 'lens' ? 'lens' : 'snell'))();
   const showControls = sp.get('controls') !== '0';
@@ -50,10 +55,10 @@ function OpticsEmbedInner() {
   const [converging, setConverging] = useState(() => sp.get('conv') !== '0');
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage containerRef={embedBoxRef} className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas"><OpticsCanvas mode={mode} n1={n1} n2={n2} theta1={theta1}
         focal={focal} objectDist={objectDist} converging={converging}
-        width={660} height={320} /></div>
+        width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.0625, 1.6) : 2.0625))} /></div>
       <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>

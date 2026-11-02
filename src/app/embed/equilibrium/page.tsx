@@ -1,4 +1,6 @@
 'use client';
+import { useRef as useEmbedRef } from 'react';
+import { useResponsiveCanvasSize as useEmbedSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { Suspense, useState, useMemo, useCallback, useEffect, useRef } from 'react';
@@ -45,6 +47,9 @@ function PoweredBy() {
 }
 
 function EquilibriumEmbedInner() {
+  const embedBoxRef = useEmbedRef<HTMLDivElement>(null);
+  const embedSize = useEmbedSize(embedBoxRef, 640, 360, 1100);
+
   const sp = useSearchParams();
   const topic = ((): Topic => {
     const t = sp.get('topic');
@@ -84,23 +89,23 @@ function EquilibriumEmbedInner() {
   }, [topic, scenario, sdF1, sdF2, sdMass, magA, angleA, magB, angleB, w1Force, w1Pos, w2Force, w2Pos, objDensity, liqIdx, blockHeight, reset]);
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage containerRef={embedBoxRef} className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas">{topic === 'static-dynamic' && (
         <StaticDynamicCanvas key={resetKey} scenario={scenario} f1={sdF1} f2={sdF2} mass={sdMass}
-          isRunning={isRunning} isPaused={isPaused} width={640} height={240} />
+          isRunning={isRunning} isPaused={isPaused} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.6666666666666665, 1.6) : 2.6666666666666665))} />
       )}</div>
       <div data-stage-role="canvas">{topic === 'concurrent' && (
         <ConcurrentForcesCanvas key={resetKey} magA={magA} angleA={angleA} magB={magB} angleB={angleB}
-          isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
+          isRunning={isRunning} isPaused={isPaused} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.2857142857142856, 1.6) : 2.2857142857142856))} />
       )}</div>
       <div data-stage-role="canvas">{topic === 'parallel' && (
         <ParallelForcesCanvas key={resetKey} weights={weights}
-          isRunning={isRunning} isPaused={isPaused} width={640} height={260} />
+          isRunning={isRunning} isPaused={isPaused} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.4615384615384617, 1.6) : 2.4615384615384617))} />
       )}</div>
       <div data-stage-role="canvas">{topic === 'floating' && (
         <FloatingBodyCanvas key={resetKey} objDensity={objDensity} liquidDensity={liquid.density}
           liquidName={liquid.name} blockHeight={blockHeight}
-          isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
+          isRunning={isRunning} isPaused={isPaused} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.2857142857142856, 1.6) : 2.2857142857142856))} />
       )}</div>
       <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}

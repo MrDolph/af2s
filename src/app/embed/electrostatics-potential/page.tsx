@@ -1,4 +1,6 @@
 'use client';
+import { useRef as useEmbedRef } from 'react';
+import { useResponsiveCanvasSize as useEmbedSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
@@ -43,6 +45,9 @@ function PoweredBy() {
 }
 
 function ElectrostaticsPotentialEmbedInner() {
+  const embedBoxRef = useEmbedRef<HTMLDivElement>(null);
+  const embedSize = useEmbedSize(embedBoxRef, 640, 360, 1100);
+
   const sp = useSearchParams();
   const topic = ((): Topic => {
     const t = sp.get('topic');
@@ -76,18 +81,18 @@ function ElectrostaticsPotentialEmbedInner() {
   }, [topic, q1nC, q2nC, separationCm, equipConfig, voltageV, resistanceOhm, capacitanceUf, reset]);
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage containerRef={embedBoxRef} className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas">{topic === 'potential' && (
         <PotentialCanvas key={resetKey} q1nC={q1nC} q2nC={q2nC} initialSeparationCm={separationCm}
-          isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
+          isRunning={isRunning} isPaused={isPaused} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.2857142857142856, 1.6) : 2.2857142857142856))} />
       )}</div>
       <div data-stage-role="canvas">{topic === 'equipotential' && (
-        <EquipotentialCanvas configuration={equipConfig} width={640} height={300} />
+        <EquipotentialCanvas configuration={equipConfig} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.1333333333333333, 1.6) : 2.1333333333333333))} />
       )}</div>
       <div data-stage-role="canvas">{topic === 'capacitor' && (
         <CapacitorCanvas key={resetKey} voltageV={voltageV} resistanceOhm={resistanceOhm} capacitanceUf={capacitanceUf}
           isRunning={isRunning} isPaused={isPaused} dischargeKey={dischargeKey}
-          onTick={(_v, ph) => setLiveCapacitor({ phase: ph })} width={640} height={300} />
+          onTick={(_v, ph) => setLiveCapacitor({ phase: ph })} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.1333333333333333, 1.6) : 2.1333333333333333))} />
       )}</div>
       <div data-stage-role="playback">{topic !== 'equipotential' && (
         <div className="flex flex-wrap items-center gap-2">

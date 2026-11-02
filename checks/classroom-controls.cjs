@@ -2,7 +2,7 @@ const fs=require('fs'),path=require('path'),vm=require('vm'),ts=require('typescr
 let initial=[];const cache=new Map();
 function load(file){file=path.resolve(file);if(file.endsWith('.json'))return JSON.parse(fs.readFileSync(file,'utf8'));if(cache.has(file))return cache.get(file).exports;
  const module={exports:{}};cache.set(file,module);
- const requireFile=id=>{if(id==='react'){let i=0;return {...React,useState:v=>[initial[i++]??v,()=>{}],useRef:v=>({current:v}),useEffect:()=>{},useId:()=> 'topic-test'};}if(id.startsWith('@/')){const base='src/'+id.slice(2);return load(fs.existsSync(base+'.ts')?base+'.ts':base+'.tsx');}if(id.endsWith('.css'))return {};if(id.startsWith('.')){let p=path.resolve(path.dirname(file),id);if(!path.extname(p))p+='.ts';return load(p);}return require(id);};
+ const requireFile=id=>{if(id==='react'){let i=0;return {...React,useState:v=>[initial[i++]??v,()=>{}],useRef:v=>({current:v}),useEffect:()=>{},useCallback:fn=>fn,useId:()=> 'topic-test'};}if(id.startsWith('@/')){const base='src/'+id.slice(2);return load(fs.existsSync(base+'.ts')?base+'.ts':base+'.tsx');}if(id.endsWith('.css'))return {};if(id.startsWith('.')){let p=path.resolve(path.dirname(file),id);if(!path.extname(p))p+='.ts';return load(p);}return require(id);};
  const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;
  vm.runInNewContext(code,{module,exports:module.exports,require:requireFile,console});return module.exports;
 }

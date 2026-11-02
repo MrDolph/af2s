@@ -1,4 +1,6 @@
 'use client';
+import { useRef as useEmbedRef } from 'react';
+import { useResponsiveCanvasSize as useEmbedSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
@@ -39,6 +41,9 @@ function PoweredBy() {
 }
 
 function WavesEmbedInner() {
+  const embedBoxRef = useEmbedRef<HTMLDivElement>(null);
+  const embedSize = useEmbedSize(embedBoxRef, 640, 360, 1100);
+
   const sp = useSearchParams();
   const mode = ((): WaveMode => {
     const m = sp.get('mode');
@@ -64,11 +69,11 @@ function WavesEmbedInner() {
   }, [A, f, lambda, A2, f2, phase2, reset]);
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage containerRef={embedBoxRef} className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas"><WaveCanvas key={resetKey} mode={mode}
         amplitude={A} frequency={f} wavelength={lambda}
         amplitude2={A2} frequency2={f2} phase2={phase2}
-        isRunning={isRunning} isPaused={isPaused} width={660} height={300} /></div>
+        isRunning={isRunning} isPaused={isPaused} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.2, 1.6) : 2.2))} /></div>
       <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
         onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>

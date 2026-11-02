@@ -18,8 +18,15 @@ export default function BjtCanvas({ params, width = 900, height = 640 }: BjtCanv
   const state = computeBjtState(params);
   
   const draw = useCallback((ctx: CanvasRenderingContext2D, t: number) => {
-    const W = ctx.canvas.width;
-    const H = ctx.canvas.height;
+    // These circuit diagrams use a fixed logical layout. Scale the whole
+    // drawing, including labels, rather than clipping its fixed coordinates.
+    const actualW = ctx.canvas.width, actualH = ctx.canvas.height;
+    const W = 900, H = 640;
+    const scale = Math.min(actualW / W, actualH / H);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, actualW, actualH);
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, actualW, actualH);
+    ctx.setTransform(scale, 0, 0, scale, (actualW - W * scale) / 2, (actualH - H * scale) / 2);
     const { Vbe, Vce, temperature, material, beta, topology, Vcc, Rb, Rc, Re, Rload } = params;
     const { region, Ib, Ic, Ie, Vb, Ve, Vc, Av, Ai, Ap, Zin, Zout, Pdiss, Ic_sat, Vce_cutoff } = state;
     

@@ -18,8 +18,15 @@ export default function PnJunctionCanvas({ params, width = 900, height = 600 }: 
   const state = computeJunctionState(params);
   
   const draw = useCallback((ctx: CanvasRenderingContext2D, t: number) => {
-    const W = ctx.canvas.width;
-    const H = ctx.canvas.height;
+    // These circuit diagrams use a fixed logical layout. Scale the whole
+    // drawing, including labels, rather than clipping its fixed coordinates.
+    const actualW = ctx.canvas.width, actualH = ctx.canvas.height;
+    const W = 900, H = 600;
+    const scale = Math.min(actualW / W, actualH / H);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, actualW, actualH);
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, actualW, actualH);
+    ctx.setTransform(scale, 0, 0, scale, (actualW - W * scale) / 2, (actualH - H * scale) / 2);
     const { Na, Nd, temperature, appliedBias, material, circuitMode, Vin, Rload, freq } = params;
     const { Vbi, Wp, Wn, Wtotal, Emax, Id, Vd, Pout, efficiency, ripple, Vdc } = state;
     

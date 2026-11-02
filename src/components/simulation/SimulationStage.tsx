@@ -1,19 +1,26 @@
 'use client';
-import { Children, isValidElement, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Children, isValidElement, useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import './simulation-stage.css';
 
 /** Keeps the existing simulation mounted while expanding it with its controls. */
-export function SimulationStage({ children, className = '' }: { children: ReactNode; className?: string }) {
+export function SimulationStage({ children, className = '', containerRef }: { children: ReactNode; className?: string; containerRef?: RefObject<HTMLDivElement | null> }) {
   const [expanded, setExpanded] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const root = useRef<HTMLDivElement>(null);
+  const setRoot = useCallback((node: HTMLDivElement | null) => { root.current = node; if (containerRef) containerRef.current = node; }, [containerRef]);
   const toggle = useRef<HTMLButtonElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
   const orientationLocked = useRef(false);
   const active = useRef(false);
   const items = Children.toArray(children);
   const role = (item: ReactNode) => isValidElement<{'data-stage-role'?: string}>(item) ? item.props['data-stage-role'] : undefined;
-  const parameters = items.filter(item => role(item) === 'parameters');
+  const hasContent = (item: ReactNode): boolean => {
+    if (!isValidElement<{children?: ReactNode}>(item)) return typeof item === 'string' ? item.trim().length > 0 : typeof item === 'number';
+    if (typeof item.type !== 'string') return true;
+    if (item.props.children === undefined) return ['input','canvas','iframe','img'].includes(item.type);
+    return Children.toArray(item.props.children).some(hasContent);
+  };
+  const parameters = items.filter(item => role(item) === 'parameters' && hasContent(item));
   const scene = items.filter(item => role(item) !== 'parameters');
   function unlock() { if (orientationLocked.current) { try { screen.orientation?.unlock(); } catch {} orientationLocked.current = false; } }
   function close() {
@@ -74,7 +81,7 @@ export function SimulationStage({ children, className = '' }: { children: ReactN
     resize();
     return () => { cancelAnimationFrame(frame); observer.disconnect(); el.style.removeProperty('--af-stage-canvas-height'); };
   }, [expanded]);
-  return <div ref={root} data-simulation-stage data-expanded={expanded} className={`af-simulation-stage ${className}`} data-has-parameters={parameters.length > 0} data-controls-visible={controlsVisible}
+  return <div ref={setRoot} data-simulation-stage data-expanded={expanded} className={`af-simulation-stage ${className}`} data-has-parameters={parameters.length > 0} data-controls-visible={controlsVisible}
     role={expanded ? 'dialog' : undefined} aria-modal={expanded || undefined} aria-label={expanded ? 'Classroom simulation view' : undefined}
     onKeyDown={e => {
       if (!expanded || e.key !== 'Tab') return;

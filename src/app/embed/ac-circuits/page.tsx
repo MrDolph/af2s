@@ -1,4 +1,6 @@
 'use client';
+import { useRef as useEmbedRef } from 'react';
+import { useResponsiveCanvasSize as useEmbedSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
@@ -41,6 +43,9 @@ function PoweredBy() {
 }
 
 function ACEmbedInner() {
+  const embedBoxRef = useEmbedRef<HTMLDivElement>(null);
+  const embedSize = useEmbedSize(embedBoxRef, 640, 360, 1100);
+
   const sp = useSearchParams();
   const topic = ((): Topic => {
     const t = sp.get('topic');
@@ -76,12 +81,12 @@ function ACEmbedInner() {
   const activeResistance = isParallelTopic ? parallelResistance : resistance;
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage containerRef={embedBoxRef} className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas"><ACCircuitCanvas key={resetKey} mode={topic as ACMode}
         vPeak={vPeak} frequency={effFrequency} resistance={activeResistance}
         component={component} inductance={inductance} capacitance={capacitance * 1e-6}
         resonanceCircuit={resonanceCircuit} speedMultiplier={speedMultiplier} phasorZoom={phasorZoom}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={320} /></div>
+        isRunning={isRunning} isPaused={isPaused} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2, 1.6) : 2))} /></div>
       <div data-stage-role="playback" className="flex items-center gap-2 flex-wrap">
         <SimulationControls isRunning={isRunning} isPaused={isPaused}
           onRun={() => { setIsRunning(true); setIsPaused(false); }}

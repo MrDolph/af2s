@@ -1,4 +1,6 @@
 'use client';
+import { useRef as useEmbedRef } from 'react';
+import { useResponsiveCanvasSize as useEmbedSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { Suspense, useState, useRef, useEffect, useCallback } from 'react';
@@ -36,6 +38,9 @@ function Slider({ label, unit, value, min, max, step, set, color }: {
 }
 
 function OscillationsEmbedInner() {
+  const embedBoxRef = useEmbedRef<HTMLDivElement>(null);
+  const embedSize = useEmbedSize(embedBoxRef, 640, 360, 1100);
+
   const sp = useSearchParams();
   const topic = ((): Topic => {
     const t = sp.get('topic');
@@ -111,23 +116,23 @@ function OscillationsEmbedInner() {
                  graphM * graphOmega * graphOmega;
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage containerRef={embedBoxRef} className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas" className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
         {topic === 'pendulum' && (
           <PendulumCanvas key={resetKey} length={pendL} amplitude={pendA} gravity={pendG} mass={pendM}
-            isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={380} height={280} />
+            isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(1.3571428571428572, 1.6) : 1.3571428571428572))} />
         )}
         {topic === 'spring' && (
           <SpringCanvas key={resetKey} k={spK} mass={spM} amplitude={spA}
-            isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={280} height={300} />
+            isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(0.9333333333333333, 1.6) : 0.9333333333333333))} />
         )}
         {topic === 'conical' && (
           <ConicalPendulumCanvas key={resetKey} length={conL} theta_deg={conTheta} mass={conM}
-            isRunning={isRunning} isPaused={isPaused} width={380} height={280} />
+            isRunning={isRunning} isPaused={isPaused} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(1.3571428571428572, 1.6) : 1.3571428571428572))} />
         )}
         {topic === 'physical' && (
           <PhysicalPendulumCanvas key={resetKey} length={physL} mass={physM} pivotFraction={physPF}
-            isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={380} height={280} />
+            isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(1.3571428571428572, 1.6) : 1.3571428571428572))} />
         )}
       </div>
 
@@ -167,7 +172,7 @@ function OscillationsEmbedInner() {
         </div>
       )}</div>
 
-      <div data-stage-role="parameters">{showGraph && (
+      <div data-stage-role="extra">{showGraph && (
         <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
           <div className="mb-2 flex gap-1 overflow-x-auto rounded-lg bg-gray-100 p-0.5">
             {(['displacement', 'velocity', 'acceleration', 'energy', 'phase'] as GraphMode[]).map(gm => (

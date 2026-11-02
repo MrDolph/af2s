@@ -39,7 +39,7 @@ function VectorsEmbedInner() {
   const ang = angleBetween(A, B);
 
   return (
-    <SimulationStage className="mx-auto max-w-3xl p-3">
+    <SimulationStage className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas" ref={boxRef} className="overflow-hidden rounded-xl border border-gray-200 p-1">
         <VectorCanvas dim={dim} width={size.width} height={h} scene={scene} snap={1} view={view} onView={setView} dragAxis="floor" showPlanes showGrid onHandle={onHandle}
           ariaLabel="Vector diagram. Drag the coloured dots at the vector tips." />

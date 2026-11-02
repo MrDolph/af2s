@@ -1,4 +1,6 @@
 'use client';
+import { useRef as useEmbedRef } from 'react';
+import { useResponsiveCanvasSize as useEmbedSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
@@ -52,6 +54,9 @@ function PoweredBy() {
 }
 
 function FrictionEmbedInner() {
+  const embedBoxRef = useEmbedRef<HTMLDivElement>(null);
+  const embedSize = useEmbedSize(embedBoxRef, 640, 360, 1100);
+
   const sp = useSearchParams();
   const mode = ((): FrictionMode => (sp.get('mode') === 'incline' ? 'incline' : 'flat'))();
   const showControls = sp.get('controls') !== '0';
@@ -80,12 +85,12 @@ function FrictionEmbedInner() {
   }, [mass, applied, angle, appliedIncline, muS, muK, reset]);
 
   return (
-    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage containerRef={embedBoxRef} className="af-embed-stage mx-auto max-w-4xl space-y-3 p-3 sm:p-4">
       <div data-stage-role="canvas"><FrictionCanvas key={resetKey} mode={mode} mass={mass} applied={applied} angle={angle}
         appliedIncline={appliedIncline} muS={muS} muK={muK} isRunning={isRunning} isPaused={isPaused} resetKey={resetKey}
         showWeight={showWeight} showComponents={showComponents} showNormal={showNormal}
         showFriction={showFriction} showApplied={showApplied}
-        width={640} height={300} /></div>
+        width={Math.max(160, embedSize.width - 24)} height={Math.round((Math.max(160, embedSize.width - 24)) / (embedSize.width < 600 ? Math.min(2.1333333333333333, 1.6) : 2.1333333333333333))} /></div>
       <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
         onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
