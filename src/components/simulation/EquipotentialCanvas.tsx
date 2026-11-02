@@ -143,7 +143,7 @@ export function EquipotentialCanvas({ configuration, width = 660, height = 320 }
     ctx.fillText('red = higher potential   blue = lower potential   white = zero', 8, H - 10);
   }, []);
 
-  useEffect(() => { draw(); }, [draw]);
+  useEffect(() => { draw(); }, [draw, width, height, configuration]);
 
   return (
     <canvas ref={canvasRef} width={width} height={height}

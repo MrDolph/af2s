@@ -1,5 +1,7 @@
 // src/app/simulations/bjt-transistor/page.tsx
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { TopicContext } from '@/components/explorer/TopicContext';
 
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
@@ -59,12 +61,12 @@ export default function BjtTransistorPage() {
             and Common-Base amplifiers with load lines, gain calculations, and animated current flow.
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+          <SimulationStage className="af-stage-dark grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div data-stage-role="canvas" className="lg:col-span-2">
               <BjtCanvas params={params} width={900} height={640} />
             </div>
 
-            <div className="space-y-4">
+            <div data-stage-role="parameters" className="space-y-4">
               <div className="bg-slate-900 rounded-lg p-4 border border-slate-700">
                 <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-slate-400">Circuit Topology</h3>
                 <div className="grid grid-cols-3 gap-2">
@@ -218,7 +220,7 @@ export default function BjtTransistorPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </SimulationStage>
         </div>
       </main>
 

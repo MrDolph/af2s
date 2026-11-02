@@ -37,47 +37,44 @@ export function ConicalPendulumCanvas({ length, theta_deg, mass, isRunning, isPa
       lastFrameRef.current = timestamp ?? null;
     }
 
-    const cx = W / 2, cy = 50;
-    const scale = Math.min((H - 100) / L, 200);
+    const cx = W / 2, pivotY = 26;
+    const scale = Math.min((H - 110) / (L * Math.cos(theta) + r_circ * 0.25), (W - 100) / Math.max(2 * r_circ, 0.1));
     const vertLen = L * Math.cos(theta) * scale;
+    const orbitY = pivotY + vertLen;
     const bobX = cx + r_circ * scale * Math.cos(phiRef.current);
-    const bobY = cy + vertLen;
+    const bobY = orbitY + r_circ * scale * 0.25 * Math.sin(phiRef.current);
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, H);
 
     // Ceiling
     ctx.fillStyle = '#64748b'; ctx.fillRect(cx - 35, 0, 70, 12);
-    ctx.fillStyle = '#94a3b8'; ctx.beginPath(); ctx.arc(cx, 12, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#94a3b8'; ctx.beginPath(); ctx.arc(cx, pivotY, 5, 0, Math.PI * 2); ctx.fill();
 
     // Orbit circle (ellipse for perspective)
     ctx.save();
     ctx.strokeStyle = 'rgba(99,102,241,0.2)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
     ctx.beginPath();
-    ctx.ellipse(cx, bobY, r_circ * scale, r_circ * scale * 0.25, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx, orbitY, r_circ * scale, r_circ * scale * 0.25, 0, 0, Math.PI * 2);
     ctx.stroke(); ctx.setLineDash([]); ctx.restore();
 
-    // Shadow on orbit
-    const shadowX = cx + r_circ * scale * Math.cos(phiRef.current);
-    ctx.beginPath(); ctx.ellipse(shadowX, bobY + 4, 10, 4, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fill();
-
     // String
-    ctx.beginPath(); ctx.moveTo(cx, 12); ctx.lineTo(bobX, bobY);
+    ctx.beginPath(); ctx.moveTo(cx, pivotY); ctx.lineTo(bobX, bobY);
     ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5; ctx.stroke();
 
     // Vertical dashed line
     ctx.setLineDash([4, 4]);
-    ctx.beginPath(); ctx.moveTo(cx, 12); ctx.lineTo(cx, bobY + 20);
+    ctx.beginPath(); ctx.moveTo(cx, pivotY); ctx.lineTo(cx, orbitY);
     ctx.strokeStyle = 'rgba(148,163,184,0.5)'; ctx.lineWidth = 1; ctx.stroke();
     ctx.setLineDash([]);
 
     // Angle arc
     ctx.beginPath();
-    ctx.arc(cx, 12, 28, Math.PI / 2, Math.PI / 2 + theta);
+    const projectedAngle = Math.atan2(bobY - pivotY, bobX - cx);
+    ctx.arc(cx, pivotY, 28, Math.min(Math.PI / 2, projectedAngle), Math.max(Math.PI / 2, projectedAngle));
     ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.fillStyle = '#f59e0b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-    ctx.fillText(`θ=${th}°`, cx + 6, 12 + 38);
+    ctx.fillText(`θ=${th}° (true angle)`, cx + 6, pivotY + 38);
 
     // Bob
     const bobG = ctx.createRadialGradient(bobX - 2, bobY - 2, 1, bobX, bobY, 12);
@@ -89,7 +86,7 @@ export function ConicalPendulumCanvas({ length, theta_deg, mass, isRunning, isPa
     // Force vectors (from bob)
     // Tension component (along string, upward-inward)
     const Tscale = Math.min(T * 8, 55);
-    const Tx = cx - bobX; const Ty = cy + 12 - bobY;
+    const Tx = cx - bobX; const Ty = pivotY - bobY;
     const Tmag = Math.sqrt(Tx * Tx + Ty * Ty);
     ctx.save();
     ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2;

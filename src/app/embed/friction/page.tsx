@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { FrictionCanvas, FrictionMode } from '@/components/simulation/FrictionCanvas';
@@ -78,16 +80,16 @@ function FrictionEmbedInner() {
   }, [mass, applied, angle, appliedIncline, muS, muK, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <FrictionCanvas key={resetKey} mode={mode} mass={mass} applied={applied} angle={angle}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><FrictionCanvas key={resetKey} mode={mode} mass={mass} applied={applied} angle={angle}
         appliedIncline={appliedIncline} muS={muS} muK={muK} isRunning={isRunning} isPaused={isPaused} resetKey={resetKey}
         showWeight={showWeight} showComponents={showComponents} showNormal={showNormal}
         showFriction={showFriction} showApplied={showApplied}
-        width={640} height={300} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+        width={640} height={300} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <>
           <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Show forces</p>
@@ -114,9 +116,9 @@ function FrictionEmbedInner() {
             <Slider label="Kinetic μk" unit="" value={muK} min={0.05} max={1} step={0.01} set={v => setMuK(Math.min(v, muS))} color="#8b5cf6" />
           </div>
         </>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

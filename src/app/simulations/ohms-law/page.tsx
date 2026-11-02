@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
@@ -241,15 +243,15 @@ export default function OhmsLawPage() {
             {mode !== 'non-ohmic' && <span className="text-xs text-gray-400 ml-2">P = VI = I²R = V²/R</span>}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <SimulationStage className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <div data-stage-role="canvas" className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <CircuitCanvas key={resetKey} mode={mode} voltage={V} r1={r1} r2={r2} r3={r3}
                   nonOhmicDevice={nonOhmicDevice} flowDisplay={flowDisplay}
                   isRunning={isRunning} isPaused={isPaused} width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <SimulationControls isRunning={isRunning} isPaused={isPaused}
                     onRun={() => { setIsRunning(true); setIsPaused(false); }}
@@ -268,7 +270,7 @@ export default function OhmsLawPage() {
                   params={{ mode, V, r1, r2, r3 }} />
               </div>
 
-              {mode === 'ohm' && (
+              <div data-stage-role="extra">{mode === 'ohm' && (
                 <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">I–V characteristic</p>
                   <IVGraph R={r1} V={V} />
@@ -276,9 +278,9 @@ export default function OhmsLawPage() {
                     Straight line through the origin — the red dot is the current operating point (slope = 1/R)
                   </p>
                 </div>
-              )}
+              )}</div>
 
-              {mode === 'non-ohmic' && (
+              <div data-stage-role="parameters">{mode === 'non-ohmic' && (
                 <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">I–V characteristic</p>
@@ -296,10 +298,10 @@ export default function OhmsLawPage() {
                     Red curve = the non-ohmic device; grey dashed line = an ohmic resistor for comparison — same R at V=12V
                   </p>
                 </div>
-              )}
+              )}</div>
             </div>
 
-            <div className="space-y-3">
+            <div data-stage-role="parameters" className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Calculated</p>
                 <div className="space-y-2">
@@ -370,7 +372,7 @@ export default function OhmsLawPage() {
               </div>
             </div>
 
-            <div className="space-y-3 lg:col-span-2 xl:col-span-1">
+            <div data-stage-role="parameters" className="space-y-3 lg:col-span-2 xl:col-span-1">
               <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-amber-700 uppercase tracking-wide">📋 Teacher notes</p>
@@ -411,7 +413,7 @@ export default function OhmsLawPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </SimulationStage>
         </div>
       </main>
     </>

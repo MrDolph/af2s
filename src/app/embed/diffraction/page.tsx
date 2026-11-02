@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DiffractionCanvas, DiffractionMode } from '@/components/simulation/DiffractionCanvas';
@@ -61,14 +63,14 @@ function DiffractionEmbedInner() {
   }, [mode, wavelengthNm, slitWidthNm, slitSpacingNm, doubleSlitSepUm, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <DiffractionCanvas key={resetKey} mode={mode} wavelengthNm={wavelengthNm} slitWidthNm={slitWidthNm} slitSpacingNm={slitSpacingNm}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><DiffractionCanvas key={resetKey} mode={mode} wavelengthNm={wavelengthNm} slitWidthNm={slitWidthNm} slitSpacingNm={slitSpacingNm}
         doubleSlitSepNm={doubleSlitSepNm}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+        isRunning={isRunning} isPaused={isPaused} width={640} height={280} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="Wavelength" unit="nm" value={wavelengthNm} min={400} max={700} step={10} set={setWavelengthNm} color="#6366f1" />
@@ -82,9 +84,9 @@ function DiffractionEmbedInner() {
             <Slider label="Slit separation" unit="μm" value={doubleSlitSepUm} min={200} max={1000} step={10} set={setDoubleSlitSepUm} color="#f59e0b" />
           )}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

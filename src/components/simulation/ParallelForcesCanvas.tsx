@@ -10,7 +10,7 @@ interface Props {
 }
 
 const MAX_TILT_DEG = 26; // the beam physically stops here (hits the ground/supports)
-const BEAM_HALF_LEN_M = 2.2; // metres represented by the beam's visible half-length
+const BEAM_HALF_LEN_M = 0.5; // metres represented by the beam's visible half-length
 
 export function ParallelForcesCanvas({ weights, isRunning, isPaused, onTick, width = 660, height = 280 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -52,8 +52,9 @@ export function ParallelForcesCanvas({ weights, isRunning, isPaused, onTick, wid
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, H);
 
-    const pivotX = W / 2, pivotY = H * 0.62;
-    const pxPerM = Math.min((W / 2 - 40) / BEAM_HALF_LEN_M, 110);
+    const pivotX = W / 2, pivotY = H * 0.43;
+    const verticalRoom = Math.max(40, Math.min(pivotY - 65, H - pivotY - 115));
+    const pxPerM = Math.min((W / 2 - 40) / BEAM_HALF_LEN_M, verticalRoom / (BEAM_HALF_LEN_M * Math.sin(MAX_TILT_DEG * Math.PI / 180)));
     const angleRad = (angleDeg * Math.PI) / 180;
 
     // Fulcrum (triangle support)
@@ -65,23 +66,24 @@ export function ParallelForcesCanvas({ weights, isRunning, isPaused, onTick, wid
     ctx.closePath(); ctx.fill();
     ctx.fillStyle = '#94a3b8'; ctx.fillRect(pivotX - 60, pivotY + 40, 120, 8);
 
-    // Beam, rotated about the pivot
+    // A laboratory metre rule, supported at the 50 cm mark.
     const beamHalfPx = BEAM_HALF_LEN_M * pxPerM;
-    const x1 = pivotX - Math.cos(angleRad) * beamHalfPx, y1 = pivotY - Math.sin(angleRad) * beamHalfPx;
-    const x2 = pivotX + Math.cos(angleRad) * beamHalfPx, y2 = pivotY + Math.sin(angleRad) * beamHalfPx;
-    ctx.strokeStyle = '#92400e'; ctx.lineWidth = 10; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-    ctx.strokeStyle = '#b45309'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-
-    // Metre scale ticks
-    ctx.fillStyle = '#94a3b8'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
-    for (let m = -2; m <= 2; m++) {
-      if (m === 0) continue;
-      const bx = pivotX + Math.cos(angleRad) * m * pxPerM;
-      const by = pivotY + Math.sin(angleRad) * m * pxPerM;
-      ctx.fillText(`${m}m`, bx, by - 12);
+    ctx.save(); ctx.translate(pivotX, pivotY); ctx.rotate(angleRad);
+    ctx.fillStyle = '#fef3c7'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.5;
+    ctx.fillRect(-beamHalfPx, -28, 2 * beamHalfPx, 28);
+    ctx.strokeRect(-beamHalfPx, -28, 2 * beamHalfPx, 28);
+    for (let cm = 0; cm <= 100; cm++) {
+      const x = (cm / 100 - 0.5) * pxPerM;
+      ctx.strokeStyle = '#78350f'; ctx.lineWidth = cm % 10 === 0 ? 1.5 : 0.7;
+      ctx.beginPath(); ctx.moveTo(x, -28); ctx.lineTo(x, cm % 10 === 0 ? -16 : cm % 5 === 0 ? -20 : -24); ctx.stroke();
+      if (cm % (W < 450 ? 20 : 10) === 0) {
+        ctx.fillStyle = '#451a03'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText(String(cm), x, -5);
+      }
     }
+    ctx.restore();
+    ctx.fillStyle = '#475569'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText('Metre rule: 0–100 cm · pivot at 50 cm', W / 2, H - 36);
 
     // Weights hanging at their positions along the beam
     s.weights.forEach((w, i) => {
@@ -97,17 +99,17 @@ export function ParallelForcesCanvas({ weights, isRunning, isPaused, onTick, wid
       ctx.fillStyle = 'white'; ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center';
       ctx.fillText(`${w.force}N`, bx, by + hookLen + r + 3);
       ctx.fillStyle = '#334155'; ctx.font = '9px system-ui';
-      ctx.fillText(`${w.position >= 0 ? '+' : ''}${w.position}m`, bx, by + hookLen + 2 * r + 14);
+      ctx.fillText(`${Math.round((w.position + 0.5) * 100)} cm`, bx, by + hookLen + 2 * r + 14);
     });
 
     // Status
     ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
     if (balanced) {
       ctx.fillStyle = '#059669';
-      ctx.fillText('BALANCED — sum of clockwise moments = sum of anticlockwise moments', W / 2, 20);
+      ctx.fillText('BALANCED: clockwise = anticlockwise moments', W / 2, 20);
     } else {
       ctx.fillStyle = '#f59e0b';
-      ctx.fillText(`UNBALANCED — net moment = ${netM.toFixed(2)} N·m (tips ${netM > 0 ? 'clockwise ↷' : 'anticlockwise ↶'})`, W / 2, 20);
+      ctx.fillText(`Net moment ${netM.toFixed(2)} N·m · ${netM > 0 ? 'clockwise' : 'anticlockwise'}`, W / 2, 20);
     }
     ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
     ctx.fillText(`Σ(F × d): ${s.weights.map(w => `${w.force}×${w.position}`).join(' + ')} = ${netM.toFixed(2)} N·m`, 8, H - 10);

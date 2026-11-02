@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
@@ -283,9 +285,9 @@ export default function DoublePendulumPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <DoublePendulumCanvas
                   key={resetKey}
                   theta1Deg={theta1Deg}
@@ -304,7 +306,7 @@ export default function DoublePendulumPage() {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -314,7 +316,7 @@ export default function DoublePendulumPage() {
                 />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-3">
@@ -347,7 +349,7 @@ export default function DoublePendulumPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

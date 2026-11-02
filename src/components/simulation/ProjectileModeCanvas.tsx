@@ -451,6 +451,17 @@ export function ProjectileModeCanvas({
     drawRef.current(stateRef.current);
   }, [setup.x0, setup.y0, setup.vx0, setup.vy0, setup.g]);
 
+  // Canvas dimension changes erase its bitmap, even while stopped or paused.
+  // Repaint the current state without restarting the physics or advancing time.
+  const paintedSize = useRef({ width, height });
+  useEffect(() => {
+    if (paintedSize.current.width !== width || paintedSize.current.height !== height) {
+      trailRef.current = []; // Trail points use the old pixel scale.
+      paintedSize.current = { width, height };
+    }
+    drawRef.current(stateRef.current);
+  }, [draw, width, height]);
+
   // Animation loop — isRunning in deps, same as homepage
   useEffect(() => {
     if (!isRunning || isPaused || completedRef.current) return;

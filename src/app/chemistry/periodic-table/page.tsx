@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useState } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -9,7 +10,7 @@ import { BY_SYMBOL, type Element } from '@/lib/chemistry/elements';
 export default function PeriodicTablePage() {
   const [sel, setSel] = useState<Element>(BY_SYMBOL['Na']);
   const [sheet, setSheet] = useState(false);
-  const pick = (e: Element) => { setSel(e); setSheet(true); };
+  const pick = (e: Element) => { setSel(e); if (!document.querySelector('[data-simulation-stage][data-expanded="true"]')) setSheet(true); };
   return (
     <>
       <AppHeader />
@@ -18,11 +19,11 @@ export default function PeriodicTablePage() {
           <Link href="/chemistry" className="text-xs text-gray-400 transition hover:text-indigo-600">← Chemistry</Link>
           <h1 className="mt-1 text-xl font-semibold text-gray-900 sm:text-2xl">Periodic table</h1>
           <p className="mb-5 mt-1 text-sm text-gray-500">Select an element to see its configuration and oxidation states.</p>
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <div className="min-w-0 rounded-2xl border border-gray-200 bg-white p-3 sm:p-4"><PeriodicTable onPick={pick} selected={sel.symbol} listMaxHeight="calc(100vh - 21rem)" /></div>
+          <SimulationStage className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div data-stage-role="canvas" className="min-w-0 rounded-2xl border border-gray-200 bg-white p-3 sm:p-4"><PeriodicTable onPick={pick} selected={sel.symbol} listMaxHeight="calc(100vh - 21rem)" /></div>
             {/* Large screens: details beside the table */}
-            <div className="hidden min-w-0 lg:block"><ElementDetails el={sel} /></div>
-          </div>
+            <div data-stage-role="parameters" className="hidden min-w-0 lg:block"><ElementDetails el={sel} /></div>
+          </SimulationStage>
         </div>
 
         {/* Small screens: details slide up as a sheet so they are never off-screen */}

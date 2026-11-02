@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -70,13 +71,13 @@ export default function EigenvectorExplorerPage() {
         </section>
 
         <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
 
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
                 <EigenvectorCanvas matrix={matrix} t={t} width={canvasSize.width} height={canvasSize.height} />
               </div>
-              <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="parameters" className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <input type="range" min={0} max={1} step={0.01} value={t}
                   onChange={e => setT(Number(e.target.value))} className="flex-1" style={{ accentColor: '#10b981' }} />
                 <span className="text-xs font-mono text-gray-500 w-16 text-right">t={t.toFixed(2)}</span>
@@ -85,7 +86,7 @@ export default function EigenvectorExplorerPage() {
                   {animating ? '⏸ Stop' : '▶ Animate'}
                 </button>
               </div>
-              <div className="rounded-2xl border border-gray-100 bg-white p-4 grid grid-cols-2 gap-2">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-100 bg-white p-4 grid grid-cols-2 gap-2">
                 {(['a', 'b', 'c', 'd'] as const).map(k => (
                   <div key={k} className="space-y-1">
                     <span className="text-xs text-gray-400">{k}</span>
@@ -95,7 +96,7 @@ export default function EigenvectorExplorerPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div data-stage-role="parameters" className="flex flex-wrap gap-1.5">
                 {PRESETS.map((p, i) => (
                   <button key={p.name} onClick={() => applyPreset(i)}
                     className={`text-xs px-3 py-2 rounded-lg border font-medium transition ${
@@ -103,7 +104,7 @@ export default function EigenvectorExplorerPage() {
                     }`}>{p.name}</button>
                 ))}
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">

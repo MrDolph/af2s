@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { XrayCanvas } from '@/components/simulation/XrayCanvas';
@@ -52,20 +54,20 @@ function XraysEmbedInner() {
   }, [kV, current, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <XrayCanvas kV={kV} current={current} isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><XrayCanvas kV={kV} current={current} isRunning={isRunning} isPaused={isPaused} width={640} height={300} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="Tube voltage" unit="kV" value={kV} min={5} max={100} step={1} set={setKV} color="#6366f1" />
           <Slider label="Filament current" unit="" value={current} min={1} max={10} step={1} set={setCurrent} color="#f59e0b" />
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

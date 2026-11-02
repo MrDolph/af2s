@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
@@ -140,9 +141,9 @@ export default function DampedOscillatorPage() {
           </div>
 
           {/* Main grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
+          <SimulationStage className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
 
-            <div className="space-y-3 min-w-0">
+            <div data-stage-role="canvas" className="space-y-3 min-w-0">
               {/* Canvas */}
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <DampedOscillatorCanvas key={resetKey}
@@ -175,7 +176,7 @@ export default function DampedOscillatorPage() {
             </div>
 
             {/* Sliders + stats */}
-            <div className="space-y-3">
+            <div data-stage-role="parameters" className="space-y-3">
               <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-4">
                 <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
                 <Slider label="Damping γ" unit="1/s" value={gamma} min={0} max={6} step={0.05}
@@ -204,7 +205,7 @@ export default function DampedOscillatorPage() {
             </div>
 
             {/* Teacher notes + exercises */}
-            <div className="space-y-3 lg:col-span-2 xl:col-span-1">
+            <div data-stage-role="parameters" className="space-y-3 lg:col-span-2 xl:col-span-1">
               <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
                 <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-3">📋 Teacher notes</p>
                 <ul className="space-y-2">
@@ -237,7 +238,7 @@ export default function DampedOscillatorPage() {
               </div>
             </div>
 
-          </div>
+          </SimulationStage>
         </div>
       </main>
     </>

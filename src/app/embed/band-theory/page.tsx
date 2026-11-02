@@ -1,6 +1,9 @@
 'use client';
-import { Suspense, useState, useCallback } from 'react';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
+import { Suspense, useRef, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 import { BandTheoryCanvas } from '@/components/simulation/BandTheoryCanvas';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { BandTheoryParams, DopingType, MATERIALS } from '@/lib/physics/bandTheory';
@@ -62,10 +65,12 @@ function BandTheoryEmbedInner() {
   const [showFermiLevel, setShowFermiLevel] = useState(() => bool(sp, 'ef', true));
   const [showBandGap, setShowBandGap] = useState(() => bool(sp, 'eg', true));
 
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 540, 1600, 420);
   const params: BandTheoryParams = {
     material, temperature, dopingType, dopingConcentration,
     speed, zoom: 1, showElectrons, showHoles, showFermiLevel,
-    showBandGap, showThermalEnergy: false, showDOS: false, animateCarriers: true,
+    showBandGap, showThermalEnergy: false, showDOS: true, animateCarriers: true,
   };
 
   const [isRunning, setIsRunning] = useState(false);
@@ -74,8 +79,8 @@ function BandTheoryEmbedInner() {
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey((k) => k + 1); }, []);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <div className="flex gap-1 overflow-x-auto pb-1">
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="parameters" className="flex gap-1 overflow-x-auto pb-1">
         {Object.entries(MATERIALS).map(([key, m]) => (
           <button key={key} onClick={() => { setMaterial(key); setIsRunning(false); setResetKey((k) => k + 1); }}
             className={`shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition ${material === key ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500 hover:border-indigo-200'}`}>
@@ -84,11 +89,12 @@ function BandTheoryEmbedInner() {
         ))}
       </div>
 
-      <BandTheoryCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} width={640} height={420} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+      <div data-stage-role="canvas" ref={canvasBoxRef}><BandTheoryCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} width={canvasSize.width} height={canvasSize.height} /></div>
+      <div data-stage-role="extra"><p className="text-xs leading-6 text-gray-700">Filled dots are electrons; hollow markers are unoccupied states. The row illustrates an electron filling a hole: the vacancy shifts the other way. Counts are amplified; low-temperature freeze-out and degenerate doping are outside this teaching approximation.</p></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused((p) => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused((p) => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="Temperature" unit="K" value={temperature} min={0} max={1000} step={10} set={setTemperature} color="#f43f5e" />
@@ -109,9 +115,9 @@ function BandTheoryEmbedInner() {
             </label>
           </div>
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -189,8 +190,8 @@ export default function PerovskiteLabPage() {
           </div>
           {presetNote && <p className="mb-5 rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2 text-xs text-indigo-900">{presetNote} <span className="opacity-70">Reference notes are summaries — check the primary literature before citing.</span></p>}
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-            <div className="min-w-0 space-y-5">
+          <SimulationStage className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+            <div data-stage-role="canvas" className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-4">
                 <CrystalViewer atoms={atoms} extent={n} styles={styles} bondDist={0.5 / modelDef.cellFactor} sizeScale={0.36} showBonds={bonds} showCell={cell} showA={showA} />
                 <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 text-xs text-gray-600">
@@ -206,7 +207,7 @@ export default function PerovskiteLabPage() {
               <CandidatesPanel onLoad={onLoad} />
             </div>
 
-            <div className="min-w-0 space-y-5">
+            <div data-stage-role="parameters" className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-5">
                 <div className="flex gap-2">
                   {(Object.keys(MODELS) as ModelId[]).map(id => (
@@ -258,7 +259,7 @@ export default function PerovskiteLabPage() {
                 extra={`${double ? 'double perovskite' : 'cubic'} model`}
               />
             </div>
-          </div>
+          </SimulationStage>
         </div>
       </main>
     </>

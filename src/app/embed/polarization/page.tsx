@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PolarizationCanvas, PolarizationMode } from '@/components/simulation/PolarizationCanvas';
@@ -55,22 +57,22 @@ function PolarizationEmbedInner() {
   }, [mode, polarizerAngle, analyzerAngle, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <PolarizationCanvas key={resetKey} mode={mode} polarizerAngle={polarizerAngle} analyzerAngle={analyzerAngle}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={240} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><PolarizationCanvas key={resetKey} mode={mode} polarizerAngle={polarizerAngle} analyzerAngle={analyzerAngle}
+        isRunning={isRunning} isPaused={isPaused} width={640} height={240} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           {mode === 'single'
             ? <Slider label="Transmission axis" unit="°" value={polarizerAngle} min={0} max={180} step={5} set={setPolarizerAngle} color="#6366f1" />
             : <Slider label="Analyser angle" unit="°" value={analyzerAngle} min={0} max={180} step={1} set={setAnalyzerAngle} color="#6366f1" />}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

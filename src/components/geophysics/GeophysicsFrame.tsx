@@ -1,3 +1,4 @@
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
 
@@ -33,11 +34,13 @@ export function GeophysicsFrame({ active, src, title }: {
         </div>
       </nav>
       <main aria-label={title} style={{ flex: '1 1 0%', minHeight: 0 }}>
-        <iframe key={src} src={src} title={title}
+        <SimulationStage className="af-geophysics-stage">
+        <div data-stage-role="canvas"><iframe allowFullScreen allow="fullscreen" key={src} src={src} title={title}
           style={{
             display: 'block', width: '100%', height: '100%', border: 0, backgroundColor: '#f4f5f0',
             colorScheme: 'light',
-          }} />
+          }} /></div>
+        </SimulationStage>
       </main>
     </div>
   );

@@ -89,7 +89,7 @@ export function EigenvectorCanvas({ matrix, t, width = 460, height = 460 }: Prop
     }
   }, [matrix, t, toCanvas]);
 
-  useEffect(() => { draw(); }, [draw]);
+  useEffect(() => { draw(); }, [draw, width, height]);
 
   return <canvas ref={canvasRef} width={width} height={height} className="rounded-xl" />;
 }

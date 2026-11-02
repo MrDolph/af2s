@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PhotoelectricCanvas } from '@/components/simulation/PhotoelectricCanvas';
@@ -55,13 +57,13 @@ function PhotoelectricEmbedInner() {
   }, [metalIdx, f14, intensity, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <PhotoelectricCanvas f14={f14} intensity={intensity} phiEV={metal.phi} metalName={metal.name}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><PhotoelectricCanvas f14={f14} intensity={intensity} phiEV={metal.phi} metalName={metal.name}
+        isRunning={isRunning} isPaused={isPaused} width={640} height={300} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <div className="flex flex-wrap gap-1.5">
@@ -75,9 +77,9 @@ function PhotoelectricEmbedInner() {
           <Slider label="Frequency" unit="×10¹⁴ Hz" value={f14} min={2} max={14} step={0.1} set={setF14} color="#6366f1" />
           <Slider label="Intensity" unit="" value={intensity} min={1} max={10} step={1} set={setIntensity} color="#f59e0b" />
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

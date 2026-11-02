@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { QuantumTunnelingCanvas } from '@/components/simulation/QuantumTunnelingCanvas';
@@ -81,8 +83,8 @@ function QuantumTunnelingEmbedInner() {
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey((k) => k + 1); }, []);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <div className="flex gap-1 overflow-x-auto pb-1">
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="parameters" className="flex gap-1 overflow-x-auto pb-1">
         {(['barrier', 'well', 'step', 'double', 'triangular'] as PotentialType[]).map((m) => {
           const labels: Record<PotentialType, string> = { barrier: 'Barrier', well: 'Well', step: 'Step', double: 'Double', triangular: 'Triangular' };
           return (
@@ -94,11 +96,11 @@ function QuantumTunnelingEmbedInner() {
         })}
       </div>
 
-      <QuantumTunnelingCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} width={640} height={420} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+      <div data-stage-role="canvas"><QuantumTunnelingCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} width={640} height={420} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused((p) => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused((p) => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="Energy" unit="eV" value={particleEnergy} min={0.1} max={10} step={0.1} set={setParticleEnergy} color="#6366f1" />
@@ -121,9 +123,9 @@ function QuantumTunnelingEmbedInner() {
             </label>
           </div>
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

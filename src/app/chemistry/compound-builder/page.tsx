@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -84,8 +85,8 @@ export default function CompoundBuilderPage() {
           <h1 className="mt-1 text-xl font-semibold text-gray-900 sm:text-2xl">Compound builder</h1>
           <p className="mb-5 mt-1 text-sm text-gray-500">Click elements to add atoms. The result is a <span className="font-medium text-gray-700">candidate composition</span>, not a claim that it exists.</p>
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-            <div className="min-w-0 space-y-5">
+          <SimulationStage className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+            <div data-stage-role="canvas" className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-4">
                 <PeriodicTable onPick={add} counts={clean} compact showLegend={false} />
                 {last && <p className="mt-2 text-[11px] text-gray-400">Added {last.name} ({last.symbol}).</p>}
@@ -101,7 +102,7 @@ export default function CompoundBuilderPage() {
               <CandidatesPanel onLoad={onLoad} />
             </div>
 
-            <div className="min-w-0 space-y-5">
+            <div data-stage-role="parameters" className="min-w-0 space-y-5">
               <div id="composition-result" className="scroll-mt-20 rounded-2xl border border-gray-200 bg-white p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -167,7 +168,7 @@ export default function CompoundBuilderPage() {
               </div>
               {syms.length > 0 && <EvidencePanel rule={{ label: balance.status === 'balanced' ? 'Charge can balance with tabulated oxidation states.' : balance.message, ok: balance.status === 'balanced' ? true : balance.status === 'unbalanced' ? false : null }} />}
             </div>
-          </div>
+          </SimulationStage>
         </div>
 
         {syms.length > 0 && (

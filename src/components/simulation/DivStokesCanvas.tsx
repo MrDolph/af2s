@@ -74,7 +74,7 @@ export function DivStokesCanvas({ fieldIndex, disk, onDiskChange, width = 480, h
     ctx.strokeStyle = 'white'; ctx.lineWidth = 1.5; ctx.stroke();
   }, [toCanvas]);
 
-  useEffect(() => { draw(); }, [draw, fieldIndex, disk]);
+  useEffect(() => { draw(); }, [draw, fieldIndex, disk, width, height]);
 
   const moveDisk = useCallback((clientX: number, clientY: number) => {
     const canvas = canvasRef.current; if (!canvas) return;

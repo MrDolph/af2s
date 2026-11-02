@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useRef } from 'react';
@@ -151,21 +153,21 @@ export default function RefractionPage() {
             {mode !== 'snell' && <span className="text-xs text-gray-400 ml-2">m = v/u · real is positive</span>}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <OpticsCanvas mode={mode} n1={n1} n2={n2} theta1={theta1}
                   focal={focal} objectDist={objectDist} converging={converging}
                   width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-end gap-2">
+              <div data-stage-role="extra" className="flex flex-wrap items-center justify-end gap-2">
                 <EmbedButton path="/embed/optics"
                   title={`${MODE_META[mode].title} — A-Factor STEM Studio`}
                   params={{ mode, n1, n2, theta1, focal, u: objectDist, conv: converging ? 1 : 0 }} />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
                 {mode === 'snell' && <>
@@ -204,7 +206,7 @@ export default function RefractionPage() {
                     note="Slide the object through 2F, F and inside F — watch the image flip" />
                 </>}
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

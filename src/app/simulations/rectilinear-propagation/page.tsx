@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -183,9 +185,9 @@ export default function RectilinearPropagationPage() {
             <span className="text-sm font-semibold font-mono text-gray-900">{TOPIC_META[topic].eq}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {topic === 'shadows' && (
                   <ShadowsCanvas key={resetKey} sourceType={sourceType} sourceRadiusPx={sourceRadius} objectRadiusPx={objectRadius}
                     objectDistPx={objectDist} screenDistPx={screenDist}
@@ -204,7 +206,7 @@ export default function RectilinearPropagationPage() {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 {topic !== 'pinhole' ? (
                   <SimulationControls isRunning={isRunning} isPaused={isPaused}
                     onRun={() => { setIsRunning(true); setIsPaused(false); }}
@@ -219,7 +221,7 @@ export default function RectilinearPropagationPage() {
                   } />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
                 {topic === 'shadows' && <>
@@ -260,7 +262,7 @@ export default function RectilinearPropagationPage() {
                     note="0 = ideal sharp point. Larger → visibly blurs the image." />
                 </>}
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

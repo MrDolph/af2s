@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CoupledOscillatorsCanvas } from '@/components/simulation/CoupledOscillatorsCanvas';
@@ -72,8 +74,8 @@ function CoupledOscillatorsEmbedInner() {
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <CoupledOscillatorsCanvas
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><CoupledOscillatorsCanvas
         key={resetKey}
         x1Init={x1}
         v1Init={v1}
@@ -87,11 +89,11 @@ function CoupledOscillatorsEmbedInner() {
         trailLength={trailLength}
         width={640}
         height={400}
-      />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+      /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="Mass m₁" unit="kg" value={m1} min={0.1} max={5} step={0.1} set={setM1} color="#6366f1" />
@@ -113,9 +115,9 @@ function CoupledOscillatorsEmbedInner() {
             </label>
           </div>
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

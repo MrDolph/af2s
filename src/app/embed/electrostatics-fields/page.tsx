@@ -1,8 +1,11 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CoulombsLawCanvas } from '@/components/simulation/CoulombsLawCanvas';
 import { ElectricFieldCanvas, FieldConfiguration } from '@/components/simulation/ElectricFieldCanvas';
+import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 
 type Topic = 'coulomb' | 'field';
@@ -52,8 +55,10 @@ function ElectrostaticsFieldsEmbedInner() {
     const c = sp.get('config');
     return c === 'single-negative' || c === 'dipole' || c === 'like-charges' ? c : 'single-positive';
   });
-  const [testX] = useState(0.75);
-  const [testY] = useState(0.3);
+  const [testX, setTestX] = useState(() => num(sp, 'testX', 0.75, 0.05, 0.95));
+  const [testY, setTestY] = useState(() => num(sp, 'testY', 0.3, 0.1, 0.9));
+  const canvasBoxRef = useRef<HTMLDivElement>(null);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 340, 1600);
 
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -66,19 +71,21 @@ function ElectrostaticsFieldsEmbedInner() {
   }, [topic, q1nC, q2nC, separationCm, fieldConfig, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas" ref={canvasBoxRef}>
       {topic === 'coulomb' && (
         <CoulombsLawCanvas key={resetKey} q1nC={q1nC} q2nC={q2nC} initialSeparationCm={separationCm}
-          isRunning={isRunning} isPaused={isPaused} width={640} height={260} />
+          isRunning={isRunning} isPaused={isPaused} width={canvasSize.width} height={canvasSize.height} />
       )}
       {topic === 'field' && (
-        <ElectricFieldCanvas key={resetKey} configuration={fieldConfig} testX={testX} testY={testY}
-          isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
+        <ElectricFieldCanvas onTestPositionChange={(x, y) => { setTestX(x); setTestY(y); }} key={resetKey} configuration={fieldConfig} testX={testX} testY={testY}
+          isRunning={isRunning} isPaused={isPaused} width={canvasSize.width} height={canvasSize.height} />
       )}
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+      </div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           {topic === 'coulomb' && <>
@@ -86,7 +93,10 @@ function ElectrostaticsFieldsEmbedInner() {
             <Slider label="Charge Q2" unit="nC" value={q2nC} min={-50} max={50} step={5} set={setQ2nC} color="#2563eb" />
             <Slider label="Initial separation" unit="cm" value={separationCm} min={5} max={30} step={1} set={setSeparationCm} color="#6366f1" />
           </>}
-          {topic === 'field' && (
+          {topic === 'field' && <>
+            <p className="text-xs text-gray-700">Tap or drag the test point on the canvas, or use these sliders.</p>
+            <Slider label="Test point horizontal" unit="" value={testX} min={0.05} max={0.95} step={0.01} set={setTestX} color="#f59e0b" />
+            <Slider label="Test point vertical" unit="" value={testY} min={0.1} max={0.9} step={0.01} set={setTestY} color="#f59e0b" />
             <div className="grid grid-cols-2 gap-2">
               {([
                 ['single-positive', 'Single +'], ['single-negative', 'Single −'],
@@ -98,11 +108,11 @@ function ElectrostaticsFieldsEmbedInner() {
                   }`}>{label}</button>
               ))}
             </div>
-          )}
+          </>}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DeBroglieCanvas } from '@/components/simulation/DeBroglieCanvas';
@@ -54,13 +56,13 @@ function DeBroglieEmbedInner() {
   }, [pIdx, velocity, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <DeBroglieCanvas mass={particle.mass} velocity={velocity} particleName={particle.name}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><DeBroglieCanvas mass={particle.mass} velocity={velocity} particleName={particle.name}
+        isRunning={isRunning} isPaused={isPaused} width={640} height={280} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <div className="flex flex-wrap gap-1.5">
@@ -74,9 +76,9 @@ function DeBroglieEmbedInner() {
           <Slider label="Speed" unit="m/s" value={velocity} min={particle.vMin} max={particle.vMax}
             step={(particle.vMax - particle.vMin) / 200} set={setVelocity} color="#6366f1" />
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

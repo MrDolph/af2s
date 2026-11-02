@@ -101,7 +101,12 @@ interface GraphProps {
 
 export function DecayGraph({ n0, halfLife, currentT = 0, currentN }: GraphProps) {
   const tMax = 4 * halfLife;
-  const data = useMemo(() => decayCurve(n0, halfLife, tMax), [n0, halfLife, tMax]);
+  const data = useMemo(() => {
+    const end = Math.min(Math.max(currentT, 0), tMax);
+    const points = decayCurve(n0, halfLife, tMax).filter(point => point.t < end);
+    points.push({ t: end, n: remaining(n0, halfLife, end) });
+    return points;
+  }, [n0, halfLife, tMax, currentT]);
   const markerT = Math.min(currentT, tMax);
   const theoryN = remaining(n0, halfLife, markerT);
 
@@ -116,7 +121,7 @@ export function DecayGraph({ n0, halfLife, currentT = 0, currentN }: GraphProps)
           <Label value="Nuclei remaining N" angle={-90} position="insideLeft" offset={12} style={{ fontSize: 10, fill: '#94a3b8' }} />
         </YAxis>
         <Tooltip formatter={(v: unknown) => [Number(v).toFixed(0), 'N']} labelFormatter={t => `t=${Number(t).toFixed(1)}s`} />
-        <Line type="monotone" dataKey="n" stroke="#6366f1" strokeWidth={2} dot={false} name="theory" />
+        <Line type="monotone" dataKey="n" stroke="#6366f1" strokeWidth={2} dot={false} isAnimationActive={false} name="theory" />
         {/* Half-life gridlines: N halves at every T½ */}
         {[1, 2, 3].map(k => (
           <ReferenceLine key={k} x={k * halfLife} stroke="#e2e8f0" strokeDasharray="4 4"

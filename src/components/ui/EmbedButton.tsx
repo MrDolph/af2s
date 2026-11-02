@@ -42,6 +42,7 @@ export function EmbedButton({ path, params = {}, title, width = 760, height = 52
   return (
     <>
       <button
+        data-embed-button
         onClick={() => setOpen(true)}
         className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-600 transition hover:border-indigo-300 hover:text-indigo-700"
       >

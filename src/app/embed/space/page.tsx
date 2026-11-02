@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { SpaceCanvas } from '@/components/simulation/SpaceCanvas';
@@ -25,13 +27,13 @@ function SpaceEmbedInner() {
   const width = size.width, height = width < 560 ? Math.round(width * (dim === '1d' ? 0.62 : 1.0)) : size.height;
 
   return (
-    <div className="mx-auto max-w-3xl p-3">
-      <div ref={boxRef} className="overflow-hidden rounded-xl border border-gray-200 p-1">
+    <SimulationStage className="mx-auto max-w-3xl p-3">
+      <div data-stage-role="canvas" ref={boxRef} className="overflow-hidden rounded-xl border border-gray-200 p-1">
         <SpaceCanvas dim={dim} activity={act} width={width} height={height} points={act === 'journey' ? pts : [pts[0]]} labels={act === 'journey' ? LABELS : ['P']}
           selected={sel} onMove={(i, p) => setPts(s => s.map((q, k) => (k === i ? p : q)))} onSelect={setSel} snap={1} view={view} onView={setView} dragAxis="floor"
           showPlanes showGrid showGuides showComponents />
       </div>
-      <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
+      <div data-stage-role="extra" className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
         {act === 'locate' ? (
           <>
             <div className="rounded-lg bg-gray-50 px-3 py-2"><span className="text-gray-500">Position </span><span className="font-semibold text-red-600">{coordText(pts[0], dim)}</span></div>
@@ -44,8 +46,8 @@ function SpaceEmbedInner() {
           </>
         )}
       </div>
-      <p className="mt-1.5 text-[10px] text-gray-400">{dim === '3d' ? 'Drag empty space to rotate. ' : ''}Drag a point to move it. A-Factor STEM Studio</p>
-    </div>
+      <div data-stage-role="extra"><p className="mt-1.5 text-[10px] text-gray-400">{dim === '3d' ? 'Drag empty space to rotate. ' : ''}Drag a point to move it. A-Factor STEM Studio</p></div>
+    </SimulationStage>
   );
 }
 

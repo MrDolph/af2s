@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useEffect, useRef, useState } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { EmbedButton } from '@/components/ui/EmbedButton';
@@ -188,10 +190,10 @@ export default function SpacePage() {
             {act === 'journey' && <span className="rounded-lg border border-gray-200 bg-white px-2.5 py-2 font-mono text-xs text-gray-700">{dim === '1d' ? 'Δx = x₂ − x₁' : dim === '2d' ? 'd = √(Δx² + Δy²)' : 'd = √(Δx² + Δy² + Δz²)'}</span>}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_300px_280px]">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_300px_280px]">
             {/* Canvas + controls */}
-            <div className="min-w-0 space-y-3">
-              <div ref={boxRef} className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
+            <SimulationStage className="min-w-0 space-y-3">
+              <div data-stage-role="canvas" ref={boxRef} className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
                 <SpaceCanvas
                   dim={dim} activity={act} width={size.width} height={canvasH}
                   points={shown} labels={readMode ? ['P'] : act === 'practice' ? ['P'] : act === 'locate' ? ['P'] : LABELS}
@@ -201,7 +203,7 @@ export default function SpacePage() {
                 />
               </div>
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
+              <div data-stage-role="parameters" className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
                 <label className="flex items-center gap-1.5 text-xs text-gray-600">Snap
                   <select value={snap} onChange={e => setSnap(Number(e.target.value))} className="h-7 rounded-md border border-gray-200 bg-white px-1.5 text-xs">
                     <option value={1}>whole numbers</option><option value={0.5}>0.5</option><option value={0}>0.1 (free)</option>
@@ -221,15 +223,15 @@ export default function SpacePage() {
                 {act === 'journey' && <><Toggle label="Components" on={comps} set={setComps} />{dim === '3d' && <Toggle label="Drop lines" on={guides} set={setGuides} />}</>}
                 <div className="ml-auto"><EmbedButton path="/embed/space" title="Space — A-Factor STEM Studio" params={{ dim, act: act === 'journey' ? 'journey' : 'locate', pts: (act === 'journey' ? journey[dim] : [locate[dim]]).map(q => `${q.x},${q.y},${q.z}`).join(';') }} /></div>
               </div>
-              {dim === '3d' && (
+              <div data-stage-role="parameters">{dim === '3d' && (
                 <div className="flex flex-wrap items-center gap-1.5">
                   <span className="text-xs text-gray-500">View</span>
                   {VIEWS.map(v => <button key={v.label} onClick={() => setView(v.v)} className="rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs text-gray-600 hover:border-indigo-300 hover:text-indigo-700">{v.label}</button>)}
                   <span className="text-[11px] text-gray-400">Drag empty space to rotate · drag a point to move it · arrow keys and Page Up/Down also work</span>
                 </div>
-              )}
-              {dim !== '3d' && <p className="text-[11px] text-gray-400">Drag a point to move it, or select it and use the arrow keys. Axes run from −{R} to +{R}.</p>}
-            </div>
+              )}</div>
+              <div data-stage-role="extra">{dim !== '3d' && <p className="text-[11px] text-gray-400">Drag a point to move it, or select it and use the arrow keys. Axes run from −{R} to +{R}.</p>}</div>
+            </SimulationStage>
 
             {/* Parameters + readouts */}
             <div className="space-y-3">

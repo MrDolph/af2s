@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AtomicModelsCanvas } from '@/components/simulation/AtomicModelsCanvas';
@@ -68,8 +70,8 @@ function AtomicModelsEmbedInner() {
   const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <div className="flex gap-1 overflow-x-auto pb-1">
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="parameters" className="flex gap-1 overflow-x-auto pb-1">
         {(['thomson', 'rutherford', 'bohr', 'quantum'] as AtomicModel[]).map(m => {
           const labels: Record<AtomicModel, string> = { thomson: 'Thomson', rutherford: 'Rutherford', bohr: 'Bohr', quantum: 'Quantum' };
           return (
@@ -81,12 +83,12 @@ function AtomicModelsEmbedInner() {
         })}
       </div>
 
-      <AtomicModelsCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+      <div data-stage-role="canvas"><AtomicModelsCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
 
-      {showControls && (
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="Speed" unit="×" value={speed} min={0} max={3} step={0.1} set={setSpeed} color="#3b82f6" />
@@ -108,9 +110,9 @@ function AtomicModelsEmbedInner() {
             <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer"><input type="checkbox" checked={showLabels} onChange={e => setShowLabels(e.target.checked)} className="rounded" />Labels</label>
           </div>
         </div>
-      )}
-      <p className="text-center text-[10px] text-gray-400">Powered by <a href="/" target="_blank" rel="noopener noreferrer" className="font-medium text-indigo-500 hover:text-indigo-600">A-Factor STEM Studio</a></p>
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><p className="text-center text-[10px] text-gray-400">Powered by <a href="/" target="_blank" rel="noopener noreferrer" className="font-medium text-indigo-500 hover:text-indigo-600">A-Factor STEM Studio</a></p></div>
+    </SimulationStage>
   );
 }
 

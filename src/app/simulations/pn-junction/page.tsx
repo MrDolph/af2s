@@ -1,5 +1,7 @@
 // src/app/simulations/pn-junction/page.tsx
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { TopicContext } from '@/components/explorer/TopicContext';
 
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
@@ -57,12 +59,12 @@ export default function PnJunctionPage() {
             and real rectifier circuits with animated AC/DC conversion, current flow, and power calculations.
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+          <SimulationStage className="af-stage-dark grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div data-stage-role="canvas" className="lg:col-span-2">
               <PnJunctionCanvas params={params} width={900} height={600} />
             </div>
 
-            <div className="space-y-4">
+            <div data-stage-role="parameters" className="space-y-4">
               <div className="bg-slate-900 rounded-lg p-4 border border-slate-700">
                 <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-slate-400">Circuit Mode</h3>
                 <div className="grid grid-cols-3 gap-2">
@@ -228,7 +230,7 @@ export default function PnJunctionPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </SimulationStage>
         </div>
       </main>
 

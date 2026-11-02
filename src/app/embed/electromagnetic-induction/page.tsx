@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { InductionCanvas, InductionMode } from '@/components/simulation/InductionCanvas';
@@ -69,16 +71,16 @@ function InductionEmbedInner() {
   }, [topic, turns, speed, magnetPoleOut, genFieldB, genOmega, primaryTurns, secondaryTurns, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <InductionCanvas key={resetKey} mode={topic as InductionMode}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><InductionCanvas key={resetKey} mode={topic as InductionMode}
         turns={turns} speed={speed} magnetPoleOut={magnetPoleOut}
         fieldB={genFieldB} coilArea={genArea} omega={genOmega}
         primaryTurns={primaryTurns} secondaryTurns={secondaryTurns} primaryVoltage={primaryVoltage}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+        isRunning={isRunning} isPaused={isPaused} width={640} height={300} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           {topic === 'faraday-lenz' && <>
@@ -102,9 +104,9 @@ function InductionEmbedInner() {
             <Slider label="Secondary turns" unit="" value={secondaryTurns} min={50} max={1000} step={50} set={setSecondaryTurns} color="#2563eb" />
           </>}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

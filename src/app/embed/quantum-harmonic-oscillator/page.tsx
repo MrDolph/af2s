@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { QuantumHarmonicOscillatorCanvas } from '@/components/simulation/QuantumHarmonicOscillatorCanvas';
@@ -100,8 +102,8 @@ function QuantumHOEmbedInner() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <QuantumHarmonicOscillatorCanvas
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><QuantumHarmonicOscillatorCanvas
         key={resetKey}
         coeffs={coeffs}
         params={params}
@@ -109,15 +111,15 @@ function QuantumHOEmbedInner() {
         isPaused={isPaused}
         width={640}
         height={400}
-      />
-      <SimulationControls
+      /></div>
+      <div data-stage-role="playback"><SimulationControls
         isRunning={isRunning}
         isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
         onPause={() => setIsPaused((p) => !p)}
         onReset={reset}
-      />
-      {showControls && (
+      /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="c₀" unit="" value={c0} min={0} max={1} step={0.01} set={setC0} color="#6366f1" />
@@ -156,9 +158,9 @@ function QuantumHOEmbedInner() {
             </label>
           </div>
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

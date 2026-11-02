@@ -1,0 +1,18 @@
+[
+  {
+    "file": "src/components/simulation/UnitCircleCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/mathematics/unit-circle/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/unit-circle.css",
+    "existed": false
+  },
+  {
+    "file": "checks/unit-circle-resize.cjs",
+    "existed": false
+  }
+]

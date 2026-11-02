@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CircuitCanvas, CircuitMode, FlowDisplay } from '@/components/simulation/CircuitCanvas';
@@ -63,11 +65,11 @@ function CircuitsEmbedInner() {
   }, [V, r1, r2, r3, nonOhmicDevice, flowDisplay, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <CircuitCanvas key={resetKey} mode={mode} voltage={V} r1={r1} r2={r2} r3={r3}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><CircuitCanvas key={resetKey} mode={mode} voltage={V} r1={r1} r2={r2} r3={r3}
         nonOhmicDevice={nonOhmicDevice} flowDisplay={flowDisplay}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
-      <div className="flex items-center gap-2 flex-wrap">
+        isRunning={isRunning} isPaused={isPaused} width={640} height={300} /></div>
+      <div data-stage-role="playback" className="flex items-center gap-2 flex-wrap">
         <SimulationControls isRunning={isRunning} isPaused={isPaused}
           onRun={() => { setIsRunning(true); setIsPaused(false); }}
           onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -80,7 +82,7 @@ function CircuitsEmbedInner() {
           ))}
         </div>
       </div>
-      {showControls && (
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
@@ -107,9 +109,9 @@ function CircuitsEmbedInner() {
             </div>
           )}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

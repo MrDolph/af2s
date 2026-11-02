@@ -1,0 +1,7 @@
+/* Only the unit-circle classroom angle control gets this wider treatment. */
+.af-unit-circle-stage[data-expanded="true"] .af-stage-parameters .af-unit-angle { width: min(100%, 1000px); flex: 1 0 min(720px, 85vw); }
+.af-unit-circle-stage[data-expanded="true"] .af-stage-parameters .af-unit-angle > div { display: flex; align-items: center; gap: 1rem; width: 100%; min-width: 0; max-width: none; flex: 1 1 auto; }
+.af-unit-circle-stage[data-expanded="true"] .af-unit-angle input[type="range"] { flex: 1 1 0%; width: auto; min-width: 160px; min-height: 36px; }
+.af-unit-circle-stage[data-expanded="true"] .af-unit-angle-output { flex: 0 0 auto; min-width: 7ch; font-size: clamp(16px, 2vw, 24px); font-weight: 600; }
+.af-unit-circle-stage[data-expanded="true"] .af-unit-angle > div > span { width: auto; font-size: 14px; }
+@media (max-width: 600px) { .af-unit-circle-stage[data-expanded="true"] .af-stage-parameters .af-unit-angle { flex-basis: calc(100vw - 3rem); } }

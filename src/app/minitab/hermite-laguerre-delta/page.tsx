@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState } from 'react';
@@ -62,15 +63,15 @@ export default function HermiteLaguerreDeltaPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 {mode === 'hermite' && <HermiteLaguerreGraph mode="hermite" shown={shownH} />}
                 {mode === 'laguerre' && <HermiteLaguerreGraph mode="laguerre" shown={shownL} />}
                 {mode === 'delta' && <DiracDeltaGraph eps={eps} fname={fname} />}
               </div>
 
-              {mode === 'hermite' && (
+              <div data-stage-role="parameters">{mode === 'hermite' && (
                 <div className="flex flex-wrap gap-1.5 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                   {Array.from({ length: 7 }, (_, i) => i).map(i => (
                     <label key={i} className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-gray-100 cursor-pointer">
@@ -78,8 +79,8 @@ export default function HermiteLaguerreDeltaPage() {
                     </label>
                   ))}
                 </div>
-              )}
-              {mode === 'laguerre' && (
+              )}</div>
+              <div data-stage-role="parameters">{mode === 'laguerre' && (
                 <div className="flex flex-wrap gap-1.5 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                   {Array.from({ length: 6 }, (_, i) => i).map(i => (
                     <label key={i} className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-gray-100 cursor-pointer">
@@ -87,8 +88,8 @@ export default function HermiteLaguerreDeltaPage() {
                     </label>
                   ))}
                 </div>
-              )}
-              {mode === 'delta' && (
+              )}</div>
+              <div data-stage-role="parameters">{mode === 'delta' && (
                 <div className="space-y-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-gray-500 shrink-0">Narrow the pulse (ε)</span>
@@ -99,8 +100,8 @@ export default function HermiteLaguerreDeltaPage() {
                     {FN_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </div>
-              )}
-            </div>
+              )}</div>
+            </SimulationStage>
 
             <div className="space-y-3">
               {mode === 'delta' && (

@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ElasticityCanvas, ElasticityMode } from '@/components/simulation/ElasticityCanvas';
@@ -68,15 +70,15 @@ function ElasticityEmbedInner() {
   }, [mode, load, k, elasticLimitF, matIdx, wireLength, wireDiamMm, wireLoad, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <ElasticityCanvas key={resetKey} mode={mode}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><ElasticityCanvas key={resetKey} mode={mode}
         load={mode === 'hooke' ? load : wireLoad} k={k} elasticLimitF={elasticLimitF}
         wireLength={wireLength} wireDiamMm={wireDiamMm} youngE={material.E} materialName={material.name}
         breakingStressMPa={material.breakingStressMPa}
         isRunning={isRunning} isPaused={isPaused} unloadKey={unloadKey}
         onSettled={() => setSettled(true)}
-        width={640} height={320} />
-      <div className="flex flex-wrap items-center justify-between gap-2">
+        width={640} height={320} /></div>
+      <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
         <SimulationControls isRunning={isRunning} isPaused={isPaused}
           onRun={() => { setIsRunning(true); setIsPaused(false); }}
           onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -87,7 +89,7 @@ function ElasticityEmbedInner() {
           </button>
         )}
       </div>
-      {showControls && (
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           {mode === 'hooke' ? <>
@@ -108,9 +110,9 @@ function ElasticityEmbedInner() {
             <Slider label="Diameter" unit="mm" value={wireDiamMm} min={0.1} max={2} step={0.05} set={setWireDiamMm} color="#8b5cf6" />
           </>}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

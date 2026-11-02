@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useRef, useMemo } from 'react';
@@ -40,7 +42,7 @@ const SCENARIO_NOTES: Record<MaterialType, { title: string; bullets: string[] }>
     title: 'Semiconductors — The Tunable Middle Ground',
     bullets: [
       'The band gap Eg ≈ 0.5–2 eV is small enough that thermal excitation creates a measurable number of electron-hole pairs at room temperature, but large enough that conductivity is controllable.',
-      'Intrinsic semiconductors: ni = √(NcNv) exp(−Eg/2kT). For Si at 300 K, ni ≈ 1.5×10¹⁰ cm⁻³ — tiny compared to metals (~10²² cm⁻³), but enough for electronics.',
+      'Intrinsic semiconductors: ni = √(NcNv) exp(−Eg/2kT). For Si at 300 K, ni is of order 10¹⁰ cm⁻³ — tiny compared to metals (~10²² cm⁻³), but enough for electronics.',
       'Doping introduces donor (n-type) or acceptor (p-type) impurities at ~10¹⁵–10¹⁹ cm⁻³, overwhelming intrinsic carriers and shifting the Fermi level toward Ec or Ev.',
       'The Fermi level is the energy at which the probability of occupation is 50%. In n-type material it rises toward Ec; in p-type it falls toward Ev.',
       'Temperature dependence: at low T, carriers freeze out onto dopants. At moderate T, extrinsic conduction dominates. At high T, intrinsic carriers dominate again — this limits device operating temperatures.',
@@ -159,7 +161,7 @@ export default function BandTheoryPage() {
   const [showFermiLevel, setShowFermiLevel] = useState(true);
   const [showBandGap, setShowBandGap] = useState(true);
   const [showThermalEnergy, setShowThermalEnergy] = useState(false);
-  const [showDOS, setShowDOS] = useState(false);
+  const [showDOS, setShowDOS] = useState(true);
   const [animateCarriers, setAnimateCarriers] = useState(true);
 
   const params: BandTheoryParams = {
@@ -199,7 +201,7 @@ export default function BandTheoryPage() {
   }, []);
 
   const canvasBoxRef = useRef<HTMLDivElement>(null);
-  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 720, 500, 900);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 720, 600, 1100, 420);
 
   const lastTickRef = useRef(0);
   const handleTick = useCallback((stats: BandTheoryStats) => {
@@ -276,13 +278,13 @@ export default function BandTheoryPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] xl:grid-cols-[1fr_280px_300px] gap-4 items-start">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_280px_300px] gap-4 items-start">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <BandTheoryCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused((p) => !p)} onReset={reset} />
@@ -290,13 +292,19 @@ export default function BandTheoryPage() {
                   params={{ mat: material, T: temperature, dopant: dopingType, conc: dopingConcentration, speed, zoom, e: showElectrons ? 1 : 0, h: showHoles ? 1 : 0, ef: showFermiLevel ? 1 : 0, eg: showBandGap ? 1 : 0, kt: showThermalEnergy ? 1 : 0, dos: showDOS ? 1 : 0, anim: animateCarriers ? 1 : 0 }} />
               </div>
 
+              <div data-stage-role="extra" className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-sm leading-6 text-indigo-950">
+                <p><strong>What moves?</strong> Electrons occupy allowed states. A hole is an unoccupied valence-band state, not a separate positive particle. When a neighbouring electron fills it, the vacancy shifts in the opposite direction. The row below the bands demonstrates this process.</p>
+                <p className="mt-2">Filled blue dots are electrons; hollow pink markers show vacancies. Without an applied field, thermal motion gives no net drift. The f(E) curve shows occupation probability, not the number of states.</p>
+                <p className="mt-2 text-xs">Teaching model: complete dopant ionisation and non-degenerate statistics; counts are amplified for visibility. Freeze-out at low temperature and very heavy doping are outside its quantitative accuracy. The gap is held constant. <a className="underline" href="https://openstax.org/books/university-physics-volume-3/pages/9-6-semiconductors-and-doping" target="_blank" rel="noreferrer">Read about electrons and holes</a>.</p>
+              </div>
+
               {/* Parameters — sticky bottom on desktop, right after controls on mobile */}
-              <div className="lg:sticky lg:bottom-4 z-30">
+              <div data-stage-role="parameters" className="relative z-10">
                 <CollapsiblePanel title="Parameters" badge="Interactive" defaultOpen={true}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
                     <div className="space-y-3">
                       <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide">Material</p>
-                      <Slider label="Temperature" unit="K" value={temperature} min={0} max={1000} step={10} set={setTemperature} color="#f43f5e" note="Thermal energy kT = {kT_eV(temperature).toFixed(3)} eV" />
+                      <Slider label="Temperature" unit="K" value={temperature} min={0} max={1000} step={10} set={setTemperature} color="#f43f5e" note={`Thermal energy kT = ${kT_eV(temperature).toFixed(3)} eV`} />
                       <Slider label="Doping conc." unit="log₁₀(cm⁻³)" value={dopingConcentration} min={10} max={20} step={0.5} set={setDopingConcentration} color="#8b5cf6" note={`Actual: ${Math.pow(10, dopingConcentration).toExponential(0)} cm⁻³`} />
                     </div>
                     <div className="space-y-3">
@@ -321,6 +329,7 @@ export default function BandTheoryPage() {
                           { label: 'Fermi level', checked: showFermiLevel, set: setShowFermiLevel },
                           { label: 'Band gap', checked: showBandGap, set: setShowBandGap },
                           { label: 'kT indicator', checked: showThermalEnergy, set: setShowThermalEnergy },
+                          { label: 'Occupation f(E)', checked: showDOS, set: setShowDOS },
                           { label: 'Animate', checked: animateCarriers, set: setAnimateCarriers },
                         ].map((item) => (
                           <label key={item.label} className="flex items-center gap-1.5 text-[11px] text-gray-600 cursor-pointer bg-gray-50 px-2 py-1 rounded-md border border-gray-100 hover:border-indigo-200 transition">
@@ -333,7 +342,7 @@ export default function BandTheoryPage() {
                   </div>
                 </CollapsiblePanel>
               </div>
-            </div>
+            </SimulationStage>
 
             {/* Stats sidebar */}
             <div className="space-y-3">
@@ -344,7 +353,7 @@ export default function BandTheoryPage() {
                   <StatRow label="Band gap Eg" value={liveStats.bandGap.toFixed(2)} unit="eV" color="text-amber-600" />
                   <StatRow label="Temperature" value={liveStats.temperature.toString()} unit="K" color="text-rose-500" />
                   <StatRow label="Thermal kT" value={liveStats.kT.toFixed(4)} unit="eV" color="text-pink-500" />
-                  <StatRow label="Fermi level" value={liveStats.fermiLevel.toFixed(2)} unit="eV" color="text-white" />
+                  <StatRow label="Fermi level" value={liveStats.fermiLevel.toFixed(2)} unit="eV" color="text-slate-700" />
                   <div className="border-t border-gray-100 my-1" />
                   <StatRow label="ni (intrinsic)" value={liveStats.intrinsicConc.toExponential(1)} unit="cm⁻³" color="text-emerald-600" />
                   <StatRow label="Electrons n" value={liveStats.electronConc.toExponential(1)} unit="cm⁻³" color="text-blue-500" />

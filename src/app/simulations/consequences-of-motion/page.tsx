@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
@@ -134,6 +136,7 @@ export default function ConsequencesPage() {
 
   // Walking
   const [frictionEnabled, setFrictionEnabled] = useState(true);
+  const [walkingSpeed, setWalkingSpeed] = useState(1);
 
   // Propulsion
   const [rocketMass, setRocketMass] = useState(5000);
@@ -269,11 +272,11 @@ export default function ConsequencesPage() {
           </div>
 
           {/* Main grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
 
             {/* Canvas + controls + params */}
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
 
                 {topic === 'elevator' && (
                   <ElevatorCanvas key={resetKey} mass={elevMass} elevState={elevState}
@@ -288,7 +291,7 @@ export default function ConsequencesPage() {
                 )}
 
                 {topic === 'walking' && (
-                  <WalkingCanvas key={resetKey} isRunning={isRunning} isPaused={isPaused}
+                  <WalkingCanvas speed={walkingSpeed} key={resetKey} isRunning={isRunning} isPaused={isPaused}
                     frictionEnabled={frictionEnabled} surfaceMass={70}
                     width={canvasSize.width} height={canvasSize.height} />
                 )}
@@ -311,7 +314,7 @@ export default function ConsequencesPage() {
               {/* Supplementary content: kept as extra explanatory context
                   alongside the real animated canvas above, not a substitute
                   for it. */}
-              {topic === 'weightlessness' && (
+              <div data-stage-role="parameters">{topic === 'weightlessness' && (
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
@@ -349,17 +352,17 @@ export default function ConsequencesPage() {
                     ))}
                   </div>
                 </div>
-              )}
+              )}</div>
 
-              {topic === 'propulsion' && (
+              <div data-stage-role="extra">{topic === 'propulsion' && (
                 <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-xs text-indigo-800">
                   <p className="font-medium mb-1">Momentum conservation</p>
                   <p>Before launch: total momentum = 0. Ejecting exhaust backward at {exhaustSpeed} m/s gives the rocket equal momentum forward — no external force needed, which is why rockets (unlike jets) work in a vacuum. Thrust stays constant, but as fuel burns the rocket&apos;s mass falls, so acceleration a = thrust/mass keeps climbing through the burn.</p>
                 </div>
-              )}
+              )}</div>
 
               {/* Controls */}
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls
                   isRunning={isRunning && !isComplete} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); setIsComplete(false); }}
@@ -373,7 +376,7 @@ export default function ConsequencesPage() {
               </div>
 
               {/* Params */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
                 {topic === 'elevator' && (
@@ -408,6 +411,7 @@ export default function ConsequencesPage() {
                   </>
                 )}
 
+                {topic === 'walking' && <Slider label="Walking animation speed" unit="×" value={walkingSpeed} min={0} max={3} step={0.1} set={setWalkingSpeed} color="#6366f1" note="Changes demonstration speed, not force or mass." />}
                 {topic === 'walking' && (
                   <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
                     <div>
@@ -450,7 +454,7 @@ export default function ConsequencesPage() {
                   </>
                 )}
               </div>
-            </div>
+            </SimulationStage>
 
             {/* Analytics */}
             <div className="space-y-3">

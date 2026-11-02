@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
@@ -246,11 +248,11 @@ export default function NewtonsLawsPage() {
           </div>
 
           {/* Main layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
 
             {/* Col 1: Canvas + controls + sliders */}
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {law === '1st' && (
                   <NewtonsFirstCanvas
                     key={resetKey} mass={mass1} friction={friction1}
@@ -277,7 +279,7 @@ export default function NewtonsLawsPage() {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls
                   isRunning={isRunning && !isComplete} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); setIsComplete(false); }}
@@ -289,7 +291,7 @@ export default function NewtonsLawsPage() {
 
               {/* Live graph — full predicted curve shown immediately, with a
                   live marker riding along it as the animation plays. */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
                     {law === '3rd' ? 'Velocity graph' : 'Live graph'}
@@ -322,16 +324,16 @@ export default function NewtonsLawsPage() {
                 })()}
               </div>
 
-              {law === '3rd' && (
+              <div data-stage-role="extra">{law === '3rd' && (
                 <p className="text-[10px] text-gray-400 -mt-2 px-1">
                   {scenario3 === 'rocket'
                     ? 'Rocket velocity keeps climbing as fuel burns — this graph loops to show the same constant-acceleration shape each cycle.'
                     : 'Same force, different acceleration: the lighter object always reaches a larger speed by the time contact ends.'}
                 </p>
-              )}
+              )}</div>
 
               {/* Sliders */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
                 {law === '1st' && (
@@ -379,7 +381,7 @@ export default function NewtonsLawsPage() {
                   </>
                 )}
               </div>
-            </div>
+            </SimulationStage>
 
             {/* Col 2: Analytics */}
             <div className="space-y-3">

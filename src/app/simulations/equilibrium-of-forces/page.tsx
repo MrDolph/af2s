@@ -1,7 +1,9 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { StaticDynamicCanvas } from '@/components/simulation/StaticDynamicCanvas';
@@ -136,10 +138,10 @@ export default function EquilibriumOfForcesPage() {
 
   // Parallel / moments
   const [w1Force, setW1Force] = useState(20);
-  const [w1Pos, setW1Pos] = useState(-0.6);
+  const [w1Pos, setW1Pos] = useState(-0.3);
   const [w2Force, setW2Force] = useState(20);
-  const [w2Pos, setW2Pos] = useState(0.6);
-  const weights: Weight[] = [{ force: w1Force, position: w1Pos }, { force: w2Force, position: w2Pos }];
+  const [w2Pos, setW2Pos] = useState(0.3);
+  const weights: Weight[] = useMemo(() => [{ force: w1Force, position: w1Pos }, { force: w2Force, position: w2Pos }], [w1Force, w1Pos, w2Force, w2Pos]);
   const [liveTilt, setLiveTilt] = useState(0);
 
   // Floating
@@ -161,7 +163,7 @@ export default function EquilibriumOfForcesPage() {
   }, [topic, scenario, sdF1, sdF2, sdMass, magA, angleA, magB, angleB, w1Force, w1Pos, w2Force, w2Pos, objDensity, liqIdx, blockHeight, reset]);
 
   const canvasBoxRef = useRef<HTMLDivElement>(null);
-  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, topic === 'floating' ? 300 : topic === 'concurrent' ? 300 : 260, 900);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, topic === 'floating' ? 300 : topic === 'concurrent' ? 300 : topic === 'parallel' ? 380 : 260, 1100, topic === 'parallel' ? 340 : 0);
 
   const lastTickRef = useRef(0);
   const handleSdTick = useCallback((v: number) => {
@@ -199,9 +201,9 @@ export default function EquilibriumOfForcesPage() {
     "magB": setMagB,
     "angleB": setAngleB,
     "w1Force": setW1Force,
-    "w1Pos": setW1Pos,
+    "w1Pos": v => setW1Pos(Math.max(-0.5, Math.min(0.5, v))),
     "w2Force": setW2Force,
-    "w2Pos": setW2Pos,
+    "w2Pos": v => setW2Pos(Math.max(-0.5, Math.min(0.5, v))),
     "objDensity": setObjDensity,
     "blockHeight": setBlockHeight }, {  });
   return (
@@ -245,9 +247,9 @@ export default function EquilibriumOfForcesPage() {
             <span className="text-sm font-semibold font-mono text-gray-900">{TOPIC_META[topic].eq}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {topic === 'static-dynamic' && (
                   <StaticDynamicCanvas key={resetKey} scenario={scenario} f1={sdF1} f2={sdF2} mass={sdMass}
                     isRunning={isRunning} isPaused={isPaused} onTick={handleSdTick}
@@ -271,7 +273,7 @@ export default function EquilibriumOfForcesPage() {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -285,7 +287,7 @@ export default function EquilibriumOfForcesPage() {
                   } />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
                 {topic === 'static-dynamic' && <>
@@ -311,9 +313,9 @@ export default function EquilibriumOfForcesPage() {
 
                 {topic === 'parallel' && <>
                   <Slider label="Weight 1" unit="N" value={w1Force} min={0} max={50} step={1} set={setW1Force} color="#6366f1" />
-                  <Slider label="Position 1" unit="m" value={w1Pos} min={-2} max={2} step={0.1} set={setW1Pos} color="#818cf8" note="Negative = left of pivot" />
+                  <Slider label="Weight 1 ruler mark" unit="cm" value={Math.round((w1Pos + 0.5) * 100)} min={0} max={100} step={1} set={v => setW1Pos(v / 100 - 0.5)} color="#818cf8" note="Moment arm = distance from the 50 cm pivot, converted to metres." />
                   <Slider label="Weight 2" unit="N" value={w2Force} min={0} max={50} step={1} set={setW2Force} color="#10b981" />
-                  <Slider label="Position 2" unit="m" value={w2Pos} min={-2} max={2} step={0.1} set={setW2Pos} color="#34d399" note="Positive = right of pivot" />
+                  <Slider label="Weight 2 ruler mark" unit="cm" value={Math.round((w2Pos + 0.5) * 100)} min={0} max={100} step={1} set={v => setW2Pos(v / 100 - 0.5)} color="#34d399" note="Moment arm = distance from the 50 cm pivot, converted to metres." />
                 </>}
 
                 {topic === 'floating' && <>
@@ -329,7 +331,7 @@ export default function EquilibriumOfForcesPage() {
                   <Slider label="Block height" unit="m" value={blockHeight} min={0.05} max={0.4} step={0.01} set={setBlockHeight} color="#f59e0b" />
                 </>}
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

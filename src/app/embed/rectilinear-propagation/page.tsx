@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ShadowsCanvas } from '@/components/simulation/ShadowsCanvas';
@@ -76,26 +78,26 @@ function RectilinearEmbedInner() {
   }, [topic, sourceType, sourceRadius, objectRadius, objectDist, screenDist, eclipseType, orbitAngleDeg, objectHeight, pinholeObjectDist, pinholeScreenDist, pinholeRadius, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      {topic === 'shadows' && (
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas">{topic === 'shadows' && (
         <ShadowsCanvas key={resetKey} sourceType={sourceType} sourceRadiusPx={sourceRadius} objectRadiusPx={objectRadius}
           objectDistPx={objectDist} screenDistPx={screenDist}
           isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
-      )}
-      {topic === 'eclipse' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'eclipse' && (
         <EclipseCanvas key={resetKey} eclipseType={eclipseType} orbitAngleDeg={orbitAngleDeg}
           isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
-      )}
-      {topic === 'pinhole' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'pinhole' && (
         <PinholeCanvas objectHeightPx={objectHeight} objectDistPx={pinholeObjectDist} screenDistPx={pinholeScreenDist}
           pinholeRadiusPx={pinholeRadius} width={640} height={280} />
-      )}
-      {topic !== 'pinhole' && (
+      )}</div>
+      <div data-stage-role="playback">{topic !== 'pinhole' && (
         <SimulationControls isRunning={isRunning} isPaused={isPaused}
           onRun={() => { setIsRunning(true); setIsPaused(false); }}
           onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      )}
-      {showControls && (
+      )}</div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           {topic === 'shadows' && <>
@@ -132,9 +134,9 @@ function RectilinearEmbedInner() {
             <Slider label="Pinhole size" unit="px" value={pinholeRadius} min={0} max={12} step={0.5} set={setPinholeRadius} color="#f59e0b" />
           </>}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

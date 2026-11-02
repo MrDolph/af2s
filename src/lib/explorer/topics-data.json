@@ -1117,11 +1117,11 @@
       },
       {
         "key": "w1Pos",
-        "label": "Position 1",
+        "label": "Weight 1 distance from 50 cm pivot",
         "unit": "m",
-        "min": -2,
-        "max": 2,
-        "default": -0.6
+        "min": -0.5,
+        "max": 0.5,
+        "default": -0.3
       },
       {
         "key": "w2Force",
@@ -1133,11 +1133,11 @@
       },
       {
         "key": "w2Pos",
-        "label": "Position 2",
+        "label": "Weight 2 distance from 50 cm pivot",
         "unit": "m",
-        "min": -2,
-        "max": 2,
-        "default": 0.6
+        "min": -0.5,
+        "max": 0.5,
+        "default": 0.3
       },
       {
         "key": "objDensity",

@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useRef } from 'react';
@@ -192,8 +194,8 @@ export default function GasLawsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 
             {/* Left: canvas / calculator */}
-            <div className="space-y-3">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+            <SimulationStage className="space-y-3">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
                   {law === 'boyle' ? 'Compression (constant T)' :
                    law === 'charles' ? 'Expansion (constant P)' :
@@ -235,7 +237,7 @@ export default function GasLawsPage() {
               </div>
 
               {/* Sliders / calculator */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
                   {law === 'ideal' ? 'PV = nRT calculator' : 'Adjust parameters'}
                 </p>
@@ -343,7 +345,7 @@ export default function GasLawsPage() {
                   </>
                 )}
               </div>
-            </div>
+            </SimulationStage>
 
             {/* Graph */}
             <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

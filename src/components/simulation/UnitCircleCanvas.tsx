@@ -20,7 +20,11 @@ export function UnitCircleCanvas({ angleDeg, onAngleChange, width = 440, height 
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    const W = canvas.width, H = canvas.height;
+    // Draw in a fixed logical coordinate system, scaling text and geometry together.
+    const scale = Math.min(canvas.width, canvas.height) / 440;
+    if (scale <= 0) return;
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    const W = canvas.width / scale, H = canvas.height / scale;
     const cx = W / 2, cy = H / 2;
     const R = Math.min(W, H) * 0.32;
 
@@ -127,7 +131,7 @@ export function UnitCircleCanvas({ angleDeg, onAngleChange, width = 440, height 
     ctx.fillText('(\u22121, 0)', cx - R + 6, cy - 6);
     ctx.fillText('(0, 1)', cx + 8, cy - R + 16);
     ctx.fillText('(0, \u22121)', cx + 8, cy + R - 8);
-  }, [angleDeg]);
+  }, [angleDeg, width, height]);
 
   useEffect(() => { draw(); }, [draw]);
 
@@ -135,6 +139,7 @@ export function UnitCircleCanvas({ angleDeg, onAngleChange, width = 440, height 
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
     const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
     const px = (clientX - rect.left) * scaleX, py = (clientY - rect.top) * scaleY;
     const cx = canvas.width / 2, cy = canvas.height / 2;
@@ -153,6 +158,9 @@ export function UnitCircleCanvas({ angleDeg, onAngleChange, width = 440, height 
       onPointerDown={e => { (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId); draggingRef.current = true; setFromPointer(e.clientX, e.clientY); }}
       onPointerMove={e => { if (draggingRef.current) setFromPointer(e.clientX, e.clientY); }}
       onPointerUp={() => { draggingRef.current = false; }}
+      onPointerCancel={() => { draggingRef.current = false; }}
+      onLostPointerCapture={() => { draggingRef.current = false; }}
+      aria-label="Unit circle: drag the point to adjust the angle, or use the labelled angle slider."
     />
   );
 }

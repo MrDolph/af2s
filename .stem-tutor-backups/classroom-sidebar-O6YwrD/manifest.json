@@ -1,0 +1,386 @@
+[
+  {
+    "file": "src/app/chemistry/nuclear/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/chemistry/periodic-table/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/chemistry/crystal-builder/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/chemistry/perovskite-lab/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/chemistry/organic/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/chemistry/compound-builder/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/chemistry/heusler/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/optics/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/coupled-oscillators/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/elasticity/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/electromagnetic-induction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/atomic-models/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/oscillations/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/xrays/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/diffraction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/bjt-transistor/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/vectors/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/reflection/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/friction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/unit-circle/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/magnetic-effects/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/decay/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/rectilinear-propagation/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/electrostatics-fields/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/polarization/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/electrostatics-potential/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/quantum-tunneling/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/electrostatics-charging/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/heat/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/quantum-harmonic-oscillator/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/projectile/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/double-pendulum/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/ac-circuits/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/equilibrium/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/band-theory/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/mosfet/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/debroglie/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/pn-junction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/space/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/waves/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/circuits/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/photoelectric/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/div-stokes/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/fourier-transform/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/eigenvector-explorer/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/damped-oscillator/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/hermite-laguerre-delta/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/fourier-series/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/gradient-explorer/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/legendre-bessel/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/gamma-function/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/coupled-oscillators/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/ohms-law/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/elasticity/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/electromagnetic-induction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/atomic-models/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/oscillations/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/refraction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/diffraction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/projectile-motion/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/bjt-transistor/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/heat-transfer/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/x-rays/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/vectors/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/equilibrium-of-forces/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/reflection/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/friction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/magnetic-effects/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/rectilinear-propagation/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/consequences-of-motion/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/electrostatics-fields/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/newtons-laws/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/polarization/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/electrostatics-potential/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/quantum-tunneling/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/electrostatics-charging/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/quantum-harmonic-oscillator/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/double-pendulum/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/ac-circuits/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/de-broglie/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/band-theory/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/mosfet/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/pn-junction/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/space/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/waves/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/gas-laws/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/radioactive-decay/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/photoelectric-effect/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/mathematics/unit-circle/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/simulation-stage.css",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/SimulationStage.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/ai/PromptBar.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/geophysics/GeophysicsFrame.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/explorer/TopicPicker.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/explorer/explorer-mobile.css",
+    "existed": true
+  },
+  {
+    "file": "checks/classroom-controls.cjs",
+    "existed": false
+  }
+]

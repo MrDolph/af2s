@@ -3,7 +3,7 @@ import { useRef, useEffect, useCallback } from 'react';
 import {
   BandTheoryParams, MaterialType,
   MATERIALS, generateCarriers, updateCarriers,
-  kT_eV, intrinsicConcentration, dopedFermiLevel,
+  kT_eV, intrinsicConcentration, dopedFermiLevel, carrierConcentrations, fermiDirac,
   type Carrier, type BandTheoryStats,
 } from '@/lib/physics/bandTheory';
 
@@ -76,11 +76,7 @@ export function BandTheoryCanvas({ params, isRunning, isPaused, onTick, width = 
     if (dt > 0 && s.isRunning && !s.isPaused && p.animateCarriers) {
       carriersRef.current = updateCarriers(carriersRef.current, dt, p.temperature, p.speed);
       timeRef.current += dt * p.speed;
-      // Re-seed carriers periodically to match new temperature/doping
-      if (timeRef.current > 2) {
-        initCarriers();
-        timeRef.current = 0;
-      }
+
     }
 
     // Background
@@ -93,14 +89,16 @@ export function BandTheoryCanvas({ params, isRunning, isPaused, onTick, width = 
     const marginL = 50;
     const marginR = 20;
     const marginT = 40;
-    const marginB = 50;
-    const plotW = displayW - marginL - marginR;
+    const marginB = 125;
+    const distributionW = p.showDOS ? Math.min(125, displayW * 0.28) : 0;
+    const plotW = displayW - marginL - marginR - distributionW;
     const plotH = displayH - marginT - marginB;
 
     // Energy scale: max 8 eV visible
-    const E_MAX = 8;
-    const eScale = plotH / E_MAX;
-    const toY = (E: number) => marginT + plotH - E * eScale;
+    const E_MIN = isConductor ? 0 : -2;
+    const E_MAX = (isConductor ? mat.fermiLevel + 1 : Eg + 2) / p.zoom;
+    const eScale = plotH / (E_MAX - E_MIN);
+    const toY = (E: number) => marginT + plotH - (E - E_MIN) * eScale;
     const toX = (x: number) => marginL + (x / 60) * plotW;
 
     // Draw lattice sites (vertical lines)
@@ -153,8 +151,8 @@ export function BandTheoryCanvas({ params, isRunning, isPaused, onTick, width = 
       }
     } else {
       // Conductor: overlapping bands
-      const overlapTop = toY(-1);
-      const overlapBot = toY(2);
+      const overlapTop = toY(Math.min(E_MAX, mat.fermiLevel + 1));
+      const overlapBot = toY(0);
       const gradO = ctx.createLinearGradient(0, overlapTop, 0, overlapBot);
       gradO.addColorStop(0, 'rgba(245, 158, 11, 0.25)');
       gradO.addColorStop(1, 'rgba(245, 158, 11, 0.08)');
@@ -195,6 +193,7 @@ export function BandTheoryCanvas({ params, isRunning, isPaused, onTick, width = 
       ctx.fillText(`kT = ${kT.toFixed(3)} eV`, marginL + plotW - 55, toY(Ef) - (toY(Ef) - ktY) / 2 + 3);
     }
 
+    ctx.save(); ctx.beginPath(); ctx.rect(marginL, marginT, plotW, plotH); ctx.clip();
     // Carriers
     const carriers = carriersRef.current;
     if (p.showElectrons) {
@@ -226,11 +225,12 @@ export function BandTheoryCanvas({ params, isRunning, isPaused, onTick, width = 
       });
     }
 
+    ctx.restore();
     // Axis labels
     ctx.fillStyle = 'rgba(148, 163, 184, 0.5)';
     ctx.font = '10px system-ui';
     ctx.textAlign = 'right';
-    for (let e = 0; e <= E_MAX; e += 2) {
+    for (let e = E_MIN; e <= E_MAX; e += 1) {
       const y = toY(e);
       ctx.fillText(`${e} eV`, marginL - 6, y + 3);
       ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
@@ -242,12 +242,44 @@ export function BandTheoryCanvas({ params, isRunning, isPaused, onTick, width = 
     ctx.textAlign = 'center';
     for (let i = 0; i <= 6; i++) {
       const x = toX(i * 10);
-      ctx.fillText(`${i * 10} Å`, x, marginT + plotH + 14);
+      ctx.fillText(`${i * 10}`, x, marginT + plotH + 14);
     }
+
+    if (distributionW) {
+      const dx = marginL + plotW + 25, dw = distributionW - 35;
+      ctx.fillStyle = '#cbd5e1'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('f(E)', dx + dw/2, marginT - 10);
+      ctx.fillText('0        1', dx + dw/2, marginT + plotH + 16);
+      ctx.beginPath();
+      for(let i=0;i<=200;i++) {
+        const e = E_MIN + (E_MAX-E_MIN)*i/200;
+        const x = dx + fermiDirac(e,Ef,p.temperature)*dw;
+        if(i===0) ctx.moveTo(x,toY(e)); else ctx.lineTo(x,toY(e));
+      }
+      ctx.strokeStyle='#fbbf24';ctx.lineWidth=2;ctx.stroke();
+    }
+    const rowY = displayH - 65, sites = displayW < 450 ? 7 : 10;
+    const spacing = (displayW - 90)/(sites-1), left = 45;
+    const step = Math.floor(timeRef.current) % (sites-1);
+    const progress = timeRef.current % 1;
+    const hole = sites - 1 - step, source = hole - 1;
+    ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillStyle='#cbd5e1';
+    ctx.fillText(isConductor ? 'Metal: partly filled band; nearby empty states' : 'Electron fills a vacancy → the vacancy shifts left', displayW/2,rowY-24,displayW-16);
+    if(!isConductor) {
+      for(let i=0;i<sites;i++) {
+        const x=left+i*spacing;
+        ctx.beginPath();ctx.arc(x,rowY,8,0,Math.PI*2);ctx.strokeStyle='#64748b';ctx.lineWidth=1;ctx.stroke();
+        if(i!==hole && i!==source && p.showElectrons) {ctx.beginPath();ctx.arc(x,rowY,4,0,Math.PI*2);ctx.fillStyle='#60a5fa';ctx.fill();}
+      }
+      if(p.showElectrons) {const x=left+(source+progress)*spacing;ctx.beginPath();ctx.arc(x,rowY,4,0,Math.PI*2);ctx.fillStyle='#60a5fa';ctx.fill();}
+      if(p.showHoles) {ctx.beginPath();ctx.arc(left+hole*spacing,rowY,10,0,Math.PI*2);ctx.strokeStyle='#fb7185';ctx.lineWidth=2;ctx.stroke();}
+    }
+    ctx.fillStyle='#94a3b8';ctx.font='9px system-ui';
+    ctx.fillText('Schematic states; counts amplified. Hop illustration, not net drift.',displayW/2,displayH-14,displayW-16);
 
     // Status
     ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-    if (!s.isRunning) { ctx.fillStyle = '#94a3b8'; ctx.fillText('Press Run to animate carriers', displayW / 2, 28); }
+    if (!s.isRunning) { ctx.fillStyle = '#94a3b8'; ctx.fillText('Press Run to animate electrons', displayW / 2, 28); }
     else if (s.isPaused) { ctx.fillStyle = '#f59e0b'; ctx.fillText('⏸ Paused', displayW / 2, 28); }
     else { ctx.fillStyle = '#10b981'; ctx.fillText('● Evolving', displayW / 2, 28); }
 
@@ -256,15 +288,16 @@ export function BandTheoryCanvas({ params, isRunning, isPaused, onTick, width = 
       const now = performance.now();
       if (now - lastTickRef.current > 80) {
         lastTickRef.current = now;
-        const ni = isConductor ? 1e22 : intrinsicConcentration(Eg, p.temperature);
+        const concentrations = carrierConcentrations(Eg, p.temperature, p.dopingType, conc);
+        const ni = isConductor ? 1e22 : concentrations.ni;
         s.onTick({
           bandGap: Eg,
           temperature: p.temperature,
           kT: kT,
           fermiLevel: Ef,
           intrinsicConc: ni,
-          electronConc: isConductor ? 1e22 : (p.dopingType === 'n-type' ? conc : ni),
-          holeConc: isConductor ? 1e22 : (p.dopingType === 'p-type' ? conc : ni),
+          electronConc: isConductor ? 1e22 : concentrations.n,
+          holeConc: isConductor ? 0 : concentrations.p,
           conductivity: mat.type === 'conductor' ? 'Very high' : mat.type === 'insulator' ? 'Negligible' : 'Moderate',
         });
       }

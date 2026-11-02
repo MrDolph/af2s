@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
@@ -165,15 +167,15 @@ export default function PolarizationPage() {
             <span className="text-sm font-semibold font-mono text-gray-900">{MODE_META[mode].eq}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <PolarizationCanvas key={resetKey} mode={mode} polarizerAngle={polarizerAngle} analyzerAngle={analyzerAngle}
                   isRunning={isRunning} isPaused={isPaused}
                   width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -182,15 +184,15 @@ export default function PolarizationPage() {
                   params={mode === 'single' ? { mode, angle: polarizerAngle } : { mode, angle: analyzerAngle }} />
               </div>
 
-              {mode === 'malus' && (
+              <div data-stage-role="extra">{mode === 'malus' && (
                 <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Transmitted intensity vs angle</p>
                   <MalusGraph analyzerAngle={analyzerAngle} />
                   <p className="text-[10px] text-gray-400 mt-2 text-center">I = I₀cos²θ — full transmission at 0°, zero at 90° (crossed)</p>
                 </div>
-              )}
+              )}</div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 {mode === 'single' && (
                   <Slider label="Transmission axis" unit="°" value={polarizerAngle} min={0} max={180} step={5} set={setPolarizerAngle} color="#6366f1" note="Measured from vertical" />
@@ -199,7 +201,7 @@ export default function PolarizationPage() {
                   <Slider label="Analyser angle θ" unit="°" value={analyzerAngle} min={0} max={180} step={1} set={setAnalyzerAngle} color="#6366f1" note="Angle between the two polarizers" />
                 )}
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

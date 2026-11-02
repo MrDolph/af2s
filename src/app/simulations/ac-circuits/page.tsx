@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -238,9 +240,9 @@ export default function ACCircuitsPage() {
             <span className="text-sm font-semibold font-mono text-gray-900">{TOPIC_META[topic].eq}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <SimulationStage className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <div data-stage-role="canvas" className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <ACCircuitCanvas key={resetKey} mode={topic as ACMode}
                   vPeak={vPeak} frequency={topic === 'resonance' ? resF0 : effFrequency}
                   resistance={isParallelTopic ? parallelResistance : topic === 'resonance' ? resR : resistance}
@@ -252,7 +254,7 @@ export default function ACCircuitsPage() {
                   width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <SimulationControls isRunning={isRunning} isPaused={isPaused}
                     onRun={() => { setIsRunning(true); setIsPaused(false); }}
@@ -272,7 +274,7 @@ export default function ACCircuitsPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div data-stage-role="parameters" className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
@@ -396,7 +398,7 @@ export default function ACCircuitsPage() {
               </div>
             </div>
 
-            <div className="space-y-3 lg:col-span-2 xl:col-span-1">
+            <div data-stage-role="parameters" className="space-y-3 lg:col-span-2 xl:col-span-1">
               <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-medium text-amber-700 uppercase tracking-wide">📋 Teacher notes</p>
@@ -437,7 +439,7 @@ export default function ACCircuitsPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </SimulationStage>
         </div>
       </main>
     </>

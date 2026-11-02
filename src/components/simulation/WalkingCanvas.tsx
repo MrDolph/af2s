@@ -3,25 +3,25 @@ import { useRef, useEffect, useCallback } from 'react';
 
 interface Props {
   isRunning: boolean; isPaused: boolean;
-  frictionEnabled: boolean; surfaceMass: number;
+  frictionEnabled: boolean; surfaceMass: number; speed?: number;
   width?: number; height?: number;
 }
 
-export function WalkingCanvas({ isRunning, isPaused, frictionEnabled, width = 680, height = 220 }: Props) {
+export function WalkingCanvas({ isRunning, isPaused, frictionEnabled, speed = 1, width = 680, height = 220 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const tRef = useRef(0);
   const xRef = useRef(100);
   const lastFrameRef = useRef<number | null>(null);
-  const simRef = useRef({ isRunning, isPaused, frictionEnabled });
-  simRef.current = { isRunning, isPaused, frictionEnabled };
+  const simRef = useRef({ isRunning, isPaused, frictionEnabled, speed });
+  simRef.current = { isRunning, isPaused, frictionEnabled, speed };
 
   useEffect(() => { tRef.current = 0; xRef.current = 100; lastFrameRef.current = null; }, [frictionEnabled]);
 
   const draw = useCallback((timestamp?: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
-    const { isRunning: r, isPaused: p, frictionEnabled: fr } = simRef.current;
+    const { isRunning: r, isPaused: p, frictionEnabled: fr, speed: rate } = simRef.current;
     const W = canvas.width, H = canvas.height;
 
     let dt = 0;
@@ -34,9 +34,9 @@ export function WalkingCanvas({ isRunning, isPaused, frictionEnabled, width = 68
       lastFrameRef.current = timestamp ?? null;
     }
     if (dt > 0) {
-      tRef.current += dt * 1.5; // matches the original leg-swing pacing
+      tRef.current += dt * rate * 1.5; // matches the original leg-swing pacing
       if (fr) {
-        xRef.current += dt * 108; // ~1.8px/frame at 60fps, now real-time
+        xRef.current += dt * rate * 108; // ~1.8px/frame at 60fps, now real-time
         if (xRef.current > W - 100) xRef.current = 100; // loop back for a continuous demo
       }
     }

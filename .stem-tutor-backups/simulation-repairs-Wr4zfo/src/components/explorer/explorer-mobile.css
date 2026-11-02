@@ -1,0 +1,44 @@
+/* Scoped layout rules: keep the explorer inside its container without hiding overflow. */
+.af-explorer, .af-tutor { min-width: 0; max-width: 100%; }
+.af-explorer *, .af-tutor * { box-sizing: border-box; }
+.af-explorer :is(p,h1,h2,h3,h4,summary,button,a,label,code,th,td),
+.af-tutor :is(p,h1,h2,h3,h4,summary,button,a,label,code) {
+  overflow-wrap: anywhere;
+}
+.af-explorer :is(input,select,textarea), .af-tutor :is(input,select,textarea) {
+  max-width: 100%;
+}
+.af-explorer :is(section,article,fieldset,details),
+.af-tutor :is(section,article,fieldset,aside) { min-width: 0; }
+@media (max-width: 767px) {
+  /* 16px fields avoid automatic zoom on mobile Safari. */
+  .af-explorer :is(input,select,textarea), .af-tutor :is(input,select,textarea) { font-size: 16px; }
+  .af-explorer summary { line-height: 1.6; }
+  .af-explorer :is(th,td) { overflow-wrap: anywhere; }
+  .af-device > header > div { height: auto; min-height: 4rem; flex-wrap: wrap; gap: .75rem; padding-block: .75rem; }
+  .af-device > header > div > div { min-width: 0; max-width: 100%; flex-wrap: wrap; gap: .5rem; }
+  .af-device > header h1 { font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
+  .af-device > main { padding: .75rem; }
+}
+
+/* Native modal goes in the browser top layer; no page-layout space is reserved. */
+dialog.af-explainer-modal {
+  width: min(64rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgb(15 23 42 / .3);
+}
+dialog.af-explainer-modal::backdrop {
+  background: rgb(15 23 42 / .58);
+  backdrop-filter: blur(3px);
+}
+.af-explainer-shell { max-height: min(90dvh, 54rem); }
+@media (max-width: 639px) {
+  dialog.af-explainer-modal { width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); border-radius: .75rem; }
+  .af-explainer-shell { max-height: calc(100dvh - 1rem); }
+}

@@ -45,7 +45,7 @@ export function CollisionCanvas({ params, isRunning, isPaused, onComplete, width
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { params: p, isRunning: r, isPaused: pa, onComplete: oc } = simRef.current;
-    const W = canvas.width, H = canvas.height;
+    const W = 680, H = Math.max(260, canvas.height);
     const groundY = H - 50;
 
     // Real wall-clock dt, gated on running/paused exactly like every other
@@ -92,6 +92,7 @@ export function CollisionCanvas({ params, isRunning, isPaused, onComplete, width
       x2 = xImpact + result.current.v2 * PX_PER_MPS * tAfter;
     }
 
+    ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, groundY);
     ctx.fillStyle = '#e2e8f0'; ctx.fillRect(0, groundY, W, H - groundY);
@@ -101,41 +102,48 @@ export function CollisionCanvas({ params, isRunning, isPaused, onComplete, width
     const by = groundY - 56;
     const midY = by + 28;
 
+    const worldLeft = Math.min(0, x1 - 80, x2 - 80);
+    const worldRight = Math.max(W, x1 + BW + 80, x2 + BW + 80);
+    const cameraScale = W / (worldRight - worldLeft);
+    x1 = (x1 - worldLeft) * cameraScale;
+    x2 = (x2 - worldLeft) * cameraScale;
+    const blockWidth = BW * cameraScale;
+
     // Impact flash
     if (phase.current === 'impact') {
       ctx.fillStyle = 'rgba(251,191,36,0.35)';
-      ctx.beginPath(); ctx.arc(x1 + BW / 2, midY, 50, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x1 + blockWidth / 2, midY, 50, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('IMPACT!', x1 + BW / 2, midY - 55);
+      ctx.fillText('IMPACT!', x1 + blockWidth / 2, midY - 55);
     }
 
     // Block 1
     const bg1 = ctx.createLinearGradient(x1, by, x1, by + 56);
     bg1.addColorStop(0, '#818cf8'); bg1.addColorStop(1, '#4f46e5');
     ctx.fillStyle = bg1;
-    ctx.beginPath(); ctx.roundRect(x1, by, BW, 56, 6); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(x1, by, blockWidth, 56, 6); ctx.fill();
     ctx.strokeStyle = '#3730a3'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.roundRect(x1, by, BW, 56, 6); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(x1, by, blockWidth, 56, 6); ctx.stroke();
     ctx.fillStyle = 'white'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-    ctx.fillText(`${p.m1}kg`, x1 + BW / 2, midY - 6);
+    ctx.fillText(`${p.m1}kg`, x1 + blockWidth / 2, midY - 6);
     ctx.font = '9px system-ui';
-    ctx.fillText(phase.current === 'before' ? `u=${p.u1} m/s` : `v=${result.current.v1.toFixed(1)} m/s`, x1 + BW / 2, midY + 10);
+    ctx.fillText(phase.current === 'before' ? `u=${p.u1} m/s` : `v=${result.current.v1.toFixed(1)} m/s`, x1 + blockWidth / 2, midY + 10);
 
     // Block 2
     const bg2 = ctx.createLinearGradient(x2, by, x2, by + 56);
     bg2.addColorStop(0, '#34d399'); bg2.addColorStop(1, '#059669');
     ctx.fillStyle = bg2;
-    ctx.beginPath(); ctx.roundRect(x2, by, BW, 56, 6); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(x2, by, blockWidth, 56, 6); ctx.fill();
     ctx.strokeStyle = '#047857'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.roundRect(x2, by, BW, 56, 6); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(x2, by, blockWidth, 56, 6); ctx.stroke();
     ctx.fillStyle = 'white'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-    ctx.fillText(`${p.m2}kg`, x2 + BW / 2, midY - 6);
+    ctx.fillText(`${p.m2}kg`, x2 + blockWidth / 2, midY - 6);
     ctx.font = '9px system-ui';
-    ctx.fillText(phase.current === 'before' ? `u=${p.u2} m/s` : `v=${result.current.v2.toFixed(1)} m/s`, x2 + BW / 2, midY + 10);
+    ctx.fillText(phase.current === 'before' ? `u=${p.u2} m/s` : `v=${result.current.v2.toFixed(1)} m/s`, x2 + blockWidth / 2, midY + 10);
 
     // Velocity arrows before impact
     if (phase.current === 'before') {
-      [{ x: x1, v: p.u1, w: BW }, { x: x2, v: p.u2, w: BW }].forEach(b => {
+      [{ x: x1, v: p.u1, w: blockWidth }, { x: x2, v: p.u2, w: blockWidth }].forEach(b => {
         if (Math.abs(b.v) < 0.01) return;
         const dir = Math.sign(b.v);
         const ax = dir > 0 ? b.x + b.w : b.x;

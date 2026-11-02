@@ -34,6 +34,7 @@ export function useResponsiveCanvasSize(
   baseWidth: number,
   baseHeight: number,
   maxWidth = 980,
+  minHeight = 0,
 ) {
   const aspect = baseWidth / baseHeight;
   const [size, setSize] = useState({ width: baseWidth, height: baseHeight });
@@ -43,11 +44,12 @@ export function useResponsiveCanvasSize(
     if (!el) return;
 
     const update = () => {
-      const available = el.clientWidth;
+      const style = getComputedStyle(el);
+      const available = el.clientWidth - parseFloat(style.paddingLeft || '0') - parseFloat(style.paddingRight || '0');
       if (!available) return;
-      const w = Math.round(Math.min(available, maxWidth));
+      const w = Math.round(Math.min(available, el.closest('[data-expanded="true"]') ? 1600 : maxWidth));
       const effectiveAspect = available < MOBILE_BREAKPOINT ? Math.min(aspect, MOBILE_MAX_ASPECT) : aspect;
-      const h = Math.round(w / effectiveAspect);
+      const h = Math.max(minHeight, Math.round(w / effectiveAspect));
       setSize(prev => (prev.width === w && prev.height === h ? prev : { width: w, height: h }));
     };
 
@@ -56,7 +58,7 @@ export function useResponsiveCanvasSize(
     ro.observe(el);
     return () => ro.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aspect, maxWidth]);
+  }, [aspect, maxWidth, minHeight]);
 
   return size;
 }

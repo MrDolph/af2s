@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
@@ -306,13 +308,13 @@ export default function OscillationsPage() {
           </div>
 
           {/* Main grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
 
             {/* Canvas + graph + controls + sliders */}
-            <div className="space-y-3 min-w-0">
+            <SimulationStage className="space-y-3 min-w-0">
 
               {/* Canvas */}
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {topic === 'pendulum' && (
                   <PendulumCanvas key={resetKey} length={pendL} amplitude={pendA}
                     gravity={pendG} mass={pendM}
@@ -360,7 +362,7 @@ export default function OscillationsPage() {
               </div>
 
               {/* Controls */}
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls
                   isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
@@ -382,7 +384,7 @@ export default function OscillationsPage() {
               </div>
 
               {/* Graph */}
-              {topic !== 'conical' && (
+              <div data-stage-role="parameters">{topic !== 'conical' && (
                 <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                     <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Graph</p>
@@ -407,10 +409,10 @@ export default function OscillationsPage() {
                     {graphMode === 'phase' && 'Ellipse in phase space — SHM traces a closed orbit'}
                   </p>
                 </div>
-              )}
+              )}</div>
 
               {/* Sliders */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
                 {topic === 'pendulum' && <>
@@ -451,7 +453,7 @@ export default function OscillationsPage() {
                   <Slider label="End load" unit="N" value={cantLoad} min={0} max={50} step={1} set={setCantLoad} color="#ef4444" />
                 </>}
               </div>
-            </div>
+            </SimulationStage>
 
             {/* Analytics */}
             <div className="space-y-3">

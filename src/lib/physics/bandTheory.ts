@@ -89,147 +89,54 @@ export function intrinsicConcentration(Eg: number, T: number): number {
   return Math.sqrt(nc * nv) * Math.exp(-Eg / (2 * KB_EV * T));
 }
 
-/** Electron concentration in conduction band */
-export function electronConcentration(Eg: number, Ef: number, T: number, Nd: number): number {
+/** Non-degenerate, fully ionised-dopant teaching approximation.
+ * Low-temperature freeze-out and degenerate doping need a fuller model.
+ */
+export function carrierConcentrations(Eg: number, T: number, doping: DopingType, conc: number) {
   const ni = intrinsicConcentration(Eg, T);
-  if (T <= 0) return Nd;
-  // Approximate: n = Nd + ni²/Nd for n-type, or ni for intrinsic
-  if (Nd > ni * 100) return Nd;
-  return Math.sqrt(ni * ni / 4 + Nd * Nd) + ni * ni / (2 * Nd || ni);
+  if (T <= 0) return { n: 0, p: 0, ni: 0 };
+  const dop = doping === 'intrinsic' ? 0 : Math.max(0, conc);
+  const majority = (dop + Math.hypot(dop, 2 * ni)) / 2;
+  const minority = majority > 0 ? ni * ni / majority : 0;
+  return doping === 'p-type' ? { n: minority, p: majority, ni } : { n: majority, p: minority, ni };
 }
-
-/** Hole concentration in valence band */
-export function holeConcentration(Eg: number, Ef: number, T: number, Na: number): number {
-  const ni = intrinsicConcentration(Eg, T);
-  if (T <= 0) return Na;
-  if (Na > ni * 100) return Na;
-  return Math.sqrt(ni * ni / 4 + Na * Na) + ni * ni / (2 * Na || ni);
+export function electronConcentration(Eg: number, Ef: number, T: number, Nd: number) {
+  return carrierConcentrations(Eg, T, 'n-type', Nd).n;
 }
-
-/** Fermi level position for doped semiconductor (approximate) */
-export function dopedFermiLevel(Eg: number, T: number, dopingType: DopingType, conc: number): number {
-  if (dopingType === 'intrinsic') return Eg / 2;
-  const ni = intrinsicConcentration(Eg, T);
-  const kT = KB_EV * T;
-  if (dopingType === 'n-type') {
-    // Ef = Ec - kT ln(Nc/Nd)
-    const nc = NC_300 * Math.pow(T / 300, 1.5);
-    return Eg - kT * Math.log(nc / conc);
-  } else {
-    // Ef = Ev + kT ln(Nv/Na)
-    const nv = NV_300 * Math.pow(T / 300, 1.5);
-    return kT * Math.log(nv / conc);
-  }
+export function holeConcentration(Eg: number, Ef: number, T: number, Na: number) {
+  return carrierConcentrations(Eg, T, 'p-type', Na).p;
 }
-
-/** Generate carriers for visualization */
-export function generateCarriers(
-  material: Material,
-  T: number,
-  dopingType: DopingType,
-  dopingConc: number, // actual cm^-3
-  count: number = 80
-): Carrier[] {
-  const carriers: Carrier[] = [];
-  const Eg = material.bandGap;
-  const isConductor = material.type === 'conductor';
-
-  // For conductors, all electrons are free (no gap)
-  if (isConductor) {
-    for (let i = 0; i < count; i++) {
-      carriers.push({
-        x: Math.random() * 60,
-        y: -0.2 - Math.random() * 0.8, // in conduction band region
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 0.5,
-        band: 'conduction',
-        type: 'electron',
-        energy: material.fermiLevel + Math.random() * 2,
-      });
-    }
-    return carriers;
-  }
-
-  const Ef = dopedFermiLevel(Eg, T, dopingType, dopingConc);
-  const kT = KB_EV * T;
-
-  // Valence band electrons (filled states)
-  const valenceCount = Math.floor(count * 0.7);
-  for (let i = 0; i < valenceCount; i++) {
-    const E = -Math.random() * 1.5; // below valence band top (0)
-    const occupied = 1 - fermiDirac(E, Ef, T); // hole probability = 1 - f(E)
-    if (occupied > 0.3) {
-      carriers.push({
-        x: Math.random() * 60,
-        y: E * 0.3, // scale for visual
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.2,
-        band: 'valence',
-        type: 'electron',
-        energy: E,
-      });
-    }
-    // Holes appear where electrons are missing
-    if (occupied < 0.7) {
-      carriers.push({
-        x: Math.random() * 60,
-        y: E * 0.3,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.2,
-        band: 'valence',
-        type: 'hole',
-        energy: E,
-      });
-    }
-  }
-
-  // Conduction band electrons (thermally excited + doped)
-  const ni = intrinsicConcentration(Eg, T);
-  const nConc = dopingType === 'n-type' ? Math.max(dopingConc, ni) : ni;
-  const excitationFrac = Math.min(0.5, nConc / 1e18);
-  const condCount = Math.max(1, Math.floor(count * excitationFrac * 10));
-
-  for (let i = 0; i < condCount; i++) {
-    const E = Eg + Math.random() * 1.0;
-    carriers.push({
-      x: Math.random() * 60,
-      y: Eg + Math.random() * 0.5,
-      vx: (Math.random() - 0.5) * 3,
-      vy: (Math.random() - 0.5) * 0.5,
-      band: 'conduction',
-      type: 'electron',
-      energy: E,
-    });
-  }
-
-  // Donor/acceptor ions visualization
-  if (dopingType === 'n-type' && T > 50) {
-    const donorCount = Math.min(15, Math.floor(dopingConc / 1e16));
-    for (let i = 0; i < donorCount; i++) {
-      carriers.push({
-        x: Math.random() * 60,
-        y: Eg - 0.05,
-        vx: 0, vy: 0,
-        band: 'conduction',
-        type: 'electron',
-        energy: Eg - 0.05,
-      });
-    }
-  }
-
-  return carriers;
+export function dopedFermiLevel(Eg: number, T: number, doping: DopingType, conc: number) {
+  if (T <= 0) return Eg / 2;
+  const { n } = carrierConcentrations(Eg, T, doping, conc);
+  const nc = NC_300 * Math.pow(T / 300, 1.5);
+  return n > 0 ? Eg + kT_eV(T) * Math.log(n / nc) : Eg / 2;
 }
-
-/** Update carrier positions with thermal motion */
+/** Sampled states, with carrier counts amplified logarithmically for visibility. */
+export function generateCarriers(material: Material, T: number, doping: DopingType, conc: number, count = 80): Carrier[] {
+  const result: Carrier[] = [];
+  function add(type: 'electron' | 'hole', band: 'valence' | 'conduction', energy: number) {
+    result.push({x: Math.random()*60, y: energy, energy, vx: (Math.random()-.5)*2, vy: 0, band, type});
+  }
+  if (material.type === 'conductor') {
+    for (let i=0;i<count;i++) add('electron','conduction', Math.random()*material.fermiLevel);
+    return result;
+  }
+  const { n, p } = carrierConcentrations(material.bandGap,T,doping,conc);
+  const sampleCount = (c: number) => c < 1 ? 0 : Math.min(40, Math.max(1, Math.round(Math.log10(c)*2)));
+  // A filled valence band contains electrons, not holes. Missing states are hollow.
+  for(let i=0;i<Math.floor(count*.7);i++) add('electron','valence',-0.05-Math.random()*1.8);
+  for(let i=0;i<sampleCount(n);i++) add('electron','conduction',material.bandGap + Math.min(1.8,-Math.log(Math.max(Math.random(),1e-8))*kT_eV(T)));
+  for(let i=0;i<sampleCount(p);i++) add('hole','valence',-Math.min(1.8,0.03-Math.log(Math.max(Math.random(),1e-8))*kT_eV(T)));
+  return result;
+}
+/** Thermal motion of conduction electrons; energies stay in their allowed band.
+ * Hollow markers denote sampled vacancies, rather than independent particles.
+ */
 export function updateCarriers(carriers: Carrier[], dt: number, T: number, speed: number): Carrier[] {
-  const thermalV = Math.sqrt(T / 300) * speed;
-  return carriers.map((c) => ({
-    ...c,
-    x: (c.x + c.vx * dt * thermalV * 20 + 60) % 60,
-    y: c.y + c.vy * dt * thermalV * 2,
-    vx: c.vx + (Math.random() - 0.5) * dt * thermalV * 5,
-    vy: c.vy + (Math.random() - 0.5) * dt * thermalV * 2,
-  }));
+  const v = Math.sqrt(Math.max(0,T)/300)*speed;
+  return carriers.map(c => c.type === 'electron' && c.band === 'conduction'
+    ? {...c,x:(c.x+c.vx*dt*v*20+60)%60} : c);
 }
 
 export interface BandTheoryPreset {

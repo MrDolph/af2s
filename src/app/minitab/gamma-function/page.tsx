@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useState } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { GammaGraph } from '@/components/simulation/GammaGraph';
@@ -38,22 +39,22 @@ export default function GammaExplorerPage() {
         </section>
 
         <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <GammaGraph x={x} showNegative={showNegative} />
               </div>
-              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="parameters" className="flex flex-wrap items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <span className="text-xs text-gray-500 shrink-0">Evaluate at x</span>
                 <input type="range" min={showNegative ? -4.5 : 0.05} max={6} step={0.01} value={x}
                   onChange={e => setX(Number(e.target.value))} className="flex-1" style={{ accentColor: '#10b981' }} />
                 <span className="text-xs font-mono text-gray-500 w-14 text-right">{x.toFixed(2)}</span>
               </div>
-              <label className="flex items-center gap-2 text-xs text-gray-600 px-1 cursor-pointer">
+              <div data-stage-role="parameters"><label className="flex items-center gap-2 text-xs text-gray-600 px-1 cursor-pointer">
                 <input type="checkbox" checked={showNegative} onChange={e => setShowNegative(e.target.checked)} className="accent-indigo-600" />
                 Show negative-x branches
-              </label>
-            </div>
+              </label></div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">

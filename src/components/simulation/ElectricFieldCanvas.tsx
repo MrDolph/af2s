@@ -8,6 +8,7 @@ interface Props {
   testX: number; testY: number; // 0..1 fractional canvas position of the movable test point
   isRunning: boolean; isPaused: boolean;
   onTick?: (fieldStrengthRelative: number) => void;
+  onTestPositionChange?: (x: number, y: number) => void;
   width?: number; height?: number;
 }
 
@@ -65,7 +66,7 @@ function drawCharge(ctx: CanvasRenderingContext2D, c: Charge) {
   if (c.q > 0) { ctx.beginPath(); ctx.moveTo(c.x, c.y - r * 0.5); ctx.lineTo(c.x, c.y + r * 0.5); ctx.stroke(); }
 }
 
-export function ElectricFieldCanvas({ configuration, testX, testY, isRunning, isPaused, onTick, width = 660, height = 320 }: Props) {
+export function ElectricFieldCanvas({ configuration, testX, testY, isRunning, isPaused, onTick, onTestPositionChange, width = 660, height = 320 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const lastFrameRef = useRef<number | null>(null);
@@ -177,8 +178,17 @@ export function ElectricFieldCanvas({ configuration, testX, testY, isRunning, is
     return () => cancelAnimationFrame(rafRef.current);
   }, [draw]);
 
+  function moveTestPoint(event: import('react').PointerEvent<HTMLCanvasElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    onTestPositionChange?.(Math.max(0.05, Math.min(0.95, (event.clientX - rect.left) / rect.width)), Math.max(0.1, Math.min(0.9, (event.clientY - rect.top) / rect.height)));
+  }
   return (
     <canvas ref={canvasRef} width={width} height={height}
-      className="w-full rounded-xl border border-gray-200 bg-white" style={{ display: 'block' }} />
+      aria-label="Electric field. Drag or tap to position the test charge; horizontal and vertical sliders are also available."
+      onPointerDown={event => { if (!onTestPositionChange) return; event.currentTarget.setPointerCapture(event.pointerId); moveTestPoint(event); }}
+      onPointerMove={event => { if (event.currentTarget.hasPointerCapture(event.pointerId)) moveTestPoint(event); }}
+      onPointerUp={event => { if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }}
+      className="w-full rounded-xl border border-gray-200 bg-white" style={{ display: 'block', touchAction: onTestPositionChange ? 'none' : 'auto', cursor: onTestPositionChange ? 'crosshair' : 'default' }} />
   );
 }

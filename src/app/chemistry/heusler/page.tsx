@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useMemo, useState } from 'react';
@@ -121,8 +122,8 @@ export default function HeuslerPage() {
           </div>
           {note && <p className="mb-5 rounded-xl border border-indigo-100 bg-indigo-50 px-3 py-2 text-xs text-indigo-900">{note} <span className="opacity-70">Reference notes and lattice parameters are approximate summaries — check the primary literature before citing.</span></p>}
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-            <div className="min-w-0 space-y-5">
+          <SimulationStage className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+            <div data-stage-role="canvas" className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-4">
                 <CrystalViewer atoms={atoms} extent={n} styles={styles} siteNames={siteNames} bondDist={NN_DIST} bondMode="nn" sizeScale={0.62} sizeNote="atom size shows period only" showBonds={bonds} showCell={cell} showA />
                 <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3 text-xs text-gray-600">
@@ -137,7 +138,7 @@ export default function HeuslerPage() {
               <CandidatesPanel onLoad={onLoad} />
             </div>
 
-            <div className="min-w-0 space-y-5">
+            <div data-stage-role="parameters" className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-5">
                 <label className="text-[11px] font-medium uppercase tracking-wide text-gray-400" htmlFor="template">Template / arrangement</label>
                 <select id="template" value={tid} onChange={e => { setTid(e.target.value as TemplateId); setSaved(false); }} className="mt-1 h-9 w-full rounded-md border border-gray-200 bg-white px-2 text-sm">
@@ -190,7 +191,7 @@ export default function HeuslerPage() {
                 extra={`${t.label}`}
               />
             </div>
-          </div>
+          </SimulationStage>
         </div>
       </main>
     </>

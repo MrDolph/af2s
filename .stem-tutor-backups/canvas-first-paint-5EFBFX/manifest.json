@@ -1,0 +1,30 @@
+[
+  {
+    "file": "src/components/simulation/ProjectileModeCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/EquipotentialCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/EigenvectorCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/GradientExplorerCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/DivStokesCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/ai/PromptBar.tsx",
+    "existed": true
+  },
+  {
+    "file": "checks/projectile-resize.cjs",
+    "existed": false
+  }
+]

@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useState, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { GradientExplorerCanvas } from '@/components/simulation/GradientExplorerCanvas';
@@ -60,7 +61,7 @@ export default function GradientExplorerPage() {
         </section>
 
         <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
-          <div className="flex flex-wrap gap-1.5">
+          <div data-stage-role="parameters" className="flex flex-wrap gap-1.5">
             {FIELDS.map((f, i) => (
               <button key={f.name} onClick={() => setFieldIndex(i)}
                 className={`text-xs px-3 py-2 rounded-lg border font-medium transition ${
@@ -69,8 +70,8 @@ export default function GradientExplorerPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4">
-            <div className="space-y-3 min-w-0">
+          <SimulationStage className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
+            <div data-stage-role="canvas" className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
                 <GradientExplorerCanvas
                   fieldIndex={fieldIndex} point={point} angleDeg={angleDeg}
@@ -83,7 +84,8 @@ export default function GradientExplorerPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div data-stage-role="parameters" className="space-y-3">
+              <label className="block text-sm text-gray-700">Scalar field<select aria-label="Scalar field" value={fieldIndex} onChange={e=>setFieldIndex(Number(e.target.value))} className="mt-1 w-full rounded-lg border border-gray-300 bg-white p-2">{FIELDS.map((f,i)=><option key={f.name} value={i}>{f.name}</option>)}</select></label>
               <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">
                 <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-2">Live readout</p>
                 {[
@@ -103,7 +105,7 @@ export default function GradientExplorerPage() {
               <p className="text-[11px] text-gray-400 px-1">Drag the blue point to move; drag the gold arrowhead to change direction â.</p>
             </div>
 
-            <div className="space-y-3 lg:col-span-2 xl:col-span-1">
+            <div data-stage-role="extra" className="space-y-3 lg:col-span-2 xl:col-span-1">
               <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
                 <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-3">📋 Teacher notes</p>
                 <ul className="space-y-2">
@@ -116,7 +118,7 @@ export default function GradientExplorerPage() {
               </div>
               <ExerciseList />
             </div>
-          </div>
+          </SimulationStage>
         </div>
       </main>
     </>

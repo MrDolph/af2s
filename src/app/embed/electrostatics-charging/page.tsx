@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ChargingMethodsCanvas, ChargingMethod } from '@/components/simulation/ChargingMethodsCanvas';
@@ -47,22 +49,22 @@ function ElectrostaticsChargingEmbedInner() {
   }, [topic, method, electroscopeMode, rodSign, electroscopeSign, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      {topic === 'production' && (
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas">{topic === 'production' && (
         <ChargingMethodsCanvas key={resetKey} method={method} rodSign={rodSign} isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
-      )}
-      {topic === 'electroscope' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'electroscope' && (
         <ElectroscopeCanvas key={resetKey} mode={electroscopeMode} rodSign={rodSign} electroscopeSign={electroscopeSign}
           isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
-      )}
-      {topic === 'electrophorus' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'electrophorus' && (
         <ElectrophorusCanvas key={resetKey} isRunning={isRunning} isPaused={isPaused}
           cycleCount={electrophorusCycle} onCycleComplete={() => setElectrophorusCycle(c => c + 1)} width={640} height={300} />
-      )}
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+      )}</div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           {topic === 'production' && (
@@ -117,9 +119,9 @@ function ElectrostaticsChargingEmbedInner() {
             <p className="text-xs text-gray-500">Press Run to lower the disc, earth it, and lift it away.</p>
           )}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
@@ -138,14 +140,14 @@ export default function XraysPage() {
             <span className="text-xs text-gray-400 ml-2">max photon energy = eV</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <XrayCanvas kV={kV} current={current}
                   isRunning={isRunning} isPaused={isPaused} width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -154,7 +156,7 @@ export default function XraysPage() {
                   params={{ kV, i: current }} />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div data-stage-role="extra" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">X-ray spectrum (Mo target)</p>
                 <SpectrumGraph kV={kV} current={current} />
                 <p className="text-[10px] text-gray-400 mt-2 text-center">
@@ -162,14 +164,14 @@ export default function XraysPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <Slider label="Tube voltage" unit="kV" value={kV} min={5} max={100} step={1} set={setKV} color="#6366f1"
                   note="Higher V → shorter λmin → harder, more penetrating X-rays" />
                 <Slider label="Filament current" unit="" value={current} min={1} max={10} step={1} set={setCurrent} color="#f59e0b"
                   note="More electrons → more X-rays, but λmin does not move" />
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

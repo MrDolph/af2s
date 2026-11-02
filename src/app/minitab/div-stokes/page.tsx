@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useRef } from 'react';
@@ -56,20 +57,20 @@ export default function DivStokesPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
                 <DivStokesCanvas fieldIndex={fieldIndex} disk={disk} onDiskChange={setDisk} width={canvasSize.width} height={canvasSize.height} />
               </div>
-              <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="parameters" className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <span className="text-xs text-gray-500 shrink-0">Disk radius r</span>
                 <input type="range" min={0.4} max={2.2} step={0.05} value={disk.r}
                   onChange={e => setDisk(d => ({ ...d, r: Number(e.target.value) }))}
                   className="flex-1" style={{ accentColor: '#2563eb' }} />
                 <span className="text-xs font-mono text-gray-500 w-14 text-right">{disk.r.toFixed(2)}</span>
               </div>
-              <p className="text-[11px] text-gray-400 px-1">Drag the disk directly on the canvas to move it.</p>
-            </div>
+              <div data-stage-role="extra"><p className="text-[11px] text-gray-400 px-1">Drag the disk directly on the canvas to move it.</p></div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">

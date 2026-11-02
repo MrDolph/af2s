@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -107,7 +109,7 @@ export default function ElectrostaticsFieldsPage() {
   }, [topic, q1nC, q2nC, separationCm, fieldConfig, reset]);
 
   const canvasBoxRef = useRef<HTMLDivElement>(null);
-  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 300, 980);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 660, 340, 1100, 300);
 
   const staticForceN = coulombForceSigned(q1nC * 1e-9, q2nC * 1e-9, separationCm / 100);
 
@@ -157,22 +159,22 @@ export default function ElectrostaticsFieldsPage() {
             <span className="text-sm font-semibold font-mono text-gray-900">{TOPIC_META[topic].eq}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {topic === 'coulomb' && (
                   <CoulombsLawCanvas key={resetKey} q1nC={q1nC} q2nC={q2nC} initialSeparationCm={separationCm}
                     isRunning={isRunning} isPaused={isPaused} onTick={(sep, force) => setLiveCoulomb({ sep, force })}
                     width={canvasSize.width} height={canvasSize.height} />
                 )}
                 {topic === 'field' && (
-                  <ElectricFieldCanvas key={resetKey} configuration={fieldConfig} testX={testX} testY={testY}
+                  <ElectricFieldCanvas onTestPositionChange={(x, y) => { setTestX(x); setTestY(y); }} key={resetKey} configuration={fieldConfig} testX={testX} testY={testY}
                     isRunning={isRunning} isPaused={isPaused} onTick={setLiveField}
                     width={canvasSize.width} height={canvasSize.height} />
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -184,7 +186,7 @@ export default function ElectrostaticsFieldsPage() {
                   } />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
                 {topic === 'coulomb' && <>
@@ -211,7 +213,7 @@ export default function ElectrostaticsFieldsPage() {
                     note="Drag to explore the field strength and direction at different points" />
                 </>}
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

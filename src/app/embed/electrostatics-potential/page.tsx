@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PotentialCanvas } from '@/components/simulation/PotentialCanvas';
@@ -74,20 +76,20 @@ function ElectrostaticsPotentialEmbedInner() {
   }, [topic, q1nC, q2nC, separationCm, equipConfig, voltageV, resistanceOhm, capacitanceUf, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      {topic === 'potential' && (
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas">{topic === 'potential' && (
         <PotentialCanvas key={resetKey} q1nC={q1nC} q2nC={q2nC} initialSeparationCm={separationCm}
           isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
-      )}
-      {topic === 'equipotential' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'equipotential' && (
         <EquipotentialCanvas configuration={equipConfig} width={640} height={300} />
-      )}
-      {topic === 'capacitor' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'capacitor' && (
         <CapacitorCanvas key={resetKey} voltageV={voltageV} resistanceOhm={resistanceOhm} capacitanceUf={capacitanceUf}
           isRunning={isRunning} isPaused={isPaused} dischargeKey={dischargeKey}
           onTick={(_v, ph) => setLiveCapacitor({ phase: ph })} width={640} height={300} />
-      )}
-      {topic !== 'equipotential' && (
+      )}</div>
+      <div data-stage-role="playback">{topic !== 'equipotential' && (
         <div className="flex flex-wrap items-center gap-2">
           <SimulationControls isRunning={isRunning} isPaused={isPaused}
             onRun={() => { setIsRunning(true); setIsPaused(false); }}
@@ -99,8 +101,8 @@ function ElectrostaticsPotentialEmbedInner() {
             </button>
           )}
         </div>
-      )}
-      {showControls && (
+      )}</div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           {topic === 'potential' && <>
@@ -127,9 +129,9 @@ function ElectrostaticsPotentialEmbedInner() {
             <Slider label="Capacitance" unit="µF" value={capacitanceUf} min={50} max={500} step={10} set={setCapacitanceUf} color="#8b5cf6" />
           </>}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

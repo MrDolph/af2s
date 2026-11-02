@@ -1,5 +1,7 @@
 // src/app/embed/pn-junction/page.tsx
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 
 import React, { useState } from 'react';
 import PnJunctionCanvas from '@/components/simulation/PnJunctionCanvas';
@@ -16,10 +18,10 @@ export default function PnJunctionEmbedPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4">
-      <div className="max-w-5xl mx-auto">
-        <PnJunctionCanvas params={params} width={800} height={480} />
+      <SimulationStage className="af-stage-dark max-w-5xl mx-auto">
+        <div data-stage-role="canvas"><PnJunctionCanvas params={params} width={800} height={480} /></div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div data-stage-role="parameters" className="mt-4 flex flex-wrap gap-2">
           {PRESET_NAMES.map(name => (
             <button
               key={name}
@@ -34,7 +36,7 @@ export default function PnJunctionEmbedPage() {
             </button>
           ))}
         </div>
-      </div>
+      </SimulationStage>
     </div>
   );
 }

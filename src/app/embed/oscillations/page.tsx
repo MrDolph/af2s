@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useRef, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PendulumCanvas } from '@/components/simulation/PendulumCanvas';
@@ -109,8 +111,8 @@ function OscillationsEmbedInner() {
                  graphM * graphOmega * graphOmega;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas" className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
         {topic === 'pendulum' && (
           <PendulumCanvas key={resetKey} length={pendL} amplitude={pendA} gravity={pendG} mass={pendM}
             isRunning={isRunning} isPaused={isPaused} onTick={handleTick} width={380} height={280} />
@@ -129,14 +131,14 @@ function OscillationsEmbedInner() {
         )}
       </div>
 
-      <SimulationControls
+      <div data-stage-role="playback"><SimulationControls
         isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
         onPause={() => setIsPaused(p => !p)}
         onReset={reset}
-      />
+      /></div>
 
-      {showControls && (
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
@@ -163,9 +165,9 @@ function OscillationsEmbedInner() {
             </>}
           </div>
         </div>
-      )}
+      )}</div>
 
-      {showGraph && (
+      <div data-stage-role="parameters">{showGraph && (
         <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
           <div className="mb-2 flex gap-1 overflow-x-auto rounded-lg bg-gray-100 p-0.5">
             {(['displacement', 'velocity', 'acceleration', 'energy', 'phase'] as GraphMode[]).map(gm => (
@@ -179,15 +181,15 @@ function OscillationsEmbedInner() {
           </div>
           <SHMGraph A={graphA} omega={graphOmega} m={graphM} k={graphK} mode={graphMode} currentT={currentT} />
         </div>
-      )}
+      )}</div>
 
-      <p className="text-center text-[10px] text-gray-400">
+      <div data-stage-role="extra"><p className="text-center text-[10px] text-gray-400">
         Powered by{' '}
         <a href="/" target="_blank" rel="noopener noreferrer" className="font-medium text-indigo-500 hover:text-indigo-600">
           A-Factor STEM Studio
         </a>
-      </p>
-    </div>
+      </p></div>
+    </SimulationStage>
   );
 }
 

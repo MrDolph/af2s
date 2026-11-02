@@ -92,7 +92,7 @@ export function GradientExplorerCanvas({
     ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
   }, [toCanvas]);
 
-  useEffect(() => { draw(); }, [draw, fieldIndex, point, angleDeg]);
+  useEffect(() => { draw(); }, [draw, fieldIndex, point, angleDeg, width, height]);
 
   const handlePointer = useCallback((clientX: number, clientY: number, isDown: boolean) => {
     const canvas = canvasRef.current; if (!canvas) return;

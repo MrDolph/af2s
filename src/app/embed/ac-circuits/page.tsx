@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ACCircuitCanvas, ACMode } from '@/components/simulation/ACCircuitCanvas';
@@ -74,13 +76,13 @@ function ACEmbedInner() {
   const activeResistance = isParallelTopic ? parallelResistance : resistance;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <ACCircuitCanvas key={resetKey} mode={topic as ACMode}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><ACCircuitCanvas key={resetKey} mode={topic as ACMode}
         vPeak={vPeak} frequency={effFrequency} resistance={activeResistance}
         component={component} inductance={inductance} capacitance={capacitance * 1e-6}
         resonanceCircuit={resonanceCircuit} speedMultiplier={speedMultiplier} phasorZoom={phasorZoom}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={320} />
-      <div className="flex items-center gap-2 flex-wrap">
+        isRunning={isRunning} isPaused={isPaused} width={640} height={320} /></div>
+      <div data-stage-role="playback" className="flex items-center gap-2 flex-wrap">
         <SimulationControls isRunning={isRunning} isPaused={isPaused}
           onRun={() => { setIsRunning(true); setIsPaused(false); }}
           onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -91,7 +93,7 @@ function ACEmbedInner() {
             }`}>{phasorZoom ? '🔍 Zoomed' : '🔍 Zoom'}</button>
         )}
       </div>
-      {showControls && (
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="Animation speed" unit="×" value={speedMultiplier} min={0.25} max={3} step={0.25} set={setSpeedMultiplier} color="#94a3b8" />
@@ -129,9 +131,9 @@ function ACEmbedInner() {
             </div>
           )}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { HeatTransferCanvas, HeatMode } from '@/components/simulation/HeatTransferCanvas';
@@ -62,13 +64,13 @@ function HeatEmbedInner() {
   }, [mode, hotTemp, coldTemp, materialIdx, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <HeatTransferCanvas mode={mode} hotTemp={hotTemp} coldTemp={coldTemp} materialK={material.k}
-        isRunning={isRunning} isPaused={isPaused} width={640} height={300} />
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><HeatTransferCanvas mode={mode} hotTemp={hotTemp} coldTemp={coldTemp} materialK={material.k}
+        isRunning={isRunning} isPaused={isPaused} width={640} height={300} /></div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <Slider label="Hot temperature" unit="°C" value={hotTemp} min={30} max={120} step={5} set={setHotTemp} color="#ef4444" />
@@ -84,9 +86,9 @@ function HeatEmbedInner() {
             </div>
           )}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

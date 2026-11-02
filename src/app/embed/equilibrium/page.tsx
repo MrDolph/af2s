@@ -1,5 +1,7 @@
 'use client';
-import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
+import { Suspense, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { StaticDynamicCanvas } from '@/components/simulation/StaticDynamicCanvas';
 import { ConcurrentForcesCanvas } from '@/components/simulation/ConcurrentForcesCanvas';
@@ -61,10 +63,10 @@ function EquilibriumEmbedInner() {
   const [angleB, setAngleB] = useState(() => num(sp, 'angleB', 90, 0, 359));
 
   const [w1Force, setW1Force] = useState(() => num(sp, 'w1f', 20, 0, 50));
-  const [w1Pos, setW1Pos] = useState(() => num(sp, 'w1p', -0.6, -2, 2));
+  const [w1Pos, setW1Pos] = useState(() => num(sp, 'w1p', -0.3, -0.5, 0.5));
   const [w2Force, setW2Force] = useState(() => num(sp, 'w2f', 20, 0, 50));
-  const [w2Pos, setW2Pos] = useState(() => num(sp, 'w2p', 0.6, -2, 2));
-  const weights: Weight[] = [{ force: w1Force, position: w1Pos }, { force: w2Force, position: w2Pos }];
+  const [w2Pos, setW2Pos] = useState(() => num(sp, 'w2p', 0.3, -0.5, 0.5));
+  const weights: Weight[] = useMemo(() => [{ force: w1Force, position: w1Pos }, { force: w2Force, position: w2Pos }], [w1Force, w1Pos, w2Force, w2Pos]);
 
   const [objDensity, setObjDensity] = useState(() => num(sp, 'density', 600, 100, 12000));
   const [liqIdx, setLiqIdx] = useState(() => Math.round(num(sp, 'liquid', 0, 0, LIQUIDS.length - 1)));
@@ -82,28 +84,28 @@ function EquilibriumEmbedInner() {
   }, [topic, scenario, sdF1, sdF2, sdMass, magA, angleA, magB, angleB, w1Force, w1Pos, w2Force, w2Pos, objDensity, liqIdx, blockHeight, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      {topic === 'static-dynamic' && (
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas">{topic === 'static-dynamic' && (
         <StaticDynamicCanvas key={resetKey} scenario={scenario} f1={sdF1} f2={sdF2} mass={sdMass}
           isRunning={isRunning} isPaused={isPaused} width={640} height={240} />
-      )}
-      {topic === 'concurrent' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'concurrent' && (
         <ConcurrentForcesCanvas key={resetKey} magA={magA} angleA={angleA} magB={magB} angleB={angleB}
           isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
-      )}
-      {topic === 'parallel' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'parallel' && (
         <ParallelForcesCanvas key={resetKey} weights={weights}
           isRunning={isRunning} isPaused={isPaused} width={640} height={260} />
-      )}
-      {topic === 'floating' && (
+      )}</div>
+      <div data-stage-role="canvas">{topic === 'floating' && (
         <FloatingBodyCanvas key={resetKey} objDensity={objDensity} liquidDensity={liquid.density}
           liquidName={liquid.name} blockHeight={blockHeight}
           isRunning={isRunning} isPaused={isPaused} width={640} height={280} />
-      )}
-      <SimulationControls isRunning={isRunning} isPaused={isPaused}
+      )}</div>
+      <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
-        onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      {showControls && (
+        onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-3">
           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           {topic === 'static-dynamic' && <>
@@ -127,9 +129,9 @@ function EquilibriumEmbedInner() {
           </>}
           {topic === 'parallel' && <>
             <Slider label="Weight 1" unit="N" value={w1Force} min={0} max={50} step={1} set={setW1Force} color="#6366f1" />
-            <Slider label="Position 1" unit="m" value={w1Pos} min={-2} max={2} step={0.1} set={setW1Pos} color="#818cf8" />
+            <Slider label="Weight 1 ruler mark" unit="cm" value={Math.round((w1Pos + 0.5) * 100)} min={0} max={100} step={1} set={v => setW1Pos(v / 100 - 0.5)} color="#6366f1" />
             <Slider label="Weight 2" unit="N" value={w2Force} min={0} max={50} step={1} set={setW2Force} color="#10b981" />
-            <Slider label="Position 2" unit="m" value={w2Pos} min={-2} max={2} step={0.1} set={setW2Pos} color="#34d399" />
+            <Slider label="Weight 2 ruler mark" unit="cm" value={Math.round((w2Pos + 0.5) * 100)} min={0} max={100} step={1} set={v => setW2Pos(v / 100 - 0.5)} color="#6366f1" />
           </>}
           {topic === 'floating' && <>
             <div className="flex flex-wrap gap-1.5">
@@ -144,9 +146,9 @@ function EquilibriumEmbedInner() {
             <Slider label="Block height" unit="m" value={blockHeight} min={0.05} max={0.4} step={0.01} set={setBlockHeight} color="#f59e0b" />
           </>}
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

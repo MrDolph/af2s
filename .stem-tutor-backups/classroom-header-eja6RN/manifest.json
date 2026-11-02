@@ -1,0 +1,10 @@
+[
+  {
+    "file": "src/components/simulation/SimulationStage.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/simulation-stage.css",
+    "existed": true
+  }
+]

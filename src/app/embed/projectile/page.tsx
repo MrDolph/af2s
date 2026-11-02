@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ProjectileModeCanvas, ProjectileMode } from '@/components/simulation/ProjectileModeCanvas';
@@ -80,16 +82,16 @@ function ProjectileEmbedInner() {
   }, [v0, angle, g, h0, hH, iAlpha, iBeta, launchFrom, reset]);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-3 p-3 sm:p-4">
-      <ProjectileModeCanvas
+    <SimulationStage className="mx-auto max-w-3xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><ProjectileModeCanvas
         key={resetKey}
         mode={mode}
         standard={std} horizontal={hrz} vertical={vtc} inclined={inc}
         isRunning={isRunning} isPaused={isPaused}
         onComplete={handleComplete}
         width={720} height={340}
-      />
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      /></div>
+      <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
         <SimulationControls
           isRunning={isRunning && !isComplete} isPaused={isPaused}
           onRun={() => { setIsRunning(true); setIsPaused(false); setIsComplete(false); }}
@@ -99,7 +101,7 @@ function ProjectileEmbedInner() {
         {isComplete && <span className="text-xs font-medium text-emerald-600">✓ Complete</span>}
       </div>
 
-      {showControls && (
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
@@ -137,15 +139,15 @@ function ProjectileEmbedInner() {
             </>}
           </div>
         </div>
-      )}
+      )}</div>
 
-      <p className="text-center text-[10px] text-gray-400">
+      <div data-stage-role="extra"><p className="text-center text-[10px] text-gray-400">
         Powered by{' '}
         <a href="/" target="_blank" rel="noopener noreferrer" className="font-medium text-indigo-500 hover:text-indigo-600">
           A-Factor STEM Studio
         </a>
-      </p>
-    </div>
+      </p></div>
+    </SimulationStage>
   );
 }
 

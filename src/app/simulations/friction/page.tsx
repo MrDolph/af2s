@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
@@ -152,7 +154,7 @@ export default function FrictionPage() {
   const inc = inclineDynamics(mass, angle, muS, muK, appliedIncline, 0);
 
   const canvasBoxRef = useRef<HTMLDivElement>(null);
-  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 300, 980);
+  const canvasSize = useResponsiveCanvasSize(canvasBoxRef, 640, 440, 1100, 360);
 
   useTopicPreset("simulations-friction", { "mass": setMass,
     "applied": setApplied,
@@ -201,9 +203,9 @@ export default function FrictionPage() {
             <span className="text-sm font-semibold font-mono text-gray-900">{MODE_META[mode].eq}</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <FrictionCanvas key={resetKey} mode={mode} mass={mass} applied={applied} angle={angle}
                   appliedIncline={appliedIncline} muS={muS} muK={muK} isRunning={isRunning} isPaused={isPaused} resetKey={resetKey}
                   showWeight={showWeight} showComponents={showComponents} showNormal={showNormal}
@@ -211,7 +213,7 @@ export default function FrictionPage() {
                   width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -220,7 +222,7 @@ export default function FrictionPage() {
                   params={{ mode, mass, applied, angle, appliedIncline, muS, muK }} />
               </div>
 
-              {mode === 'flat' && (
+              <div data-stage-role="extra">{mode === 'flat' && (
                 <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Friction vs applied force</p>
                   <FrictionGraph mass={mass} muS={muS} muK={muK} applied={applied} />
@@ -228,9 +230,9 @@ export default function FrictionPage() {
                     Friction RISES to match F (static), then plateaus at μkN once sliding
                   </p>
                 </div>
-              )}
+              )}</div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="extra" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Show forces</p>
                 <div className="flex flex-wrap gap-1.5">
                   <ToggleChip label="Weight (mg)" active={showWeight} onClick={() => setShowWeight(v => !v)} color="#8b5cf6" />
@@ -243,7 +245,7 @@ export default function FrictionPage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <Slider label="Mass" unit="kg" value={mass} min={1} max={20} step={0.5} set={setMass} color="#6366f1" />
                 {mode === 'flat' && (
@@ -259,7 +261,7 @@ export default function FrictionPage() {
                 <Slider label="Static μs" unit="" value={muS} min={0.05} max={1} step={0.01} set={v => setMuS(Math.max(v, muK))} color="#10b981" />
                 <Slider label="Kinetic μk" unit="" value={muK} min={0.05} max={1} step={0.01} set={v => setMuK(Math.min(v, muS))} color="#8b5cf6" note="μk is kept ≤ μs, as it always is physically" />
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

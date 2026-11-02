@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ReflectionCanvas, ReflectionMode } from '@/components/simulation/ReflectionCanvas';
@@ -61,17 +63,17 @@ function ReflectionEmbedInner() {
   }, [mode, incidenceAngle, focal, objectDist, converging, rotationAngle, reset]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
-      <ReflectionCanvas key={resetKey} mode={mode} incidenceAngle={incidenceAngle}
+    <SimulationStage className="mx-auto max-w-2xl space-y-3 p-3 sm:p-4">
+      <div data-stage-role="canvas"><ReflectionCanvas key={resetKey} mode={mode} incidenceAngle={incidenceAngle}
         focal={focal} objectDist={objectDist} converging={converging}
         rotationAngle={rotationAngle} isRunning={isRunning} isPaused={isPaused}
-        width={660} height={320} />
-      {mode === 'rotation' && (
+        width={660} height={320} /></div>
+      <div data-stage-role="playback">{mode === 'rotation' && (
         <SimulationControls isRunning={isRunning} isPaused={isPaused}
           onRun={() => { setIsRunning(true); setIsPaused(false); }}
           onPause={() => setIsPaused(p => !p)} onReset={reset} />
-      )}
-      {showControls && (
+      )}</div>
+      <div data-stage-role="parameters">{showControls && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
           <p className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-400">Parameters</p>
           <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
@@ -100,9 +102,9 @@ function ReflectionEmbedInner() {
             )}
           </div>
         </div>
-      )}
-      <PoweredBy />
-    </div>
+      )}</div>
+      <div data-stage-role="extra"><PoweredBy /></div>
+    </SimulationStage>
   );
 }
 

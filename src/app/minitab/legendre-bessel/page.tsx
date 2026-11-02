@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState } from 'react';
@@ -57,12 +58,12 @@ export default function LegendreBesselPage() {
               className={`text-xs px-4 py-2 rounded-lg border font-medium transition ${mode === 'bessel' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-600 border-gray-200'}`}>Bessel Jₙ(x)</button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <LegendreBesselGraph mode={mode} shown={shown} />
               </div>
-              <div className="flex flex-wrap gap-1.5 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="parameters" className="flex flex-wrap gap-1.5 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 {Array.from({ length: 7 }, (_, i) => i).map(i => (
                   <label key={i} className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-gray-100 cursor-pointer hover:border-indigo-200">
                     <input type="checkbox" checked={shown.includes(i)} onChange={() => toggle(i)} className="accent-indigo-600" />
@@ -70,7 +71,7 @@ export default function LegendreBesselPage() {
                   </label>
                 ))}
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               {mode === 'legendre' ? (

@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useRef, useState } from 'react';
@@ -236,14 +238,14 @@ export default function VectorsPage() {
             {MODES.map(m => <button key={m.id} role="tab" aria-selected={mode === m.id} onClick={() => changeMode(m.id)} className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition ${mode === m.id ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-300'}`}>{m.title}</button>)}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_320px_280px]">
-            <div className="min-w-0 space-y-3">
-              <div ref={boxRef} className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_320px_280px]">
+            <SimulationStage className="min-w-0 space-y-3">
+              <div data-stage-role="canvas" ref={boxRef} className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
                 <VectorCanvas dim={dim} width={size.width} height={canvasH} scene={scene} snap={snap} view={view} onView={setView} dragAxis={dragAxis} showPlanes={planes} showGrid={grid}
                   readOnly={practicing} onHandle={onHandle}
                   ariaLabel={`${dim === '2d' ? '2D' : '3D'} vector diagram. ${practicing ? 'The vectors for the current problem are drawn from the origin.' : 'Drag the coloured handles at the tips of the vectors, or focus the diagram and use the arrow keys.'}`} />
               </div>
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
+              <div data-stage-role="parameters" className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5">
                 <label className="flex items-center gap-1.5 text-xs text-gray-600">Snap
                   <select value={snap} onChange={e => setSnap(Number(e.target.value))} className="h-7 rounded-md border border-gray-200 bg-white px-1.5 text-xs"><option value={1}>whole numbers</option><option value={0.5}>0.5</option><option value={0}>0.1 (free)</option></select>
                 </label>
@@ -257,8 +259,8 @@ export default function VectorsPage() {
                 <Toggle label="Grid" on={grid} set={setGrid} />
                 <div className="ml-auto"><EmbedButton path="/embed/vectors" title="Vectors — A-Factor STEM Studio" params={{ dim, mode: practicing ? 'add' : mode, A: `${A.x},${A.y},${A.z}`, B: `${B.x},${B.y},${B.z}`, k: String(k) }} /></div>
               </div>
-              <p className="text-[11px] text-gray-400">{practicing ? 'Practice: the problem’s vectors are drawn from the origin on the grid.' : `Drag the coloured dots at the vector tips${dim === '3d' ? ', drag empty space to rotate' : ''}; or click the diagram and use the arrow keys${dim === '3d' ? ' (Page Up/Down for z)' : ''}.`}</p>
-            </div>
+              <div data-stage-role="extra"><p className="text-[11px] text-gray-400">{practicing ? 'Practice: the problem’s vectors are drawn from the origin on the grid.' : `Drag the coloured dots at the vector tips${dim === '3d' ? ', drag empty space to rotate' : ''}; or click the diagram and use the arrow keys${dim === '3d' ? ' (Page Up/Down for z)' : ''}.`}</p></div>
+            </SimulationStage>
 
             <div className="min-w-0 space-y-3">
               {!practicing && (

@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -180,9 +182,9 @@ export default function WavesPage() {
             <span className="text-xs text-gray-400 ml-2">v = fλ</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <WaveCanvas key={resetKey} mode={mode}
                   amplitude={A} frequency={f} wavelength={lambda}
                   amplitude2={A2} frequency2={f2} phase2={phase2}
@@ -190,7 +192,7 @@ export default function WavesPage() {
                   width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -199,7 +201,7 @@ export default function WavesPage() {
                   params={{ mode, A, f, lambda, A2, f2, phase2 }} />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <Slider label="Amplitude" unit="m" value={A} min={0.2} max={1.5} step={0.1} set={setA} color="#6366f1" />
                 <Slider label="Frequency" unit="Hz" value={f} min={0.1} max={2} step={0.05} set={setF} color="#f59e0b" note="Slow enough to follow by eye" />
@@ -211,7 +213,7 @@ export default function WavesPage() {
                   <Slider label="Phase difference" unit="°" value={phase2} min={0} max={360} step={5} set={setPhase2} color="#0ea5e9" note="0° constructive · 180° destructive" />
                 </>}
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

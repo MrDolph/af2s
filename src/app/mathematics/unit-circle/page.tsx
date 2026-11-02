@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -6,6 +7,7 @@ import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
 import { EmbedButton } from '@/components/ui/EmbedButton';
+import '@/components/simulation/unit-circle.css';
 import { UnitCircleCanvas } from '@/components/simulation/UnitCircleCanvas';
 import { UnitCircleGraph } from '@/components/simulation/UnitCircleGraph';
 import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
@@ -65,7 +67,7 @@ export default function UnitCirclePage() {
   const quadrant = quadrantOf(angleDeg);
   const signs = QUADRANT_SIGNS[quadrant];
 
-  const displayValue = unit === 'deg' ? angleDeg.toFixed(2) : rad2deg(angleDeg) === 0 ? '0' : (rad).toFixed(3);
+  const displayValue = unit === 'deg' ? angleDeg.toFixed(2) : rad.toFixed(3);
   const sliderMax = unit === 'deg' ? 360 : Math.PI * 2;
   const sliderValue = unit === 'deg' ? angleDeg : rad;
   const handleSliderChange = (v: number) => {
@@ -99,14 +101,14 @@ export default function UnitCirclePage() {
         </section>
 
         <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
 
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
+            <SimulationStage className="af-unit-circle-stage space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
                 <UnitCircleCanvas angleDeg={angleDeg} onAngleChange={setAngleDeg} width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="playback" className="flex flex-wrap items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <SimulationControls
                   isRunning={animating} isPaused={false}
                   onRun={toggleAnimate}
@@ -126,21 +128,21 @@ export default function UnitCirclePage() {
                 <EmbedButton path="/embed/unit-circle" params={{ angleDeg }} title="Unit Circle Explorer" />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="parameters" className="af-unit-angle rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-gray-500 shrink-0 w-14">θ ({unit === 'deg' ? '°' : 'rad'})</span>
-                  <input type="range" min={0} max={sliderMax} step={sliderMax / 720} value={sliderValue}
+                  <input aria-label={`Angle in ${unit === 'deg' ? 'degrees' : 'radians'}`} type="range" min={0} max={sliderMax} step={sliderMax / 720} value={sliderValue}
                     onChange={e => handleSliderChange(Number(e.target.value))}
                     className="flex-1" style={{ accentColor: '#6366f1' }} />
-                  <span className="text-xs font-mono text-gray-500 w-16 text-right">{displayValue}{unit === 'deg' ? '°' : ''}</span>
+                  <output className="af-unit-angle-output text-xs font-mono text-gray-700 text-right">{displayValue}{unit === 'deg' ? '°' : ' rad'}</output>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div data-stage-role="extra" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">sin θ and cos θ vs angle</p>
                 <UnitCircleGraph angleDeg={angleDeg} />
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">

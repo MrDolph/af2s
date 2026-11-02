@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/layout/AppHeader';
@@ -85,8 +86,8 @@ export default function OrganicPage() {
           <h1 className="mt-1 text-xl font-semibold text-gray-900 sm:text-2xl">Organic molecules</h1>
           <p className="mb-4 mt-1 text-sm text-gray-500">Draw atoms and bonds, or load a molecule. Hydrogens fill in automatically from valence. The tool reads the structure you drew — it tells you what the <span className="font-medium text-gray-700">graph</span> contains, not whether the molecule is stable or easy to make.</p>
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-            <div className="min-w-0 space-y-5">
+          <SimulationStage className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+            <div data-stage-role="canvas" className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-4">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <div className="flex overflow-hidden rounded-lg border border-gray-200" role="group" aria-label="Drawing tool">
@@ -138,7 +139,7 @@ export default function OrganicPage() {
               <CandidatesPanel onLoad={onLoadCandidate} />
             </div>
 
-            <div className="min-w-0 space-y-5">
+            <div data-stage-role="parameters" className="min-w-0 space-y-5">
               <div className="rounded-2xl border border-gray-200 bg-white p-5">
                 <div className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Molecular formula</div>
                 <div className="text-3xl font-semibold text-gray-900" aria-live="polite">{formula}</div>
@@ -192,7 +193,7 @@ export default function OrganicPage() {
                 calculated={{ state: 'no', text: 'None. The 2D layout is only a drawing: no 3D geometry, energies, charges, pKa or spectra are calculated.' }}
               />
             </div>
-          </div>
+          </SimulationStage>
         </div>
       </main>
     </>

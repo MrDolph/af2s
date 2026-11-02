@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
@@ -141,14 +143,14 @@ export default function PhotoelectricPage() {
             <span className="text-xs text-gray-400 ml-2">f₀ = φ/h &nbsp;|&nbsp; eVs = KEmax</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <PhotoelectricCanvas f14={f14} intensity={intensity} phiEV={metal.phi} metalName={metal.name}
                   isRunning={isRunning} isPaused={isPaused} width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -157,7 +159,7 @@ export default function PhotoelectricPage() {
                   params={{ metal: metalIdx, f: f14, i: intensity }} />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div data-stage-role="extra" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">KEmax against frequency</p>
                 <KEGraph phiEV={metal.phi} f14={f14} />
                 <p className="text-[10px] text-gray-400 mt-2 text-center">
@@ -165,7 +167,7 @@ export default function PhotoelectricPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <div className="flex flex-wrap gap-1.5">
                   {METALS.map((m, i) => (
@@ -180,7 +182,7 @@ export default function PhotoelectricPage() {
                 <Slider label="Intensity" unit="" value={intensity} min={1} max={10} step={1} set={setIntensity} color="#f59e0b"
                   note="Changes how MANY electrons per second — never their energy" />
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

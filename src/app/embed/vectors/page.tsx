@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { Suspense, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { VectorCanvas } from '@/components/simulation/VectorCanvas';
@@ -37,20 +39,20 @@ function VectorsEmbedInner() {
   const ang = angleBetween(A, B);
 
   return (
-    <div className="mx-auto max-w-3xl p-3">
-      <div ref={boxRef} className="overflow-hidden rounded-xl border border-gray-200 p-1">
+    <SimulationStage className="mx-auto max-w-3xl p-3">
+      <div data-stage-role="canvas" ref={boxRef} className="overflow-hidden rounded-xl border border-gray-200 p-1">
         <VectorCanvas dim={dim} width={size.width} height={h} scene={scene} snap={1} view={view} onView={setView} dragAxis="floor" showPlanes showGrid onHandle={onHandle}
           ariaLabel="Vector diagram. Drag the coloured dots at the vector tips." />
       </div>
-      <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
+      <div data-stage-role="extra" className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
         {mode === 'components' && <>{stat('|A|', fmt(mag(A)))}{stat('A', compText(A, dim))}</>}
         {mode === 'add' && <>{stat('A + B', compText(add(A, B), dim))}{stat('|A + B|', fmt(mag(add(A, B))))}</>}
         {mode === 'scalar' && <>{stat(`${fmt(k)}A`, compText(scale(A, k), dim))}{stat(`|${fmt(k)}A|`, fmt(mag(scale(A, k))))}</>}
         {mode === 'dot' && <>{stat('A·B', fmt(dot(A, B)))}{stat('Angle', ang === null ? 'undefined' : `${fmt(ang, 1)}°`)}</>}
         {mode === 'cross' && <>{stat('A × B', compText(cross(A, B), '3d'))}{stat('|A × B|', fmt(mag(cross(A, B))))}</>}
       </div>
-      <p className="mt-1.5 text-[10px] text-gray-400">{dim === '3d' ? 'Drag empty space to rotate. ' : ''}Drag a coloured dot to change a vector. A-Factor STEM Studio</p>
-    </div>
+      <div data-stage-role="extra"><p className="mt-1.5 text-[10px] text-gray-400">{dim === '3d' ? 'Drag empty space to rotate. ' : ''}Drag a coloured dot to change a vector. A-Factor STEM Studio</p></div>
+    </SimulationStage>
   );
 }
 

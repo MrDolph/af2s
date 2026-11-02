@@ -1,0 +1,34 @@
+'use client';
+import { TopicPicker } from '@/components/explorer/TopicPicker';
+import { SpeechInput } from '@/components/accessibility/SpeechInput';
+
+import { useEffect, useRef, useState } from 'react';
+import type { AIPromptResponse } from '@/types/ai';
+import { getTopic, isLanguage, topics, type Language } from '@/lib/explorer/catalog';
+import { languageNames, ui } from '@/lib/explorer/locales';
+import type { ExplorerResult } from '@/lib/explorer/prepare';
+import { ResultCard } from '@/components/explorer/ResultCard';
+interface Props { onResult?:(result:AIPromptResponse)=>void; className?:string; }
+export function PromptBar({onResult,className}:Props) {
+ const [language,setLanguage]=useState<Language>('en'),[topicId,setTopicId]=useState(''),[prompt,setPrompt]=useState('');
+ const [numbers,setNumbers]=useState<Record<string,string>>({}),[modes,setModes]=useState<Record<string,string>>({});
+ const [result,setResult]=useState<ExplorerResult|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
+ const pending=useRef<AbortController|null>(null);const s=ui[language],topic=getTopic(topicId);
+ useEffect(()=>{const q=new URLSearchParams(window.location.search),id=q.get('topic'),lang=q.get('lang');if(id&&getTopic(id))setTopicId(id);try{const saved=lang||localStorage.getItem('afactor-simulation-language-v1');if(isLanguage(saved))setLanguage(saved);}catch{}return()=>pending.current?.abort();},[]);
+ function reset(){pending.current?.abort();pending.current=null;setBusy(false);setError('');setResult(null);}
+ function changeTopic(id:string){reset();setTopicId(id);setNumbers({});setModes({});}
+ function changeLanguage(value:Language){reset();setLanguage(value);try{localStorage.setItem('afactor-simulation-language-v1',value);}catch{}}
+ async function submit(text=prompt){if(busy||(!text.trim()&&!topicId))return;const controller=new AbortController();pending.current=controller;setBusy(true);setError('');setResult(null);const timer=setTimeout(()=>controller.abort(),15000);
+ try {const params:Record<string,number>={};for(const [k,v] of Object.entries(numbers))if(v.trim())params[k]=Number(v);const r=await fetch('/api/ai',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify({prompt:text,topicId:topicId||undefined,language,params,modes})});const data=await r.json();if(!r.ok)throw Error(data.error||s.error);if(pending.current!==controller)return;setResult(data);
+ // Preserve the homepage's existing projectile preview for the compatible standard case.
+ if(onResult&&window.location.pathname==='/'&&data.topicId==='simulations-projectile-motion'&&data.modes.mode==='standard'&&data.params.h0===0)onResult({simulationType:'projectile_motion',title:data.title,description:data.explanation,explanation:data.explanation,params:{initialVelocity:data.params.v0,angle:data.params.angle,gravity:data.params.g,mass:1},suggestedFollowUps:[]});
+ }catch(e){if(pending.current===controller)setError(e instanceof Error?e.message:s.error);}finally{clearTimeout(timer);if(pending.current===controller){pending.current=null;setBusy(false);}}}
+ const sample=topic?`${topic.title}${topic.parameters.length?' '+topic.parameters[0].key+'='+topic.parameters[0].default:''}`:'';
+ return <div className={`af-explorer min-w-0 max-w-full ${className || ''}`} style={{colorScheme:'light'}}><div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px]">
+  <TopicPicker value={topicId} onChange={changeTopic} label={s.topic} automatic={s.automatic}/>
+  <label className="min-w-0 text-xs font-semibold text-gray-800">{s.language}<select value={language} onChange={e=>changeLanguage(e.target.value as Language)} className="mt-1 min-h-11 min-w-0 max-w-full w-full rounded-xl border border-gray-300 bg-white p-3 text-sm text-gray-900">{Object.entries(languageNames).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label>
+ </div><p className="my-3 text-xs leading-6 text-emerald-900">{s.free}</p><SpeechInput language={language} onTranscript={text=>setPrompt(current=>(current+' '+text).trim().slice(0,1200))}/><form onSubmit={e=>{e.preventDefault();void submit();}} className="flex flex-col gap-2 sm:flex-row"><label className="sr-only" htmlFor="all-topic-prompt">{s.prompt}</label><input id="all-topic-prompt" value={prompt} maxLength={1200} onChange={e=>setPrompt(e.target.value)} placeholder={s.prompt} className="min-h-11 min-w-0 flex-1 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-600" /><button disabled={busy||(!prompt.trim()&&!topicId)} className="min-h-11 rounded-xl bg-indigo-700 px-5 py-3 text-sm font-semibold text-white disabled:opacity-50">{busy?'…':s.apply}</button></form>
+ {topic&&<details className="mt-3 rounded-xl border border-gray-200 bg-white p-4"><summary className="min-h-11 cursor-pointer py-2 text-sm font-medium text-gray-800">{s.settings} · {topic.parameters.length}</summary><p className="my-3 text-xs leading-6 text-gray-700">{s.omitted} {s.manual}</p><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{topic.modes.map(m=><label key={m.key} className="min-w-0 text-xs text-gray-800">{s.modes}: {m.key}<select value={modes[m.key]||m.default} onChange={e=>{setResult(null);setModes(old=>({...old,[m.key]:e.target.value}));}} className="mt-1 min-h-11 min-w-0 max-w-full w-full rounded-lg border border-gray-300 bg-white p-2">{m.options.map(v=><option key={v}>{v}</option>)}</select></label>)}{topic.parameters.map(p=><label key={p.key} className="min-w-0 text-xs text-gray-800">{p.label} <code>({p.key})</code><input type="number" step="any" min={p.min} max={p.max} value={numbers[p.key]??''} placeholder={String(p.default)} onChange={e=>{setResult(null);setNumbers(old=>({...old,[p.key]:e.target.value}));}} className="mt-1 min-h-11 min-w-0 max-w-full w-full rounded-lg border border-gray-300 bg-white p-2 text-gray-900" /><span className="mt-1 block text-gray-600">{p.min}–{p.max} {p.unit}</span></label>)}</div></details>}
+ <div className="mt-3 flex flex-wrap gap-2">{(topic?[sample]:['Ohm 12 V 6 ohm',"Newton second law 10 kg 50 N friction2=0",'Waves f=1 lambda=2','Projectile 30 m/s 45°']).map(text=><button key={text} onClick={()=>{setPrompt(text);void submit(text);}} disabled={busy} className="min-h-11 max-w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-left text-xs leading-5 text-gray-800">{text}</button>)}</div>
+ {error&&<p role="alert" className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-900">{error}</p>}{result&&<ResultCard result={result}/>}<p className="mt-4 text-xs leading-6 text-gray-600">{s.notes}</p></div>;
+}

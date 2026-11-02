@@ -1,4 +1,5 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState } from 'react';
@@ -49,19 +50,19 @@ export default function FourierTransformPage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] xl:grid-cols-[1fr_260px_300px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <FourierTransformGraph pair={pair} a={a} />
               </div>
-              <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="parameters" className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <span className="text-xs text-gray-500 shrink-0">Width a</span>
                 <input type="range" min={0.2} max={3} step={0.01} value={a}
                   onChange={e => setA(Number(e.target.value))} className="flex-1" style={{ accentColor: '#2563eb' }} />
                 <span className="text-xs font-mono text-gray-500 w-14 text-right">{a.toFixed(2)}</span>
               </div>
-              <p className="text-[11px] font-mono text-gray-400 px-1">{pair.formula}</p>
-            </div>
+              <div data-stage-role="extra"><p className="text-[11px] font-mono text-gray-400 px-1">{pair.formula}</p></div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">

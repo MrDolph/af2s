@@ -1,4 +1,6 @@
 'use client';
+import { SimulationStage } from '@/components/simulation/SimulationStage';
+
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -126,15 +128,15 @@ export default function RadioactiveDecayPage() {
             <span className="text-xs text-gray-400 ml-2">λ = ln2/T½ &nbsp;|&nbsp; A = λN</span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] xl:grid-cols-[1fr_220px_260px] gap-4">
-            <div className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+            <SimulationStage className="space-y-3 min-w-0">
+              <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <DecayCanvas n0={n0} halfLife={halfLife} resetKey={resetKey}
                   isRunning={isRunning} isPaused={isPaused}
                   onTick={handleTick} width={canvasSize.width} height={canvasSize.height} />
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
@@ -143,7 +145,7 @@ export default function RadioactiveDecayPage() {
                   params={{ n0, hl: halfLife }} />
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div data-stage-role="extra" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">Decay curve N–t</p>
                 <DecayGraph n0={n0} halfLife={halfLife} currentT={live.t} currentN={live.n} />
                 <p className="text-[10px] text-gray-400 mt-2 text-center">
@@ -151,13 +153,13 @@ export default function RadioactiveDecayPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
+              <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <Slider label="Initial nuclei N₀" unit="" value={n0} min={50} max={900} step={50} set={setN0} color="#6366f1"
                   note="Larger samples follow the theory curve more closely" />
                 <Slider label="Half-life T½" unit="s" value={halfLife} min={1} max={20} step={0.5} set={setHalfLife} color="#f59e0b" />
               </div>
-            </div>
+            </SimulationStage>
 
             <div className="space-y-3">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
