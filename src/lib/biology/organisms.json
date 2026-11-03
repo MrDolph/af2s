@@ -1,0 +1,1813 @@
+[
+  {
+    "id": "homo-sapiens",
+    "common": "Human",
+    "name": "Homo sapiens",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Primates",
+      "Hominidae",
+      "Homo",
+      "Homo sapiens"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2436436",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "felis-catus",
+    "common": "Domestic cat",
+    "name": "Felis catus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Carnivora",
+      "Felidae",
+      "Felis",
+      "Felis catus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2435035",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "capra-hircus",
+    "common": "Goat",
+    "name": "Capra hircus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Artiodactyla",
+      "Bovidae",
+      "Capra",
+      "Capra hircus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2441056",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "bos-taurus",
+    "common": "Cattle",
+    "name": "Bos taurus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Artiodactyla",
+      "Bovidae",
+      "Bos",
+      "Bos taurus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2441022",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "ovis-aries",
+    "common": "Sheep",
+    "name": "Ovis aries",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Artiodactyla",
+      "Bovidae",
+      "Ovis",
+      "Ovis aries"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2441110",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "oryctolagus-cuniculus",
+    "common": "Rabbit",
+    "name": "Oryctolagus cuniculus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Lagomorpha",
+      "Leporidae",
+      "Oryctolagus",
+      "Oryctolagus cuniculus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2436940",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "rattus-norvegicus",
+    "common": "Brown rat",
+    "name": "Rattus norvegicus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Rodentia",
+      "Muridae",
+      "Rattus",
+      "Rattus norvegicus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2439261",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "mus-musculus",
+    "common": "House mouse",
+    "name": "Mus musculus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Rodentia",
+      "Muridae",
+      "Mus",
+      "Mus musculus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/7429082",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "panthera-leo",
+    "common": "Lion",
+    "name": "Panthera leo",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Carnivora",
+      "Felidae",
+      "Panthera",
+      "Panthera leo"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/5219404",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "pan-troglodytes",
+    "common": "Chimpanzee",
+    "name": "Pan troglodytes",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Primates",
+      "Hominidae",
+      "Pan",
+      "Pan troglodytes"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/5219534",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "eidolon-helvum",
+    "common": "Straw-coloured fruit bat",
+    "name": "Eidolon helvum",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Mammalia",
+      "Chiroptera",
+      "Pteropodidae",
+      "Eidolon",
+      "Eidolon helvum"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2432851",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "gallus-gallus",
+    "common": "Chicken (red junglefowl species)",
+    "name": "Gallus gallus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Aves",
+      "Galliformes",
+      "Phasianidae",
+      "Gallus",
+      "Gallus gallus"
+    ],
+    "aliases": [],
+    "note": "The species includes red junglefowl; domestic chicken is commonly treated at subspecies level. This table intentionally stops at species.",
+    "source": "https://www.gbif.org/species/9326020",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "columba-livia",
+    "common": "Pigeon",
+    "name": "Columba livia",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Aves",
+      "Columbiformes",
+      "Columbidae",
+      "Columba",
+      "Columba livia"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2495414",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "anas-platyrhynchos",
+    "common": "Mallard duck",
+    "name": "Anas platyrhynchos",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Aves",
+      "Anseriformes",
+      "Anatidae",
+      "Anas",
+      "Anas platyrhynchos"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/9761484",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "struthio-camelus",
+    "common": "Ostrich",
+    "name": "Struthio camelus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Aves",
+      "Struthioniformes",
+      "Struthionidae",
+      "Struthio",
+      "Struthio camelus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2495150",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "crocodylus-niloticus",
+    "common": "Nile crocodile",
+    "name": "Crocodylus niloticus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Crocodylia",
+      null,
+      "Crocodylidae",
+      "Crocodylus",
+      "Crocodylus niloticus"
+    ],
+    "aliases": [],
+    "note": "Many school texts use class Reptilia and order Crocodylia. This GBIF snapshot assigns Crocodylia at class rank and leaves order unassigned; the source profile is shown explicitly.",
+    "source": "https://www.gbif.org/species/2441341",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "python-sebae",
+    "common": "African rock python",
+    "name": "Python sebae",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Squamata",
+      null,
+      "Pythonidae",
+      "Python",
+      "Python sebae"
+    ],
+    "aliases": [],
+    "note": "School texts usually use class Reptilia and order Squamata. This GBIF snapshot assigns Squamata at class rank and leaves order unassigned.",
+    "source": "https://www.gbif.org/species/2465346",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "agama-agama",
+    "common": "Common agama",
+    "name": "Agama agama",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Squamata",
+      null,
+      "Agamidae",
+      "Agama",
+      "Agama agama"
+    ],
+    "aliases": [],
+    "note": "School texts usually use class Reptilia and order Squamata. This GBIF snapshot assigns Squamata at class rank and leaves order unassigned.",
+    "source": "https://www.gbif.org/species/5226308",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "rana-temporaria",
+    "common": "Common frog",
+    "name": "Rana temporaria",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Amphibia",
+      "Anura",
+      "Ranidae",
+      "Rana",
+      "Rana temporaria"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2426805",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "sclerophrys-regularis",
+    "common": "African common toad",
+    "name": "Sclerophrys regularis",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      "Amphibia",
+      "Anura",
+      "Bufonidae",
+      "Sclerophrys",
+      "Sclerophrys regularis"
+    ],
+    "aliases": [
+      "Bufo regularis",
+      "Amietophrynus regularis"
+    ],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/10698146",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "oreochromis-niloticus",
+    "common": "Nile tilapia",
+    "name": "Oreochromis niloticus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      null,
+      "Perciformes",
+      "Cichlidae",
+      "Oreochromis",
+      "Oreochromis niloticus"
+    ],
+    "aliases": [],
+    "note": "A bony fish often taught under Pisces or Actinopterygii. GBIF leaves class unassigned here and uses order Perciformes; other modern references use Cichliformes.",
+    "source": "https://www.gbif.org/species/4285694",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "clarias-gariepinus",
+    "common": "African sharptooth catfish",
+    "name": "Clarias gariepinus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Chordata",
+      null,
+      "Siluriformes",
+      "Clariidae",
+      "Clarias",
+      "Clarias gariepinus"
+    ],
+    "aliases": [],
+    "note": "A bony fish, often taught under Pisces or Actinopterygii. Class is unassigned in this snapshot. The order Siluriformes groups catfishes.",
+    "source": "https://www.gbif.org/species/5202793",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "lumbricus-terrestris",
+    "common": "Earthworm",
+    "name": "Lumbricus terrestris",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Annelida",
+      "Clitellata",
+      "Crassiclitellata",
+      "Lumbricidae",
+      "Lumbricus",
+      "Lumbricus terrestris"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/4410657",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "achatina-achatina",
+    "common": "Giant African tiger snail",
+    "name": "Achatina achatina",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Mollusca",
+      "Gastropoda",
+      "Stylommatophora",
+      "Achatinidae",
+      "Achatina",
+      "Achatina achatina"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/8305409",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "periplaneta-americana",
+    "common": "American cockroach",
+    "name": "Periplaneta americana",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Insecta",
+      "Blattodea",
+      "Blattidae",
+      "Periplaneta",
+      "Periplaneta americana"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2000152",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "locusta-migratoria",
+    "common": "Migratory locust",
+    "name": "Locusta migratoria",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Insecta",
+      "Orthoptera",
+      "Acrididae",
+      "Locusta",
+      "Locusta migratoria"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/1713418",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "musca-domestica",
+    "common": "Housefly",
+    "name": "Musca domestica",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Insecta",
+      "Diptera",
+      "Muscidae",
+      "Musca",
+      "Musca domestica"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/1524843",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "anopheles-gambiae",
+    "common": "African malaria mosquito",
+    "name": "Anopheles gambiae",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Insecta",
+      "Diptera",
+      "Culicidae",
+      "Anopheles",
+      "Anopheles gambiae"
+    ],
+    "aliases": [],
+    "note": "One member of the Anopheles gambiae species complex. A species-complex name does not make all mosquitoes the same species.",
+    "source": "https://www.gbif.org/species/1650518",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "apis-mellifera",
+    "common": "Western honeybee",
+    "name": "Apis mellifera",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Insecta",
+      "Hymenoptera",
+      "Apidae",
+      "Apis",
+      "Apis mellifera"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/1341976",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "danaus-plexippus",
+    "common": "Monarch butterfly",
+    "name": "Danaus plexippus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Insecta",
+      "Lepidoptera",
+      "Nymphalidae",
+      "Danaus",
+      "Danaus plexippus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/5133088",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "macrotermes-bellicosus",
+    "common": "Mound-building termite",
+    "name": "Macrotermes bellicosus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Insecta",
+      "Blattodea",
+      "Termitidae",
+      "Macrotermes",
+      "Macrotermes bellicosus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/9656725",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "araneus-diadematus",
+    "common": "Garden orb-weaver spider",
+    "name": "Araneus diadematus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Arachnida",
+      "Araneae",
+      "Araneidae",
+      "Araneus",
+      "Araneus diadematus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2160133",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "pandinus-imperator",
+    "common": "Emperor scorpion",
+    "name": "Pandinus imperator",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Arachnida",
+      "Scorpiones",
+      "Scorpionidae",
+      "Pandinus",
+      "Pandinus imperator"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/6894611",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "procambarus-clarkii",
+    "common": "Red swamp crayfish",
+    "name": "Procambarus clarkii",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Malacostraca",
+      "Decapoda",
+      "Cambaridae",
+      "Procambarus",
+      "Procambarus clarkii"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2227300",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "macrobrachium-rosenbergii",
+    "common": "Giant freshwater prawn",
+    "name": "Macrobrachium rosenbergii",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Malacostraca",
+      "Decapoda",
+      "Palaemonidae",
+      "Macrobrachium",
+      "Macrobrachium rosenbergii"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2224546",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "callinectes-sapidus",
+    "common": "Blue crab",
+    "name": "Callinectes sapidus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Arthropoda",
+      "Malacostraca",
+      "Decapoda",
+      "Portunidae",
+      "Callinectes",
+      "Callinectes sapidus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2225646",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "octopus-vulgaris",
+    "common": "Common octopus",
+    "name": "Octopus vulgaris",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Mollusca",
+      "Cephalopoda",
+      "Octopoda",
+      "Octopodidae",
+      "Octopus",
+      "Octopus vulgaris"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2289671",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "asterias-rubens",
+    "common": "Common starfish",
+    "name": "Asterias rubens",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Echinodermata",
+      "Asteroidea",
+      "Forcipulatida",
+      "Asteriidae",
+      "Asterias",
+      "Asterias rubens"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/7765831",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "paracentrotus-lividus",
+    "common": "Purple sea urchin",
+    "name": "Paracentrotus lividus",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Echinodermata",
+      "Echinoidea",
+      "Camarodonta",
+      "Parechinidae",
+      "Paracentrotus",
+      "Paracentrotus lividus"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2278845",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "hydra-vulgaris",
+    "common": "Freshwater hydra",
+    "name": "Hydra vulgaris",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Cnidaria",
+      "Hydrozoa",
+      "Anthoathecata",
+      "Hydridae",
+      "Hydra",
+      "Hydra vulgaris"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/5185782",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "obelia-geniculata",
+    "common": "Obelia hydroid",
+    "name": "Obelia geniculata",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Cnidaria",
+      "Hydrozoa",
+      "Leptothecata",
+      "Campanulariidae",
+      "Obelia",
+      "Obelia geniculata"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/2268160",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "spongia-officinalis",
+    "common": "Bath sponge",
+    "name": "Spongia officinalis",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Porifera",
+      "Demospongiae",
+      "Dictyoceratida",
+      "Spongiidae",
+      "Spongia",
+      "Spongia officinalis"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/8234398",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "girardia-tigrina",
+    "common": "Brown planarian",
+    "name": "Girardia tigrina",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Platyhelminthes",
+      null,
+      "Tricladida",
+      "Dugesiidae",
+      "Girardia",
+      "Girardia tigrina"
+    ],
+    "aliases": [
+      "Dugesia tigrina"
+    ],
+    "note": "Often called Dugesia tigrina in older school resources. Traditional Turbellaria is not a natural evolutionary group; class is unassigned in this snapshot.",
+    "source": "https://www.gbif.org/species/5892120",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "taenia-solium",
+    "common": "Pork tapeworm",
+    "name": "Taenia solium",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Platyhelminthes",
+      "Cestoda",
+      "Cyclophyllidea",
+      "Taeniidae",
+      "Taenia",
+      "Taenia solium"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/6101576",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "ascaris-lumbricoides",
+    "common": "Giant intestinal roundworm",
+    "name": "Ascaris lumbricoides",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Nematoda",
+      "Chromadorea",
+      "Rhabditida",
+      "Ascarididae",
+      "Ascaris",
+      "Ascaris lumbricoides"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/4558786",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "schistosoma-mansoni",
+    "common": "Blood fluke",
+    "name": "Schistosoma mansoni",
+    "group": "Animals",
+    "ranks": [
+      "Eukarya",
+      "Animalia",
+      "Platyhelminthes",
+      "Trematoda",
+      "Diplostomida",
+      "Schistosomatidae",
+      "Schistosoma",
+      "Schistosoma mansoni"
+    ],
+    "aliases": [],
+    "note": "A named animal species example. Compare common names with scientific names: a broad name such as snail, spider or frog can refer to many species.",
+    "source": "https://www.gbif.org/species/5967489",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "zea-mays",
+    "common": "Maize",
+    "name": "Zea mays",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Poales",
+      "Poaceae",
+      "Zea",
+      "Zea mays"
+    ],
+    "aliases": [],
+    "note": "Maize is a flowering monocot. Compare with rice for shared family Poaceae; traditional plant division names can differ from Tracheophyta.",
+    "source": "https://www.gbif.org/species/5290052",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "oryza-sativa",
+    "common": "Rice",
+    "name": "Oryza sativa",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Poales",
+      "Poaceae",
+      "Oryza",
+      "Oryza sativa"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2703459",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "triticum-aestivum",
+    "common": "Bread wheat",
+    "name": "Triticum aestivum",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Poales",
+      "Poaceae",
+      "Triticum",
+      "Triticum aestivum"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/7795888",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "sorghum-bicolor",
+    "common": "Sorghum",
+    "name": "Sorghum bicolor",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Poales",
+      "Poaceae",
+      "Sorghum",
+      "Sorghum bicolor"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2705181",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "saccharum-officinarum",
+    "common": "Sugarcane",
+    "name": "Saccharum officinarum",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Poales",
+      "Poaceae",
+      "Saccharum",
+      "Saccharum officinarum"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2703912",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "allium-cepa",
+    "common": "Onion",
+    "name": "Allium cepa",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Asparagales",
+      "Amaryllidaceae",
+      "Allium",
+      "Allium cepa"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2857697",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "cocos-nucifera",
+    "common": "Coconut",
+    "name": "Cocos nucifera",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Arecales",
+      "Arecaceae",
+      "Cocos",
+      "Cocos nucifera"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2735117",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "elaeis-guineensis",
+    "common": "Oil palm",
+    "name": "Elaeis guineensis",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Arecales",
+      "Arecaceae",
+      "Elaeis",
+      "Elaeis guineensis"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2731882",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "vigna-unguiculata",
+    "common": "Cowpea",
+    "name": "Vigna unguiculata",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Fabales",
+      "Fabaceae",
+      "Vigna",
+      "Vigna unguiculata"
+    ],
+    "aliases": [],
+    "note": "Cowpea is a legume commonly grown in West Africa. Compare family Fabaceae with groundnut, common bean and soybean.",
+    "source": "https://www.gbif.org/species/2982583",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "arachis-hypogaea",
+    "common": "Groundnut",
+    "name": "Arachis hypogaea",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Fabales",
+      "Fabaceae",
+      "Arachis",
+      "Arachis hypogaea"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/5353770",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "phaseolus-vulgaris",
+    "common": "Common bean",
+    "name": "Phaseolus vulgaris",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Fabales",
+      "Fabaceae",
+      "Phaseolus",
+      "Phaseolus vulgaris"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/5350452",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "glycine-max",
+    "common": "Soybean",
+    "name": "Glycine max",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Fabales",
+      "Fabaceae",
+      "Glycine",
+      "Glycine max"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/5359660",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "manihot-esculenta",
+    "common": "Cassava",
+    "name": "Manihot esculenta",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Malpighiales",
+      "Euphorbiaceae",
+      "Manihot",
+      "Manihot esculenta"
+    ],
+    "aliases": [],
+    "note": "Cassava is a major Nigerian food crop. Compare with cowpea: both are flowering plants but belong to different families.",
+    "source": "https://www.gbif.org/species/3060998",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "dioscorea-rotundata",
+    "common": "White yam",
+    "name": "Dioscorea cayenensis",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Liliopsida",
+      "Dioscoreales",
+      "Dioscoreaceae",
+      "Dioscorea",
+      "Dioscorea cayenensis"
+    ],
+    "aliases": [
+      "Dioscorea rotundata"
+    ],
+    "note": "White yam is commonly taught as Dioscorea rotundata. GBIF treats that name as a synonym of Dioscorea cayenensis subsp. rotundata. The species row therefore shows Dioscorea cayenensis; the linked record is the subspecies. Other references distinguish the taxa.",
+    "source": "https://www.gbif.org/species/2755104",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "solanum-lycopersicum",
+    "common": "Tomato",
+    "name": "Solanum lycopersicum",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Solanales",
+      "Solanaceae",
+      "Solanum",
+      "Solanum lycopersicum"
+    ],
+    "aliases": [
+      "Lycopersicon esculentum"
+    ],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2930137",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "solanum-tuberosum",
+    "common": "Potato",
+    "name": "Solanum tuberosum",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Solanales",
+      "Solanaceae",
+      "Solanum",
+      "Solanum tuberosum"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2930262",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "abelmoschus-esculentus",
+    "common": "Okra",
+    "name": "Abelmoschus esculentus",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Malvales",
+      "Malvaceae",
+      "Abelmoschus",
+      "Abelmoschus esculentus"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/3152707",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "hibiscus-rosa-sinensis",
+    "common": "Hibiscus",
+    "name": "Hibiscus rosa-sinensis",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Malvales",
+      "Malvaceae",
+      "Hibiscus",
+      "Hibiscus rosa-sinensis"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/3152559",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "mangifera-indica",
+    "common": "Mango",
+    "name": "Mangifera indica",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Sapindales",
+      "Anacardiaceae",
+      "Mangifera",
+      "Mangifera indica"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/3190638",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "carica-papaya",
+    "common": "Papaya",
+    "name": "Carica papaya",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Brassicales",
+      "Caricaceae",
+      "Carica",
+      "Carica papaya"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/2874484",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "theobroma-cacao",
+    "common": "Cacao",
+    "name": "Theobroma cacao",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Malvales",
+      "Malvaceae",
+      "Theobroma",
+      "Theobroma cacao"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/3152205",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "helianthus-annuus",
+    "common": "Sunflower",
+    "name": "Helianthus annuus",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Magnoliopsida",
+      "Asterales",
+      "Asteraceae",
+      "Helianthus",
+      "Helianthus annuus"
+    ],
+    "aliases": [],
+    "note": "A named plant species example. Plant phylum is often called division in school texts; monocot/dicot groupings and source class ranks may differ.",
+    "source": "https://www.gbif.org/species/9206251",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "pinus-sylvestris",
+    "common": "Scots pine",
+    "name": "Pinus sylvestris",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Pinopsida",
+      "Pinales",
+      "Pinaceae",
+      "Pinus",
+      "Pinus sylvestris"
+    ],
+    "aliases": [],
+    "note": "A gymnosperm example with seeds borne in cones; it is not a flowering plant.",
+    "source": "https://www.gbif.org/species/5285637",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "polytrichum-commune",
+    "common": "Common haircap moss",
+    "name": "Polytrichum commune",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Bryophyta",
+      "Polytrichopsida",
+      "Polytrichales",
+      "Polytrichaceae",
+      "Polytrichum",
+      "Polytrichum commune"
+    ],
+    "aliases": [],
+    "note": "A moss example. Bryophytes differ from vascular plants; do not place all green land plants in flowering-plant groups.",
+    "source": "https://www.gbif.org/species/2683084",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "dryopteris-filix-mas",
+    "common": "Male fern",
+    "name": "Dryopteris filix-mas",
+    "group": "Plants",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Tracheophyta",
+      "Polypodiopsida",
+      "Polypodiales",
+      "Dryopteridaceae",
+      "Dryopteris",
+      "Dryopteris filix-mas"
+    ],
+    "aliases": [],
+    "note": "A fern example: a vascular plant that reproduces by spores, rather than flowers and seeds.",
+    "source": "https://www.gbif.org/species/5275132",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "saccharomyces-cerevisiae",
+    "common": "Baker’s yeast",
+    "name": "Saccharomyces cerevisiae",
+    "group": "Fungi",
+    "ranks": [
+      "Eukarya",
+      "Fungi",
+      "Ascomycota",
+      "Saccharomycetes",
+      "Saccharomycetales",
+      "Saccharomycetaceae",
+      "Saccharomyces",
+      "Saccharomyces cerevisiae"
+    ],
+    "aliases": [],
+    "note": "A unicellular fungus used in baking and fermentation. Unicellular does not mean bacterial.",
+    "source": "https://www.gbif.org/species/7440012",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "agaricus-bisporus",
+    "common": "Button mushroom",
+    "name": "Agaricus bisporus",
+    "group": "Fungi",
+    "ranks": [
+      "Eukarya",
+      "Fungi",
+      "Basidiomycota",
+      "Agaricomycetes",
+      "Agaricales",
+      "Agaricaceae",
+      "Agaricus",
+      "Agaricus bisporus"
+    ],
+    "aliases": [],
+    "note": "A named fungus example. Fungal phylum and class names differ between older school schemes and newer reference hierarchies.",
+    "source": "https://www.gbif.org/species/5243447",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "rhizopus-stolonifer",
+    "common": "Black bread mould",
+    "name": "Rhizopus stolonifer",
+    "group": "Fungi",
+    "ranks": [
+      "Eukarya",
+      "Fungi",
+      "Mucoromycota",
+      "Mucoromycetes",
+      "Mucorales",
+      "Rhizopodaceae",
+      "Rhizopus",
+      "Rhizopus stolonifer"
+    ],
+    "aliases": [
+      "Rhizopus nigricans"
+    ],
+    "note": "An example of bread mould. Older texts use Zygomycota/Zygomycetes; this reference uses a different ranked fungal classification.",
+    "source": "https://www.gbif.org/species/2558944",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "aspergillus-niger",
+    "common": "Black Aspergillus mould",
+    "name": "Aspergillus niger",
+    "group": "Fungi",
+    "ranks": [
+      "Eukarya",
+      "Fungi",
+      "Ascomycota",
+      "Eurotiomycetes",
+      "Eurotiales",
+      "Aspergillaceae",
+      "Aspergillus",
+      "Aspergillus niger"
+    ],
+    "aliases": [],
+    "note": "A named fungus example. Fungal phylum and class names differ between older school schemes and newer reference hierarchies.",
+    "source": "https://www.gbif.org/species/3465658",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "penicillium-chrysogenum",
+    "common": "Penicillium mould",
+    "name": "Penicillium chrysogenum",
+    "group": "Fungi",
+    "ranks": [
+      "Eukarya",
+      "Fungi",
+      "Ascomycota",
+      "Eurotiomycetes",
+      "Eurotiales",
+      "Aspergillaceae",
+      "Penicillium",
+      "Penicillium chrysogenum"
+    ],
+    "aliases": [],
+    "note": "A named mould example; some famous penicillin-producing strains formerly called P. chrysogenum are now identified as P. rubens.",
+    "source": "https://www.gbif.org/species/3466349",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "ustilago-maydis",
+    "common": "Corn smut",
+    "name": "Ustilago maydis",
+    "group": "Fungi",
+    "ranks": [
+      "Eukarya",
+      "Fungi",
+      "Basidiomycota",
+      "Ustilaginomycetes",
+      "Ustilaginales",
+      "Ustilaginaceae",
+      "Ustilago",
+      "Ustilago maydis"
+    ],
+    "aliases": [],
+    "note": "A named fungus example. Fungal phylum and class names differ between older school schemes and newer reference hierarchies.",
+    "source": "https://www.gbif.org/species/8092646",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "amoeba-proteus",
+    "common": "Amoeba",
+    "name": "Amoeba proteus",
+    "group": "Protists and algae",
+    "ranks": [
+      "Eukarya",
+      "Protozoa",
+      "Amoebozoa",
+      "Lobosa",
+      "Amoebida",
+      "Amoebidae",
+      "Amoeba",
+      "Amoeba proteus"
+    ],
+    "aliases": [],
+    "note": "Often taught in Protista with older group names such as Rhizopoda. Here the source uses kingdom Protozoa, phylum Amoebozoa and class Lobosa.",
+    "source": "https://www.gbif.org/species/5425264",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "paramecium-caudatum",
+    "common": "Paramecium",
+    "name": "Paramecium caudatum",
+    "group": "Protists and algae",
+    "ranks": [
+      "Eukarya",
+      "Chromista",
+      "Ciliophora",
+      "Oligohymenophorea",
+      "Peniculida",
+      "Parameciidae",
+      "Paramecium",
+      "Paramecium caudatum"
+    ],
+    "aliases": [],
+    "note": "A ciliate often placed in school kingdom Protista. This reference places it in Chromista. The teaching group filter is not a kingdom label.",
+    "source": "https://www.gbif.org/species/8122199",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "euglena-gracilis",
+    "common": "Euglena",
+    "name": "Euglena gracilis",
+    "group": "Protists and algae",
+    "ranks": [
+      "Eukarya",
+      "Protozoa",
+      "Euglenozoa",
+      "Euglenoidea",
+      "Euglenida",
+      "Euglenaceae",
+      "Euglena",
+      "Euglena gracilis"
+    ],
+    "aliases": [],
+    "note": "Frequently taught as Protista, with older phylum names such as Euglenophyta. The GBIF profile uses Protozoa and Euglenozoa; systems vary.",
+    "source": "https://www.gbif.org/species/7465722",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "plasmodium-falciparum",
+    "common": "Malaria parasite",
+    "name": "Plasmodium falciparum",
+    "group": "Protists and algae",
+    "ranks": [
+      "Eukarya",
+      "Chromista",
+      "Myzozoa",
+      "Aconoidasida",
+      "Haemospororida",
+      "Plasmodiidae",
+      "Plasmodium",
+      "Plasmodium falciparum"
+    ],
+    "aliases": [],
+    "note": "One malaria parasite species; malaria is not caused by every protist. Often taught in Protista; source kingdom names may differ.",
+    "source": "https://www.gbif.org/species/10540993",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "trypanosoma-brucei",
+    "common": "Sleeping-sickness trypanosome",
+    "name": "Trypanosoma brucei",
+    "group": "Protists and algae",
+    "ranks": [
+      "Eukarya",
+      "Protozoa",
+      "Euglenozoa",
+      "Kinetoplastea",
+      "Trypanosomatida",
+      "Trypanosomatidae",
+      "Trypanosoma",
+      "Trypanosoma brucei"
+    ],
+    "aliases": [],
+    "note": "Includes lineages associated with African trypanosomiasis; not every member of the genus has the same host or disease role.",
+    "source": "https://www.gbif.org/species/7822322",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "chlamydomonas-reinhardtii",
+    "common": "Chlamydomonas green alga",
+    "name": "Chlamydomonas reinhardtii",
+    "group": "Protists and algae",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Chlorophyta",
+      "Chlorophyceae",
+      "Volvocales",
+      "Chlamydomonadaceae",
+      "Chlamydomonas",
+      "Chlamydomonas reinhardtii"
+    ],
+    "aliases": [],
+    "note": "A unicellular green alga; often grouped with protists in school courses. GBIF places it within Plantae. Protists and algae is a study filter, not a formal kingdom.",
+    "source": "https://www.gbif.org/species/5271221",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "volvox-carteri",
+    "common": "Volvox green alga",
+    "name": "Volvox carteri",
+    "group": "Protists and algae",
+    "ranks": [
+      "Eukarya",
+      "Plantae",
+      "Chlorophyta",
+      "Chlorophyceae",
+      "Volvocales",
+      "Volvocaceae",
+      "Volvox",
+      "Volvox carteri"
+    ],
+    "aliases": [],
+    "note": "A colonial green alga. School resources may group it with protists; this source places it in Plantae.",
+    "source": "https://www.gbif.org/species/2639377",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "escherichia-coli",
+    "common": "Gut bacterium E. coli",
+    "name": "Escherichia coli",
+    "group": "Bacteria and archaea",
+    "ranks": [
+      "Bacteria",
+      "Bacteria",
+      "Proteobacteria",
+      "Gammaproteobacteria",
+      "Enterobacterales",
+      "Enterobacteriaceae",
+      "Escherichia",
+      "Escherichia coli"
+    ],
+    "aliases": [],
+    "note": "Strains differ greatly; many occur in animal intestines, while some cause illness. Proteobacteria is an older widely used name for Pseudomonadota.",
+    "source": "https://www.gbif.org/species/11286021",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "bacillus-subtilis",
+    "common": "Hay bacillus",
+    "name": "Bacillus subtilis",
+    "group": "Bacteria and archaea",
+    "ranks": [
+      "Bacteria",
+      "Bacteria",
+      "Firmicutes",
+      "Bacilli",
+      "Bacillales",
+      "Bacillaceae",
+      "Bacillus",
+      "Bacillus subtilis"
+    ],
+    "aliases": [],
+    "note": "A commonly studied spore-forming bacterium. Firmicutes is an older widely used name for Bacillota.",
+    "source": "https://www.gbif.org/species/10826006",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "vibrio-cholerae",
+    "common": "Cholera bacterium",
+    "name": "Vibrio cholerae",
+    "group": "Bacteria and archaea",
+    "ranks": [
+      "Bacteria",
+      "Bacteria",
+      "Proteobacteria",
+      "Gammaproteobacteria",
+      "Enterobacterales",
+      "Vibrionaceae",
+      "Vibrio",
+      "Vibrio cholerae"
+    ],
+    "aliases": [],
+    "note": "Traditional school Monera combines prokaryotes. Modern domain systems separate Bacteria and Archaea; bacterial phylum names can vary between references.",
+    "source": "https://www.gbif.org/species/3222442",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "staphylococcus-aureus",
+    "common": "Staphylococcus",
+    "name": "Staphylococcus aureus",
+    "group": "Bacteria and archaea",
+    "ranks": [
+      "Bacteria",
+      "Bacteria",
+      "Firmicutes",
+      "Bacilli",
+      "Staphylococcales",
+      "Staphylococcaceae",
+      "Staphylococcus",
+      "Staphylococcus aureus"
+    ],
+    "aliases": [],
+    "note": "Traditional school Monera combines prokaryotes. Modern domain systems separate Bacteria and Archaea; bacterial phylum names can vary between references.",
+    "source": "https://www.gbif.org/species/3227657",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "rhizobium-leguminosarum",
+    "common": "Nitrogen-fixing Rhizobium",
+    "name": "Rhizobium leguminosarum",
+    "group": "Bacteria and archaea",
+    "ranks": [
+      "Bacteria",
+      "Bacteria",
+      "Proteobacteria",
+      "Alphaproteobacteria",
+      "Rhizobiales",
+      "Rhizobiaceae",
+      "Rhizobium",
+      "Rhizobium leguminosarum"
+    ],
+    "aliases": [],
+    "note": "Traditional school Monera combines prokaryotes. Modern domain systems separate Bacteria and Archaea; bacterial phylum names can vary between references.",
+    "source": "https://www.gbif.org/species/11046672",
+    "checked": "2026-11-03"
+  },
+  {
+    "id": "halobacterium-salinarum",
+    "common": "Salt-loving archaeon",
+    "name": "Halobacterium salinarum",
+    "group": "Bacteria and archaea",
+    "ranks": [
+      "Archaea",
+      "Archaea",
+      "Halobacteriota",
+      "Halobacteria",
+      "Halobacteriales",
+      "Halobacteriaceae",
+      "Halobacterium",
+      "Halobacterium salinarum"
+    ],
+    "aliases": [],
+    "note": "Despite the genus name, this is an archaeon, not a bacterium. Traditional Monera combines lineages separated by modern domains.",
+    "source": "https://www.gbif.org/species/7357253",
+    "checked": "2026-11-03"
+  }
+]

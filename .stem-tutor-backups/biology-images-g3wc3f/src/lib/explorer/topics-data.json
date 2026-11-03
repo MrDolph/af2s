@@ -1,0 +1,3502 @@
+[
+  {
+    "id": "simulations-ac-circuits",
+    "route": "/simulations/ac-circuits",
+    "subject": "Physics",
+    "title": "AC circuits",
+    "description": "Compare alternating voltage, current and the effects of resistance, inductance and capacitance.",
+    "principle": "V_rms = V_peak / √2 (sinusoidal voltage)",
+    "concept": "circuit",
+    "aliases": [
+      "ac circuits",
+      "ac circuits"
+    ],
+    "parameters": [
+      {
+        "key": "speedMultiplier",
+        "label": "Animation speed",
+        "unit": "×",
+        "min": 0.25,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "vPeak",
+        "label": "Peak voltage",
+        "unit": "V",
+        "min": 5,
+        "max": 50,
+        "default": 20
+      },
+      {
+        "key": "frequency",
+        "label": "Frequency",
+        "unit": "Hz",
+        "min": 0.5,
+        "max": 5,
+        "default": 2
+      },
+      {
+        "key": "resistance",
+        "label": "Resistance",
+        "unit": "Ω",
+        "min": 10,
+        "max": 500,
+        "default": 100
+      },
+      {
+        "key": "inductance",
+        "label": "Inductance",
+        "unit": "H",
+        "min": 0.1,
+        "max": 2,
+        "default": 0.5
+      },
+      {
+        "key": "capacitance",
+        "label": "Capacitance",
+        "unit": "µF",
+        "min": 1,
+        "max": 50,
+        "default": 10
+      },
+      {
+        "key": "rlcFrequency",
+        "label": "Frequency",
+        "unit": "Hz",
+        "min": 10,
+        "max": 200,
+        "default": 50
+      },
+      {
+        "key": "parallelResistance",
+        "label": "Resistance",
+        "unit": "Ω",
+        "min": 100,
+        "max": 3000,
+        "default": 1000
+      },
+      {
+        "key": "resL",
+        "label": "Inductance",
+        "unit": "H",
+        "min": 0.1,
+        "max": 2,
+        "default": 0.5
+      },
+      {
+        "key": "resC",
+        "label": "Capacitance",
+        "unit": "µF",
+        "min": 1,
+        "max": 50,
+        "default": 10
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-atomic-models",
+    "route": "/simulations/atomic-models",
+    "subject": "Physics",
+    "title": "Atomic models",
+    "description": "Compare models of atomic structure and the evidence behind them.",
+    "principle": "Atomic number Z = number of protons",
+    "concept": "atom",
+    "aliases": [
+      "atomic models",
+      "atomic models"
+    ],
+    "parameters": [
+      {
+        "key": "speed",
+        "label": "Animation speed",
+        "unit": "×",
+        "min": 0,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "zoom",
+        "label": "Zoom",
+        "unit": "×",
+        "min": 0.3,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "protonCount",
+        "label": "Protons Z",
+        "unit": "",
+        "min": 1,
+        "max": 92,
+        "default": 1,
+        "integer": true
+      },
+      {
+        "key": "neutronCount",
+        "label": "Neutrons N",
+        "unit": "",
+        "min": 0,
+        "max": 150,
+        "default": 0,
+        "integer": true
+      },
+      {
+        "key": "alphaEnergy",
+        "label": "α-particle energy",
+        "unit": "MeV",
+        "min": 1,
+        "max": 10,
+        "default": 5
+      },
+      {
+        "key": "magneticField",
+        "label": "Magnetic field B",
+        "unit": "T",
+        "min": 0,
+        "max": 5,
+        "default": 0
+      },
+      {
+        "key": "nQuantum",
+        "label": "n",
+        "unit": "",
+        "min": 1,
+        "max": 4,
+        "default": 1,
+        "integer": true
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-band-theory",
+    "route": "/simulations/band-theory",
+    "subject": "Physics",
+    "title": "Band theory",
+    "description": "Explore how energy bands and carrier populations affect electrical conduction.",
+    "principle": "Band gap separates valence and conduction bands",
+    "concept": "band",
+    "aliases": [
+      "band theory",
+      "band theory"
+    ],
+    "parameters": [
+      {
+        "key": "temperature",
+        "label": "Temperature",
+        "unit": "K",
+        "min": 0,
+        "max": 1000,
+        "default": 300
+      },
+      {
+        "key": "dopingConcentration",
+        "label": "Doping conc.",
+        "unit": "log₁₀(cm⁻³)",
+        "min": 10,
+        "max": 20,
+        "default": 10
+      },
+      {
+        "key": "speed",
+        "label": "Animation speed",
+        "unit": "×",
+        "min": 0,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "zoom",
+        "label": "Zoom",
+        "unit": "×",
+        "min": 0.5,
+        "max": 2,
+        "default": 1
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-bjt-transistor",
+    "route": "/simulations/bjt-transistor",
+    "subject": "Physics",
+    "title": "BJT transistor",
+    "description": "Explore how terminal currents and bias conditions control a bipolar transistor.",
+    "principle": "I_E = I_C + I_B",
+    "concept": "transistor",
+    "aliases": [
+      "bjt transistor",
+      "bjt transistor"
+    ],
+    "parameters": [
+      {
+        "key": "params.Vcc",
+        "label": "params.Vcc",
+        "unit": "",
+        "min": 3,
+        "max": 20,
+        "default": 10
+      },
+      {
+        "key": "params.Vbe",
+        "label": "params.Vbe",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 0.7
+      },
+      {
+        "key": "params.Vce",
+        "label": "params.Vce",
+        "unit": "",
+        "min": 0,
+        "max": 15,
+        "default": 5
+      },
+      {
+        "key": "params.Rb",
+        "label": "params.Rb",
+        "unit": "",
+        "min": 10,
+        "max": 500,
+        "default": 100
+      },
+      {
+        "key": "params.Rc",
+        "label": "params.Rc",
+        "unit": "",
+        "min": 0.1,
+        "max": 10,
+        "default": 2
+      },
+      {
+        "key": "params.Re",
+        "label": "params.Re",
+        "unit": "",
+        "min": 0,
+        "max": 5,
+        "default": 0.5
+      },
+      {
+        "key": "params.Rload",
+        "label": "params.Rload",
+        "unit": "",
+        "min": 1,
+        "max": 50,
+        "default": 10
+      },
+      {
+        "key": "params.beta",
+        "label": "params.beta",
+        "unit": "",
+        "min": 20,
+        "max": 500,
+        "default": 100
+      },
+      {
+        "key": "params.temperature",
+        "label": "params.temperature",
+        "unit": "",
+        "min": 200,
+        "max": 500,
+        "default": 300
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-consequences-of-motion",
+    "route": "/simulations/consequences-of-motion",
+    "subject": "Physics",
+    "title": "Consequences of motion",
+    "description": "Compare forces, momentum and energy in elevators, rockets and collisions.",
+    "principle": "ΣF = ma; p = mv",
+    "concept": "force",
+    "aliases": [
+      "consequences of motion",
+      "consequences of motion"
+    ],
+    "parameters": [
+      {
+        "key": "elevMass",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 10,
+        "max": 150,
+        "default": 60
+      },
+      {
+        "key": "elevAccel",
+        "label": "Acceleration magnitude",
+        "unit": "m/s²",
+        "min": 0.5,
+        "max": 9.8,
+        "default": 3
+      },
+      {
+        "key": "wlHeight",
+        "label": "Orbit altitude",
+        "unit": "km",
+        "min": 200,
+        "max": 400000,
+        "default": 400
+      },
+      {
+        "key": "rocketMass",
+        "label": "Rocket mass (total)",
+        "unit": "kg",
+        "min": 500,
+        "max": 50000,
+        "default": 5000
+      },
+      {
+        "key": "fuelFraction",
+        "label": "Fuel fraction",
+        "unit": "",
+        "min": 0.2,
+        "max": 0.9,
+        "default": 0.6
+      },
+      {
+        "key": "exhaustSpeed",
+        "label": "Exhaust speed",
+        "unit": "m/s",
+        "min": 200,
+        "max": 5000,
+        "default": 2000
+      },
+      {
+        "key": "massFlowRate",
+        "label": "Mass flow rate",
+        "unit": "kg/s",
+        "min": 1,
+        "max": 100,
+        "default": 10
+      },
+      {
+        "key": "collM1",
+        "label": "Mass 1 (blue)",
+        "unit": "kg",
+        "min": 0.5,
+        "max": 10,
+        "default": 3
+      },
+      {
+        "key": "collU1",
+        "label": "Velocity 1",
+        "unit": "m/s",
+        "min": -10,
+        "max": 20,
+        "default": 6
+      },
+      {
+        "key": "collM2",
+        "label": "Mass 2 (green)",
+        "unit": "kg",
+        "min": 0.5,
+        "max": 10,
+        "default": 2
+      },
+      {
+        "key": "collU2",
+        "label": "Velocity 2",
+        "unit": "m/s",
+        "min": -10,
+        "max": 10,
+        "default": 0
+      },
+      {
+        "key": "collE",
+        "label": "Coefficient of restitution (e)",
+        "unit": "",
+        "min": 0.01,
+        "max": 0.99,
+        "default": 0.6
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-coupled-oscillators",
+    "route": "/simulations/coupled-oscillators",
+    "subject": "Physics",
+    "title": "Coupled oscillators",
+    "description": "Observe how connected oscillators exchange energy and form collective modes.",
+    "principle": "Restoring spring force: F = −kx",
+    "concept": "oscillation",
+    "aliases": [
+      "coupled oscillators",
+      "coupled oscillators"
+    ],
+    "parameters": [
+      {
+        "key": "m1",
+        "label": "Mass m₁",
+        "unit": "kg",
+        "min": 0.1,
+        "max": 5,
+        "default": 1
+      },
+      {
+        "key": "k1",
+        "label": "Spring k₁",
+        "unit": "N/m",
+        "min": 0.1,
+        "max": 5,
+        "default": 1
+      },
+      {
+        "key": "x1",
+        "label": "Initial x₁",
+        "unit": "m",
+        "min": -0.3,
+        "max": 0.3,
+        "default": 0.1
+      },
+      {
+        "key": "v1",
+        "label": "Initial v₁",
+        "unit": "m/s",
+        "min": -2,
+        "max": 2,
+        "default": 0
+      },
+      {
+        "key": "damping1",
+        "label": "Damping c₁",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 0
+      },
+      {
+        "key": "m2",
+        "label": "Mass m₂",
+        "unit": "kg",
+        "min": 0.1,
+        "max": 5,
+        "default": 1
+      },
+      {
+        "key": "k3",
+        "label": "Spring k₃",
+        "unit": "N/m",
+        "min": 0.1,
+        "max": 5,
+        "default": 1
+      },
+      {
+        "key": "x2",
+        "label": "Initial x₂",
+        "unit": "m",
+        "min": -0.3,
+        "max": 0.3,
+        "default": 0.1
+      },
+      {
+        "key": "v2",
+        "label": "Initial v₂",
+        "unit": "m/s",
+        "min": -2,
+        "max": 2,
+        "default": 0
+      },
+      {
+        "key": "damping2",
+        "label": "Damping c₂",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 0
+      },
+      {
+        "key": "k2",
+        "label": "Coupling k₂",
+        "unit": "N/m",
+        "min": 0,
+        "max": 5,
+        "default": 0.2
+      },
+      {
+        "key": "trailLength",
+        "label": "Trail length",
+        "unit": "frames",
+        "min": 0,
+        "max": 800,
+        "default": 300
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-de-broglie",
+    "route": "/simulations/de-broglie",
+    "subject": "Physics",
+    "title": "De Broglie waves",
+    "description": "Relate a particle’s momentum to its matter wavelength.",
+    "principle": "λ = h/p",
+    "concept": "quantum",
+    "aliases": [
+      "de broglie",
+      "de broglie waves"
+    ],
+    "parameters": [
+      {
+        "key": "accelV",
+        "label": "Accelerating voltage",
+        "unit": "V",
+        "min": 10,
+        "max": 10000,
+        "default": 100
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-diffraction",
+    "route": "/simulations/diffraction",
+    "subject": "Physics",
+    "title": "Diffraction",
+    "description": "Investigate wave spreading and interference as wavelength and aperture geometry change.",
+    "principle": "Single-slit minima: a sin θ = mλ, m = ±1, ±2, …",
+    "concept": "wave",
+    "aliases": [
+      "diffraction",
+      "diffraction"
+    ],
+    "parameters": [
+      {
+        "key": "wavelengthNm",
+        "label": "Wavelength",
+        "unit": "nm",
+        "min": 400,
+        "max": 700,
+        "default": 550
+      },
+      {
+        "key": "slitWidthNm",
+        "label": "Slit width (a)",
+        "unit": "nm",
+        "min": 200,
+        "max": 3000,
+        "default": 1000
+      },
+      {
+        "key": "slitSpacingNm",
+        "label": "Slit spacing (d)",
+        "unit": "nm",
+        "min": 500,
+        "max": 5000,
+        "default": 2000
+      },
+      {
+        "key": "doubleSlitSepUm",
+        "label": "Slit separation (d)",
+        "unit": "μm",
+        "min": 200,
+        "max": 1000,
+        "default": 500
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "single-slit",
+        "options": [
+          "single-slit",
+          "grating",
+          "double-slit"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-double-pendulum",
+    "route": "/simulations/double-pendulum",
+    "subject": "Physics",
+    "title": "Double pendulum",
+    "description": "Explore nonlinear motion and sensitivity to initial conditions in two linked pendulums.",
+    "principle": "Deterministic equations can produce sensitive, complex motion",
+    "concept": "oscillation",
+    "aliases": [
+      "double pendulum",
+      "double pendulum"
+    ],
+    "parameters": [
+      {
+        "key": "m1",
+        "label": "Mass m₁",
+        "unit": "kg",
+        "min": 0.1,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "L1",
+        "label": "Length L₁",
+        "unit": "m",
+        "min": 0.3,
+        "max": 2,
+        "default": 1
+      },
+      {
+        "key": "theta1Deg",
+        "label": "Initial angle θ₁",
+        "unit": "°",
+        "min": -180,
+        "max": 180,
+        "default": 90
+      },
+      {
+        "key": "omega1",
+        "label": "Initial ω₁",
+        "unit": "rad/s",
+        "min": -5,
+        "max": 5,
+        "default": 0
+      },
+      {
+        "key": "m2",
+        "label": "Mass m₂",
+        "unit": "kg",
+        "min": 0.1,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "L2",
+        "label": "Length L₂",
+        "unit": "m",
+        "min": 0.3,
+        "max": 2,
+        "default": 1
+      },
+      {
+        "key": "theta2Deg",
+        "label": "Initial angle θ₂",
+        "unit": "°",
+        "min": -180,
+        "max": 180,
+        "default": 90
+      },
+      {
+        "key": "omega2",
+        "label": "Initial ω₂",
+        "unit": "rad/s",
+        "min": -5,
+        "max": 5,
+        "default": 0
+      },
+      {
+        "key": "damping",
+        "label": "Damping",
+        "unit": "",
+        "min": 0,
+        "max": 0.5,
+        "default": 0
+      },
+      {
+        "key": "trailLength",
+        "label": "Trail length",
+        "unit": "frames",
+        "min": 0,
+        "max": 800,
+        "default": 300
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-elasticity",
+    "route": "/simulations/elasticity",
+    "subject": "Physics",
+    "title": "Elasticity",
+    "description": "Relate load and deformation, and distinguish elastic behaviour from permanent deformation.",
+    "principle": "F = kx (within the proportional limit)",
+    "concept": "elastic",
+    "aliases": [
+      "elasticity",
+      "elasticity"
+    ],
+    "parameters": [
+      {
+        "key": "load",
+        "label": "Load F",
+        "unit": "N",
+        "min": 0,
+        "max": 30,
+        "default": 8
+      },
+      {
+        "key": "k",
+        "label": "Spring constant k",
+        "unit": "N/m",
+        "min": 50,
+        "max": 500,
+        "default": 200
+      },
+      {
+        "key": "elasticLimitF",
+        "label": "Elastic limit",
+        "unit": "N",
+        "min": 5,
+        "max": 25,
+        "default": 15
+      },
+      {
+        "key": "wireLoad",
+        "label": "Load F",
+        "unit": "N",
+        "min": 5,
+        "max": 200,
+        "default": 60
+      },
+      {
+        "key": "wireLength",
+        "label": "Wire length L",
+        "unit": "m",
+        "min": 0.5,
+        "max": 5,
+        "default": 2
+      },
+      {
+        "key": "wireDiamMm",
+        "label": "Wire diameter",
+        "unit": "mm",
+        "min": 0.1,
+        "max": 2,
+        "default": 0.5
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "hooke",
+        "options": [
+          "hooke",
+          "wire"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-electromagnetic-induction",
+    "route": "/simulations/electromagnetic-induction",
+    "subject": "Physics",
+    "title": "Electromagnetic induction",
+    "description": "Explore induced voltage when magnetic flux linkage changes.",
+    "principle": "ε = −N dΦ/dt",
+    "concept": "induction",
+    "aliases": [
+      "electromagnetic induction",
+      "electromagnetic induction"
+    ],
+    "parameters": [
+      {
+        "key": "turns",
+        "label": "Coil turns",
+        "unit": "",
+        "min": 2,
+        "max": 20,
+        "default": 8,
+        "integer": true
+      },
+      {
+        "key": "speed",
+        "label": "Oscillation speed",
+        "unit": "rad/s",
+        "min": 0.5,
+        "max": 5,
+        "default": 2
+      },
+      {
+        "key": "genTurns",
+        "label": "Coil turns",
+        "unit": "",
+        "min": 10,
+        "max": 200,
+        "default": 50,
+        "integer": true
+      },
+      {
+        "key": "genFieldB",
+        "label": "Field strength",
+        "unit": "T",
+        "min": 0.1,
+        "max": 1,
+        "default": 0.3
+      },
+      {
+        "key": "genArea",
+        "label": "Coil area",
+        "unit": "m²",
+        "min": 0.005,
+        "max": 0.05,
+        "default": 0.02
+      },
+      {
+        "key": "genOmega",
+        "label": "Angular speed ω",
+        "unit": "rad/s",
+        "min": 1,
+        "max": 10,
+        "default": 3
+      },
+      {
+        "key": "primaryVoltage",
+        "label": "Primary voltage (peak)",
+        "unit": "V",
+        "min": 12,
+        "max": 240,
+        "default": 240
+      },
+      {
+        "key": "primaryTurns",
+        "label": "Primary turns",
+        "unit": "",
+        "min": 50,
+        "max": 1000,
+        "default": 500,
+        "integer": true
+      },
+      {
+        "key": "secondaryTurns",
+        "label": "Secondary turns",
+        "unit": "",
+        "min": 50,
+        "max": 1000,
+        "default": 100,
+        "integer": true
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-electrostatics-charging",
+    "route": "/simulations/electrostatics-charging",
+    "subject": "Physics",
+    "title": "Electrostatic charging",
+    "description": "Compare charge transfer by friction, contact and induction.",
+    "principle": "Charge is conserved",
+    "concept": "charge",
+    "aliases": [
+      "electrostatics charging",
+      "electrostatic charging"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-electrostatics-fields",
+    "route": "/simulations/electrostatics-fields",
+    "subject": "Physics",
+    "title": "Electric fields",
+    "description": "Investigate the force on a test charge and how fields combine.",
+    "principle": "E = F/q; F = kq₁q₂/r² for point charges",
+    "concept": "charge",
+    "aliases": [
+      "electrostatics fields",
+      "electric fields"
+    ],
+    "parameters": [
+      {
+        "key": "q1nC",
+        "label": "Charge Q₁",
+        "unit": "nC",
+        "min": -50,
+        "max": 50,
+        "default": 20
+      },
+      {
+        "key": "q2nC",
+        "label": "Charge Q₂",
+        "unit": "nC",
+        "min": -50,
+        "max": 50,
+        "default": 20
+      },
+      {
+        "key": "separationCm",
+        "label": "Initial separation",
+        "unit": "cm",
+        "min": 5,
+        "max": 30,
+        "default": 10
+      },
+      {
+        "key": "testX",
+        "label": "Test point — horizontal",
+        "unit": "",
+        "min": 0.05,
+        "max": 0.95,
+        "default": 0.75
+      },
+      {
+        "key": "testY",
+        "label": "Test point — vertical",
+        "unit": "",
+        "min": 0.1,
+        "max": 0.9,
+        "default": 0.3
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-electrostatics-potential",
+    "route": "/simulations/electrostatics-potential",
+    "subject": "Physics",
+    "title": "Electric potential and capacitance",
+    "description": "Explore potential difference, stored charge and capacitor behaviour.",
+    "principle": "C = Q/V",
+    "concept": "capacitor",
+    "aliases": [
+      "electrostatics potential",
+      "electric potential and capacitance"
+    ],
+    "parameters": [
+      {
+        "key": "q1nC",
+        "label": "Charge Q₁",
+        "unit": "nC",
+        "min": -50,
+        "max": 50,
+        "default": 20
+      },
+      {
+        "key": "q2nC",
+        "label": "Charge Q₂",
+        "unit": "nC",
+        "min": -50,
+        "max": 50,
+        "default": -20
+      },
+      {
+        "key": "separationCm",
+        "label": "Initial separation",
+        "unit": "cm",
+        "min": 5,
+        "max": 25,
+        "default": 10
+      },
+      {
+        "key": "voltageV",
+        "label": "Supply voltage",
+        "unit": "V",
+        "min": 1,
+        "max": 20,
+        "default": 9
+      },
+      {
+        "key": "resistanceOhm",
+        "label": "Resistance",
+        "unit": "Ω",
+        "min": 500,
+        "max": 5000,
+        "default": 2000
+      },
+      {
+        "key": "capacitanceUf",
+        "label": "Capacitance",
+        "unit": "µF",
+        "min": 50,
+        "max": 500,
+        "default": 100
+      },
+      {
+        "key": "plateAreaCm2",
+        "label": "Plate area",
+        "unit": "cm²",
+        "min": 20,
+        "max": 500,
+        "default": 200
+      },
+      {
+        "key": "plateSepMm",
+        "label": "Plate separation",
+        "unit": "mm",
+        "min": 0.2,
+        "max": 5,
+        "default": 1
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-equilibrium-of-forces",
+    "route": "/simulations/equilibrium-of-forces",
+    "subject": "Physics",
+    "title": "Equilibrium of forces",
+    "description": "Investigate balanced forces, turning effects and buoyancy.",
+    "principle": "ΣF = 0 and Στ = 0 for static equilibrium",
+    "concept": "equilibrium",
+    "aliases": [
+      "equilibrium of forces",
+      "equilibrium of forces"
+    ],
+    "parameters": [
+      {
+        "key": "sdF1",
+        "label": "Force F₁ (right-pulling)",
+        "unit": "N",
+        "min": 0,
+        "max": 30,
+        "default": 15
+      },
+      {
+        "key": "sdF2",
+        "label": "Force F₂ (left-pulling)",
+        "unit": "N",
+        "min": 0,
+        "max": 30,
+        "default": 15
+      },
+      {
+        "key": "sdMass",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 1,
+        "max": 20,
+        "default": 5
+      },
+      {
+        "key": "magA",
+        "label": "Force A",
+        "unit": "N",
+        "min": 1,
+        "max": 20,
+        "default": 10
+      },
+      {
+        "key": "angleA",
+        "label": "Angle A",
+        "unit": "°",
+        "min": 0,
+        "max": 359,
+        "default": 0
+      },
+      {
+        "key": "magB",
+        "label": "Force B",
+        "unit": "N",
+        "min": 1,
+        "max": 20,
+        "default": 10
+      },
+      {
+        "key": "angleB",
+        "label": "Angle B",
+        "unit": "°",
+        "min": 0,
+        "max": 359,
+        "default": 90
+      },
+      {
+        "key": "w1Force",
+        "label": "Weight 1",
+        "unit": "N",
+        "min": 0,
+        "max": 50,
+        "default": 20
+      },
+      {
+        "key": "w1Pos",
+        "label": "Weight 1 distance from 50 cm pivot",
+        "unit": "m",
+        "min": -0.5,
+        "max": 0.5,
+        "default": -0.3
+      },
+      {
+        "key": "w2Force",
+        "label": "Weight 2",
+        "unit": "N",
+        "min": 0,
+        "max": 50,
+        "default": 20
+      },
+      {
+        "key": "w2Pos",
+        "label": "Weight 2 distance from 50 cm pivot",
+        "unit": "m",
+        "min": -0.5,
+        "max": 0.5,
+        "default": 0.3
+      },
+      {
+        "key": "objDensity",
+        "label": "Object density",
+        "unit": "kg/m³",
+        "min": 100,
+        "max": 12000,
+        "default": 600
+      },
+      {
+        "key": "blockHeight",
+        "label": "Block height",
+        "unit": "m",
+        "min": 0.05,
+        "max": 0.4,
+        "default": 0.2
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-friction",
+    "route": "/simulations/friction",
+    "subject": "Physics",
+    "title": "Friction",
+    "description": "Compare static and kinetic friction and their effects on motion.",
+    "principle": "f_s ≤ μ_s N; f_k = μ_k N",
+    "concept": "friction",
+    "aliases": [
+      "friction",
+      "friction"
+    ],
+    "parameters": [
+      {
+        "key": "mass",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 1,
+        "max": 20,
+        "default": 5
+      },
+      {
+        "key": "applied",
+        "label": "Applied force",
+        "unit": "N",
+        "min": 0,
+        "max": 80,
+        "default": 25
+      },
+      {
+        "key": "angle",
+        "label": "Incline angle",
+        "unit": "°",
+        "min": 0,
+        "max": 60,
+        "default": 35
+      },
+      {
+        "key": "appliedIncline",
+        "label": "Applied push (up-slope)",
+        "unit": "N",
+        "min": 0,
+        "max": 100,
+        "default": 0
+      },
+      {
+        "key": "muS",
+        "label": "Static μs",
+        "unit": "",
+        "min": 0.05,
+        "max": 1,
+        "default": 0.4
+      },
+      {
+        "key": "muK",
+        "label": "Kinetic μk",
+        "unit": "",
+        "min": 0.05,
+        "max": 1,
+        "default": 0.3
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "flat",
+        "options": [
+          "flat",
+          "incline"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-gas-laws",
+    "route": "/simulations/gas-laws",
+    "subject": "Physics",
+    "title": "Gas laws",
+    "description": "Compare pressure, volume and temperature for a fixed amount of gas.",
+    "principle": "PV = nRT (ideal gas)",
+    "concept": "gas",
+    "aliases": [
+      "gas laws",
+      "gas laws",
+      "boyle",
+      "charles",
+      "ideal gas",
+      "real gas",
+      "pressure law"
+    ],
+    "parameters": [
+      {
+        "key": "pressure",
+        "label": "pressure",
+        "unit": "",
+        "min": 10,
+        "max": 1000,
+        "default": 200
+      },
+      {
+        "key": "volume",
+        "label": "volume",
+        "unit": "",
+        "min": 0.5,
+        "max": 20,
+        "default": 4
+      },
+      {
+        "key": "moles",
+        "label": "moles",
+        "unit": "",
+        "min": 0.01,
+        "max": 1,
+        "default": 0.1
+      },
+      {
+        "key": "temperature",
+        "label": "temperature",
+        "unit": "",
+        "min": 100,
+        "max": 1000,
+        "default": 300
+      }
+    ],
+    "modes": [
+      {
+        "key": "law",
+        "default": "boyle",
+        "options": [
+          "boyle",
+          "charles",
+          "pressure",
+          "ideal",
+          "real"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-heat-transfer",
+    "route": "/simulations/heat-transfer",
+    "subject": "Physics",
+    "title": "Heat transfer",
+    "description": "Explore how energy moves by conduction, convection and radiation.",
+    "principle": "Conduction rate: P = kAΔT/L in a uniform slab",
+    "concept": "heat",
+    "aliases": [
+      "heat transfer",
+      "heat transfer"
+    ],
+    "parameters": [
+      {
+        "key": "hotTemp",
+        "label": "Hot temperature",
+        "unit": "°C",
+        "min": 30,
+        "max": 120,
+        "default": 90
+      },
+      {
+        "key": "coldTemp",
+        "label": "Cold / surroundings temperature",
+        "unit": "°C",
+        "min": 0,
+        "max": 40,
+        "default": 20
+      },
+      {
+        "key": "areaCm2",
+        "label": "Cross-sectional area",
+        "unit": "cm²",
+        "min": 1,
+        "max": 100,
+        "default": 20
+      },
+      {
+        "key": "lengthCm",
+        "label": "Rod length",
+        "unit": "cm",
+        "min": 5,
+        "max": 150,
+        "default": 50
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "conduction",
+        "options": [
+          "conduction",
+          "convection",
+          "radiation"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-magnetic-effects",
+    "route": "/simulations/magnetic-effects",
+    "subject": "Physics",
+    "title": "Magnetic effects",
+    "description": "Explore magnetic fields due to currents and forces on current-carrying conductors.",
+    "principle": "F = BIL sin θ for a straight wire in a uniform field",
+    "concept": "magnetic",
+    "aliases": [
+      "magnetic effects",
+      "magnetic effects"
+    ],
+    "parameters": [
+      {
+        "key": "current",
+        "label": "Current",
+        "unit": "A",
+        "min": 1,
+        "max": 20,
+        "default": 5
+      },
+      {
+        "key": "testDistanceCm",
+        "label": "Test point distance",
+        "unit": "cm",
+        "min": 2,
+        "max": 8,
+        "default": 4
+      },
+      {
+        "key": "turnsPerMetre",
+        "label": "Turns per metre",
+        "unit": "n/m",
+        "min": 200,
+        "max": 3000,
+        "default": 1000
+      },
+      {
+        "key": "fieldB",
+        "label": "Field strength B",
+        "unit": "T",
+        "min": 0.1,
+        "max": 2,
+        "default": 0.5
+      },
+      {
+        "key": "wireLengthCm",
+        "label": "Wire length",
+        "unit": "cm",
+        "min": 5,
+        "max": 30,
+        "default": 10
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-mosfet",
+    "route": "/simulations/mosfet",
+    "subject": "Physics",
+    "title": "MOSFET",
+    "description": "Explore how gate bias controls conduction and how device geometry affects behaviour.",
+    "principle": "Gate voltage controls channel conduction",
+    "concept": "transistor",
+    "aliases": [
+      "mosfet",
+      "mosfet"
+    ],
+    "parameters": [
+      {
+        "key": "Vgs",
+        "label": "Vgs",
+        "unit": "V",
+        "min": -5,
+        "max": 5,
+        "default": 2
+      },
+      {
+        "key": "Vds",
+        "label": "Vds",
+        "unit": "V",
+        "min": -10,
+        "max": 10,
+        "default": 5
+      },
+      {
+        "key": "Vth",
+        "label": "Vth",
+        "unit": "V",
+        "min": -2,
+        "max": 2,
+        "default": 0.7
+      },
+      {
+        "key": "Vdd",
+        "label": "Vdd",
+        "unit": "V",
+        "min": 1,
+        "max": 20,
+        "default": 10
+      },
+      {
+        "key": "Rd",
+        "label": "Rd",
+        "unit": "kΩ",
+        "min": 0.1,
+        "max": 10,
+        "default": 2
+      },
+      {
+        "key": "Rs",
+        "label": "Rs",
+        "unit": "kΩ",
+        "min": 0,
+        "max": 5,
+        "default": 0.5
+      },
+      {
+        "key": "Rg",
+        "label": "Rg",
+        "unit": "MΩ",
+        "min": 0.01,
+        "max": 10,
+        "default": 1
+      },
+      {
+        "key": "Rload",
+        "label": "Rload",
+        "unit": "kΩ",
+        "min": 0.1,
+        "max": 50,
+        "default": 10
+      },
+      {
+        "key": "W",
+        "label": "W",
+        "unit": "μm",
+        "min": 0.1,
+        "max": 100,
+        "default": 10
+      },
+      {
+        "key": "L",
+        "label": "L",
+        "unit": "μm",
+        "min": 0.05,
+        "max": 10,
+        "default": 1
+      },
+      {
+        "key": "tox",
+        "label": "tox",
+        "unit": "nm",
+        "min": 1,
+        "max": 50,
+        "default": 10
+      },
+      {
+        "key": "temperature",
+        "label": "Temp",
+        "unit": "K",
+        "min": 200,
+        "max": 400,
+        "default": 300
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-newtons-laws",
+    "route": "/simulations/newtons-laws",
+    "subject": "Physics",
+    "title": "Newton’s laws",
+    "description": "Compare inertia, acceleration under a net force, and interaction-force pairs.",
+    "principle": "ΣF = ma; action–reaction forces act on different bodies",
+    "concept": "force",
+    "aliases": [
+      "newtons laws",
+      "newton’s laws",
+      "newton",
+      "force and mass"
+    ],
+    "parameters": [
+      {
+        "key": "mass1",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 1,
+        "max": 20,
+        "default": 5
+      },
+      {
+        "key": "initV",
+        "label": "Initial velocity",
+        "unit": "m/s",
+        "min": 0,
+        "max": 20,
+        "default": 5
+      },
+      {
+        "key": "friction1",
+        "label": "Friction coefficient μ",
+        "unit": "",
+        "min": 0,
+        "max": 0.8,
+        "default": 0
+      },
+      {
+        "key": "force1",
+        "label": "Force",
+        "unit": "N",
+        "min": 1,
+        "max": 50,
+        "default": 10
+      },
+      {
+        "key": "mass2",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 1,
+        "max": 20,
+        "default": 5
+      },
+      {
+        "key": "applied",
+        "label": "Applied force",
+        "unit": "N",
+        "min": 1,
+        "max": 100,
+        "default": 30
+      },
+      {
+        "key": "friction2",
+        "label": "Friction coefficient μ",
+        "unit": "",
+        "min": 0,
+        "max": 0.8,
+        "default": 0.2
+      },
+      {
+        "key": "mass3a",
+        "label": "Object 1 mass",
+        "unit": "kg",
+        "min": 1,
+        "max": 50,
+        "default": 5
+      },
+      {
+        "key": "mass3b",
+        "label": "Object 2 mass",
+        "unit": "kg",
+        "min": 1,
+        "max": 50,
+        "default": 10
+      },
+      {
+        "key": "force3",
+        "label": "Interaction force",
+        "unit": "N",
+        "min": 5,
+        "max": 100,
+        "default": 20
+      }
+    ],
+    "modes": [
+      {
+        "key": "law",
+        "default": "1st",
+        "options": [
+          "1st",
+          "2nd",
+          "3rd"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-ohms-law",
+    "route": "/simulations/ohms-law",
+    "subject": "Physics",
+    "title": "Ohm’s law and circuits",
+    "description": "Relate voltage, current and resistance; compare series, parallel and non-ohmic cases.",
+    "principle": "V = IR for an ohmic conductor at fixed physical conditions",
+    "concept": "circuit",
+    "aliases": [
+      "ohms law",
+      "ohm’s law and circuits",
+      "ohm",
+      "circuit",
+      "circuits",
+      "series circuit",
+      "parallel circuit"
+    ],
+    "parameters": [
+      {
+        "key": "V",
+        "label": "Supply voltage",
+        "unit": "V",
+        "min": 1,
+        "max": 24,
+        "default": 12
+      },
+      {
+        "key": "r1",
+        "label": "r1",
+        "unit": "Ω",
+        "min": 1,
+        "max": 50,
+        "default": 4
+      },
+      {
+        "key": "r2",
+        "label": "R₂",
+        "unit": "Ω",
+        "min": 1,
+        "max": 50,
+        "default": 6
+      },
+      {
+        "key": "r3",
+        "label": "R₃",
+        "unit": "Ω",
+        "min": 1,
+        "max": 50,
+        "default": 12
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "ohm",
+        "options": [
+          "ohm",
+          "series",
+          "parallel",
+          "non-ohmic"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-oscillations",
+    "route": "/simulations/oscillations",
+    "subject": "Physics",
+    "title": "Oscillations",
+    "description": "Compare oscillatory systems and how their physical parameters affect period.",
+    "principle": "Simple pendulum: T ≈ 2π√(L/g) for small angles",
+    "concept": "oscillation",
+    "aliases": [
+      "oscillations",
+      "oscillations",
+      "shm",
+      "simple harmonic motion",
+      "pendulum"
+    ],
+    "parameters": [
+      {
+        "key": "pendL",
+        "label": "Length",
+        "unit": "m",
+        "min": 0.1,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "pendA",
+        "label": "Amplitude",
+        "unit": "°",
+        "min": 2,
+        "max": 30,
+        "default": 15
+      },
+      {
+        "key": "pendM",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 0.1,
+        "max": 2,
+        "default": 0.5
+      },
+      {
+        "key": "pendG",
+        "label": "Gravity",
+        "unit": "m/s²",
+        "min": 1.6,
+        "max": 25,
+        "default": 9.81
+      },
+      {
+        "key": "spK",
+        "label": "Spring constant k",
+        "unit": "N/m",
+        "min": 5,
+        "max": 500,
+        "default": 50
+      },
+      {
+        "key": "spM",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 0.1,
+        "max": 5,
+        "default": 1
+      },
+      {
+        "key": "spA",
+        "label": "Amplitude",
+        "unit": "m",
+        "min": 0.01,
+        "max": 0.3,
+        "default": 0.1
+      },
+      {
+        "key": "conL",
+        "label": "String length",
+        "unit": "m",
+        "min": 0.2,
+        "max": 2,
+        "default": 0.8
+      },
+      {
+        "key": "conTheta",
+        "label": "Half-angle θ",
+        "unit": "°",
+        "min": 5,
+        "max": 75,
+        "default": 30
+      },
+      {
+        "key": "conM",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 0.1,
+        "max": 1,
+        "default": 0.3
+      },
+      {
+        "key": "physL",
+        "label": "Rod length",
+        "unit": "m",
+        "min": 0.2,
+        "max": 2,
+        "default": 1
+      },
+      {
+        "key": "physM",
+        "label": "Mass",
+        "unit": "kg",
+        "min": 0.1,
+        "max": 2,
+        "default": 0.5
+      },
+      {
+        "key": "physPF",
+        "label": "Pivot position (fraction from top)",
+        "unit": "",
+        "min": 0,
+        "max": 0.45,
+        "default": 0
+      },
+      {
+        "key": "bifM",
+        "label": "Rod mass",
+        "unit": "kg",
+        "min": 0.5,
+        "max": 5,
+        "default": 2
+      },
+      {
+        "key": "bifL",
+        "label": "Rod length",
+        "unit": "m",
+        "min": 0.2,
+        "max": 1.5,
+        "default": 0.6
+      },
+      {
+        "key": "bifWire",
+        "label": "Wire length",
+        "unit": "m",
+        "min": 0.3,
+        "max": 2,
+        "default": 1
+      },
+      {
+        "key": "bifSep",
+        "label": "Wire separation (2d)",
+        "unit": "m",
+        "min": 0.1,
+        "max": 0.8,
+        "default": 0.3
+      },
+      {
+        "key": "cantL",
+        "label": "Beam length",
+        "unit": "m",
+        "min": 0.1,
+        "max": 1,
+        "default": 0.5
+      },
+      {
+        "key": "cantH",
+        "label": "Beam height (thickness)",
+        "unit": "mm",
+        "min": 2,
+        "max": 20,
+        "default": 10
+      },
+      {
+        "key": "cantLoad",
+        "label": "End load",
+        "unit": "N",
+        "min": 0,
+        "max": 50,
+        "default": 5
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-photoelectric-effect",
+    "route": "/simulations/photoelectric-effect",
+    "subject": "Physics",
+    "title": "Photoelectric effect",
+    "description": "Investigate the threshold frequency and maximum kinetic energy of emitted electrons.",
+    "principle": "K_max = hf − φ when hf ≥ φ",
+    "concept": "quantum",
+    "aliases": [
+      "photoelectric effect",
+      "photoelectric effect"
+    ],
+    "parameters": [
+      {
+        "key": "f14",
+        "label": "Light frequency",
+        "unit": "×10¹⁴ Hz",
+        "min": 2,
+        "max": 14,
+        "default": 6
+      },
+      {
+        "key": "intensity",
+        "label": "Intensity",
+        "unit": "",
+        "min": 1,
+        "max": 10,
+        "default": 5
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-pn-junction",
+    "route": "/simulations/pn-junction",
+    "subject": "Physics",
+    "title": "PN junction",
+    "description": "Explore carrier motion, the depletion region and the effect of forward and reverse bias.",
+    "principle": "Bias changes the junction barrier",
+    "concept": "semiconductor",
+    "aliases": [
+      "pn junction",
+      "pn junction"
+    ],
+    "parameters": [
+      {
+        "key": "params.appliedBias",
+        "label": "params.appliedBias",
+        "unit": "",
+        "min": -10,
+        "max": 1,
+        "default": 0
+      },
+      {
+        "key": "params.Vin",
+        "label": "params.Vin",
+        "unit": "",
+        "min": 2,
+        "max": 20,
+        "default": 5
+      },
+      {
+        "key": "params.Rload",
+        "label": "params.Rload",
+        "unit": "",
+        "min": 100,
+        "max": 10000,
+        "default": 1000
+      },
+      {
+        "key": "params.freq",
+        "label": "params.freq",
+        "unit": "",
+        "min": 10,
+        "max": 100,
+        "default": 50
+      },
+      {
+        "key": "params.temperature",
+        "label": "params.temperature",
+        "unit": "",
+        "min": 100,
+        "max": 600,
+        "default": 300
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-polarization",
+    "route": "/simulations/polarization",
+    "subject": "Physics",
+    "title": "Polarization",
+    "description": "Explore how polarizers select the direction of a wave’s electric field.",
+    "principle": "I = I₀ cos² θ for ideal polarizers",
+    "concept": "polarization",
+    "aliases": [
+      "polarization",
+      "polarization"
+    ],
+    "parameters": [
+      {
+        "key": "polarizerAngle",
+        "label": "Transmission axis",
+        "unit": "°",
+        "min": 0,
+        "max": 180,
+        "default": 30
+      },
+      {
+        "key": "analyzerAngle",
+        "label": "Analyser angle θ",
+        "unit": "°",
+        "min": 0,
+        "max": 180,
+        "default": 45
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "single",
+        "options": [
+          "single",
+          "malus"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-projectile-motion",
+    "route": "/simulations/projectile-motion",
+    "subject": "Physics",
+    "title": "Projectile motion",
+    "description": "Resolve launch velocity into components and investigate the trajectory under gravity.",
+    "principle": "x = v₀ cos θ · t; y = h₀ + v₀ sin θ · t − gt²/2",
+    "concept": "projectile",
+    "aliases": [
+      "projectile motion",
+      "projectile motion",
+      "projectile",
+      "projectiles"
+    ],
+    "parameters": [
+      {
+        "key": "g",
+        "label": "Gravity",
+        "unit": "m/s²",
+        "min": 1,
+        "max": 25,
+        "default": 9.81
+      },
+      {
+        "key": "v0",
+        "label": "Initial velocity",
+        "unit": "m/s",
+        "min": 1,
+        "max": 100,
+        "default": 25
+      },
+      {
+        "key": "angle",
+        "label": "Launch angle",
+        "unit": "°",
+        "min": 1,
+        "max": 89,
+        "default": 45
+      },
+      {
+        "key": "h0",
+        "label": "Platform height",
+        "unit": "m",
+        "min": 0,
+        "max": 120,
+        "default": 0
+      },
+      {
+        "key": "hV0",
+        "label": "Horizontal speed",
+        "unit": "m/s",
+        "min": 1,
+        "max": 100,
+        "default": 20
+      },
+      {
+        "key": "hH",
+        "label": "Launch height",
+        "unit": "m",
+        "min": 1,
+        "max": 200,
+        "default": 30
+      },
+      {
+        "key": "vV0",
+        "label": "Initial velocity (↑ positive)",
+        "unit": "m/s",
+        "min": -30,
+        "max": 50,
+        "default": 15
+      },
+      {
+        "key": "vH0",
+        "label": "Initial height",
+        "unit": "m",
+        "min": 0,
+        "max": 200,
+        "default": 0
+      },
+      {
+        "key": "iV0",
+        "label": "Initial velocity",
+        "unit": "m/s",
+        "min": 1,
+        "max": 60,
+        "default": 20
+      },
+      {
+        "key": "iAlpha",
+        "label": "α — angle above slope",
+        "unit": "°",
+        "min": 1,
+        "max": 89,
+        "default": 30
+      },
+      {
+        "key": "iBeta",
+        "label": "β — slope angle",
+        "unit": "°",
+        "min": 5,
+        "max": 60,
+        "default": 30
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "standard",
+        "options": [
+          "standard",
+          "horizontal",
+          "vertical",
+          "inclined"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-quantum-harmonic-oscillator",
+    "route": "/simulations/quantum-harmonic-oscillator",
+    "subject": "Physics",
+    "title": "Quantum harmonic oscillator",
+    "description": "Compare quantized oscillator states and their superpositions.",
+    "principle": "E_n = (n + 1/2)ℏω",
+    "concept": "quantum",
+    "aliases": [
+      "quantum harmonic oscillator",
+      "quantum harmonic oscillator"
+    ],
+    "parameters": [
+      {
+        "key": "c0",
+        "label": "c₀ (n=0)",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 1
+      },
+      {
+        "key": "c1",
+        "label": "c₁ (n=1)",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 0
+      },
+      {
+        "key": "c2",
+        "label": "c₂ (n=2)",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 0
+      },
+      {
+        "key": "c3",
+        "label": "c₃ (n=3)",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 0
+      },
+      {
+        "key": "c4",
+        "label": "c₄ (n=4)",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 0
+      },
+      {
+        "key": "c5",
+        "label": "c₅ (n=5)",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 0
+      },
+      {
+        "key": "speed",
+        "label": "Time speed",
+        "unit": "×",
+        "min": 0,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "xMax",
+        "label": "X-range",
+        "unit": "a",
+        "min": 3,
+        "max": 12,
+        "default": 5
+      },
+      {
+        "key": "eMax",
+        "label": "E-range",
+        "unit": "ℏω",
+        "min": 2,
+        "max": 8,
+        "default": 4.5
+      },
+      {
+        "key": "nMax",
+        "label": "Levels shown",
+        "unit": "",
+        "min": 1,
+        "max": 8,
+        "default": 5,
+        "integer": true
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-quantum-tunneling",
+    "route": "/simulations/quantum-tunneling",
+    "subject": "Physics",
+    "title": "Quantum tunneling",
+    "description": "Explore how barrier properties and particle energy affect transmission probability.",
+    "principle": "Transmission can be nonzero when particle energy is below barrier height",
+    "concept": "quantum",
+    "aliases": [
+      "quantum tunneling",
+      "quantum tunneling"
+    ],
+    "parameters": [
+      {
+        "key": "particleEnergy",
+        "label": "Energy E",
+        "unit": "eV",
+        "min": 0.1,
+        "max": 10,
+        "default": 1
+      },
+      {
+        "key": "packetWidth",
+        "label": "Packet width σ",
+        "unit": "Å",
+        "min": 0.5,
+        "max": 4,
+        "default": 1.5
+      },
+      {
+        "key": "particleMass",
+        "label": "Mass",
+        "unit": "mₑ",
+        "min": 0.2,
+        "max": 20,
+        "default": 1
+      },
+      {
+        "key": "barrierHeight",
+        "label": "Height |V₀|",
+        "unit": "eV",
+        "min": 0.5,
+        "max": 10,
+        "default": 2
+      },
+      {
+        "key": "barrierWidth",
+        "label": "Width w",
+        "unit": "Å",
+        "min": 0.5,
+        "max": 10,
+        "default": 2
+      },
+      {
+        "key": "barrierPosition",
+        "label": "Position",
+        "unit": "Å",
+        "min": 10,
+        "max": 45,
+        "default": 25
+      },
+      {
+        "key": "speed",
+        "label": "Speed",
+        "unit": "×",
+        "min": 0,
+        "max": 3,
+        "default": 1
+      },
+      {
+        "key": "zoom",
+        "label": "Zoom",
+        "unit": "×",
+        "min": 0.5,
+        "max": 2,
+        "default": 1
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-radioactive-decay",
+    "route": "/simulations/radioactive-decay",
+    "subject": "Physics",
+    "title": "Radioactive decay",
+    "description": "Explore statistical decay and how half-life affects the expected surviving population.",
+    "principle": "N(t) = N₀ 2^(−t/T₁/₂)",
+    "concept": "decay",
+    "aliases": [
+      "radioactive decay",
+      "radioactive decay",
+      "half life"
+    ],
+    "parameters": [
+      {
+        "key": "n0",
+        "label": "Initial nuclei N₀",
+        "unit": "",
+        "min": 50,
+        "max": 900,
+        "default": 400,
+        "integer": true
+      },
+      {
+        "key": "halfLife",
+        "label": "Half-life T½",
+        "unit": "s",
+        "min": 1,
+        "max": 20,
+        "default": 5
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-rectilinear-propagation",
+    "route": "/simulations/rectilinear-propagation",
+    "subject": "Physics",
+    "title": "Light, shadows and pinholes",
+    "description": "Use straight-line ray models to investigate shadows and pinhole images.",
+    "principle": "Similar triangles relate object and image sizes",
+    "concept": "optics",
+    "aliases": [
+      "rectilinear propagation",
+      "light, shadows and pinholes"
+    ],
+    "parameters": [
+      {
+        "key": "sourceRadius",
+        "label": "Source size",
+        "unit": "px",
+        "min": 5,
+        "max": 60,
+        "default": 35
+      },
+      {
+        "key": "objectRadius",
+        "label": "Object size",
+        "unit": "px",
+        "min": 8,
+        "max": 50,
+        "default": 24
+      },
+      {
+        "key": "objectDist",
+        "label": "Object distance",
+        "unit": "px",
+        "min": 60,
+        "max": 300,
+        "default": 160
+      },
+      {
+        "key": "orbitAngleDeg",
+        "label": "Moon's position in orbit",
+        "unit": "°",
+        "min": 0,
+        "max": 359,
+        "default": 180
+      },
+      {
+        "key": "objectHeight",
+        "label": "Object height",
+        "unit": "px",
+        "min": 30,
+        "max": 130,
+        "default": 90
+      },
+      {
+        "key": "pinholeObjectDist",
+        "label": "Object distance (u)",
+        "unit": "px",
+        "min": 60,
+        "max": 260,
+        "default": 140
+      },
+      {
+        "key": "pinholeScreenDist",
+        "label": "Screen distance (v)",
+        "unit": "px",
+        "min": 40,
+        "max": 260,
+        "default": 160
+      },
+      {
+        "key": "pinholeRadius",
+        "label": "Pinhole size",
+        "unit": "px",
+        "min": 0,
+        "max": 12,
+        "default": 1
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-reflection",
+    "route": "/simulations/reflection",
+    "subject": "Physics",
+    "title": "Reflection",
+    "description": "Explore ray reflection, mirror images and the effect of mirror geometry.",
+    "principle": "Angle of incidence = angle of reflection",
+    "concept": "reflection",
+    "aliases": [
+      "reflection",
+      "reflection"
+    ],
+    "parameters": [
+      {
+        "key": "incidenceAngle",
+        "label": "Angle of incidence",
+        "unit": "°",
+        "min": 5,
+        "max": 80,
+        "default": 35
+      },
+      {
+        "key": "focal",
+        "label": "Focal length |f|",
+        "unit": "cm",
+        "min": 5,
+        "max": 40,
+        "default": 15
+      },
+      {
+        "key": "objectDist",
+        "label": "Object distance u",
+        "unit": "cm",
+        "min": 5,
+        "max": 90,
+        "default": 40
+      },
+      {
+        "key": "rotationAngle",
+        "label": "Mirror rotation θ",
+        "unit": "°",
+        "min": -35,
+        "max": 35,
+        "default": 15
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "plane",
+        "options": [
+          "plane",
+          "curved",
+          "rotation"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-refraction",
+    "route": "/simulations/refraction",
+    "subject": "Physics",
+    "title": "Refraction",
+    "description": "Explore how light changes direction across media and how lenses form images.",
+    "principle": "n₁ sin θ₁ = n₂ sin θ₂",
+    "concept": "refraction",
+    "aliases": [
+      "refraction",
+      "refraction"
+    ],
+    "parameters": [
+      {
+        "key": "theta1",
+        "label": "Angle of incidence θ₁",
+        "unit": "°",
+        "min": 0,
+        "max": 89,
+        "default": 35
+      },
+      {
+        "key": "n1",
+        "label": "n₁ (top medium)",
+        "unit": "",
+        "min": 1,
+        "max": 2.5,
+        "default": 1
+      },
+      {
+        "key": "n2",
+        "label": "n₂ (bottom medium)",
+        "unit": "",
+        "min": 1,
+        "max": 2.5,
+        "default": 1.5
+      },
+      {
+        "key": "focal",
+        "label": "Focal length |f|",
+        "unit": "cm",
+        "min": 5,
+        "max": 40,
+        "default": 15
+      },
+      {
+        "key": "objectDist",
+        "label": "Object distance u",
+        "unit": "cm",
+        "min": 5,
+        "max": 90,
+        "default": 40
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "snell",
+        "options": [
+          "snell",
+          "lens"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-space",
+    "route": "/simulations/space",
+    "subject": "Physics",
+    "title": "Space and displacement",
+    "description": "Locate positions and distinguish distance travelled from displacement.",
+    "principle": "Displacement = final position − initial position",
+    "concept": "vector",
+    "aliases": [
+      "space",
+      "space and displacement"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-vectors",
+    "route": "/simulations/vectors",
+    "subject": "Physics",
+    "title": "Vectors",
+    "description": "Explore components, addition and products while distinguishing scalars from vectors.",
+    "principle": "A · B = |A||B| cos θ",
+    "concept": "vector",
+    "aliases": [
+      "vectors",
+      "vectors"
+    ],
+    "parameters": [
+      {
+        "key": "k",
+        "label": "k",
+        "unit": "",
+        "min": -10,
+        "max": 10,
+        "default": 2
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "simulations-waves",
+    "route": "/simulations/waves",
+    "subject": "Physics",
+    "title": "Waves",
+    "description": "Compare travelling, longitudinal, superposed and standing wave patterns.",
+    "principle": "v = fλ; T = 1/f",
+    "concept": "wave",
+    "aliases": [
+      "waves",
+      "waves",
+      "wave"
+    ],
+    "parameters": [
+      {
+        "key": "A",
+        "label": "Amplitude",
+        "unit": "m",
+        "min": 0.2,
+        "max": 1.5,
+        "default": 1
+      },
+      {
+        "key": "f",
+        "label": "Frequency",
+        "unit": "Hz",
+        "min": 0.1,
+        "max": 2,
+        "default": 0.5
+      },
+      {
+        "key": "lambda",
+        "label": "Wavelength",
+        "unit": "m",
+        "min": 0.5,
+        "max": 4,
+        "default": 2
+      },
+      {
+        "key": "A2",
+        "label": "Amplitude A₂",
+        "unit": "m",
+        "min": 0.1,
+        "max": 1.5,
+        "default": 0.7
+      },
+      {
+        "key": "f2",
+        "label": "Frequency f₂",
+        "unit": "Hz",
+        "min": 0.1,
+        "max": 2,
+        "default": 0.5
+      },
+      {
+        "key": "phase2",
+        "label": "Phase difference",
+        "unit": "°",
+        "min": 0,
+        "max": 360,
+        "default": 0
+      }
+    ],
+    "modes": [
+      {
+        "key": "mode",
+        "default": "transverse",
+        "options": [
+          "transverse",
+          "longitudinal",
+          "superposition",
+          "standing"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "simulations-x-rays",
+    "route": "/simulations/x-rays",
+    "subject": "Physics",
+    "title": "X-rays",
+    "description": "Explore how accelerating voltage affects X-ray production and the short-wavelength cutoff.",
+    "principle": "λ_min = hc/(eV) for an ideal cutoff",
+    "concept": "quantum",
+    "aliases": [
+      "x rays",
+      "x-rays"
+    ],
+    "parameters": [
+      {
+        "key": "kV",
+        "label": "Tube voltage",
+        "unit": "kV",
+        "min": 5,
+        "max": 100,
+        "default": 35
+      },
+      {
+        "key": "current",
+        "label": "Filament current",
+        "unit": "",
+        "min": 1,
+        "max": 10,
+        "default": 5
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "chemistry-compound-builder",
+    "route": "/chemistry/compound-builder",
+    "subject": "Chemistry",
+    "title": "Compound builder",
+    "description": "Assemble atomic ratios and inspect formulae and molar masses without assuming a candidate compound exists.",
+    "principle": "M = Σ n_i A_i",
+    "concept": "chemistry",
+    "aliases": [
+      "compound builder",
+      "compound builder"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "chemistry-crystal-builder",
+    "route": "/chemistry/crystal-builder",
+    "subject": "Chemistry",
+    "title": "Crystal builder",
+    "description": "Compare crystal prototypes, coordination and geometric properties.",
+    "principle": "Structure and composition together determine the model",
+    "concept": "crystal",
+    "aliases": [
+      "crystal builder",
+      "crystal builder"
+    ],
+    "parameters": [
+      {
+        "key": "a",
+        "label": "a",
+        "unit": "",
+        "min": 1.5,
+        "max": 12,
+        "default": 5.64
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "chemistry-heusler",
+    "route": "/chemistry/heusler",
+    "subject": "Chemistry",
+    "title": "Heusler alloys",
+    "description": "Explore full and half-Heusler candidate compositions and structural arrangements.",
+    "principle": "Full Heusler: X₂YZ; half-Heusler: XYZ",
+    "concept": "crystal",
+    "aliases": [
+      "heusler",
+      "heusler alloys"
+    ],
+    "parameters": [
+      {
+        "key": "a",
+        "label": "a",
+        "unit": "",
+        "min": 3,
+        "max": 9,
+        "default": 5.94
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "chemistry-nuclear",
+    "route": "/chemistry/nuclear",
+    "subject": "Chemistry",
+    "title": "Nuclear playground",
+    "description": "Check decay and nuclear reaction bookkeeping, and compare half-life curves.",
+    "principle": "Conserve total charge and nucleon number in nuclear equations",
+    "concept": "decay",
+    "aliases": [
+      "nuclear",
+      "nuclear playground"
+    ],
+    "parameters": [
+      {
+        "key": "targetPct",
+        "label": "targetPct",
+        "unit": "",
+        "min": 0.0001,
+        "max": 100,
+        "default": 25
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "chemistry-organic",
+    "route": "/chemistry/organic",
+    "subject": "Chemistry",
+    "title": "Organic molecules",
+    "description": "Build molecular connectivity and inspect formulae, functional groups and isomer candidates.",
+    "principle": "Connectivity matters as well as molecular formula",
+    "concept": "chemistry",
+    "aliases": [
+      "organic",
+      "organic molecules"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "chemistry-periodic-table",
+    "route": "/chemistry/periodic-table",
+    "subject": "Chemistry",
+    "title": "Periodic table",
+    "description": "Explore elements by atomic number and compare their periodic properties.",
+    "principle": "Atomic number Z = number of protons",
+    "concept": "atom",
+    "aliases": [
+      "periodic table",
+      "periodic table"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "chemistry-perovskite-lab",
+    "route": "/chemistry/perovskite-lab",
+    "subject": "Chemistry",
+    "title": "Perovskite lab",
+    "description": "Explore candidate site assignments and geometric screening indicators.",
+    "principle": "ABX₃ is a common perovskite composition pattern",
+    "concept": "crystal",
+    "aliases": [
+      "perovskite lab",
+      "perovskite lab"
+    ],
+    "parameters": [
+      {
+        "key": "aCustom",
+        "label": "aCustom",
+        "unit": "",
+        "min": 2,
+        "max": 12,
+        "default": 5
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "mathematics-unit-circle",
+    "route": "/mathematics/unit-circle",
+    "subject": "Mathematics",
+    "title": "Unit circle",
+    "description": "Relate angular position to sine and cosine and the signs of trigonometric functions.",
+    "principle": "(x, y) = (cos θ, sin θ) on the unit circle",
+    "concept": "trig",
+    "aliases": [
+      "unit circle",
+      "unit circle",
+      "sine",
+      "cosine",
+      "trigonometry"
+    ],
+    "parameters": [
+      {
+        "key": "angleDeg",
+        "label": "Angle",
+        "unit": "°",
+        "min": 0,
+        "max": 360,
+        "default": 105.86
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "geophysics-earth",
+    "route": "/geophysics/earth",
+    "subject": "Geophysics",
+    "title": "Earth explorer",
+    "description": "Explore layers of Earth and the atmosphere using the existing interactive model.",
+    "principle": "Layer properties change with depth and altitude",
+    "concept": "earth",
+    "aliases": [
+      "earth",
+      "earth explorer"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "geophysics-lab",
+    "route": "/geophysics/lab",
+    "subject": "Geophysics",
+    "title": "Geophysics field lab",
+    "description": "Compare simplified gravity, resistivity, seismic and electromagnetic field models.",
+    "principle": "Measured physical signals can constrain subsurface models",
+    "concept": "geophysics",
+    "aliases": [
+      "lab",
+      "geophysics field lab"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "geophysics-solar",
+    "route": "/geophysics/solar",
+    "subject": "Geophysics",
+    "title": "Solar system explorer",
+    "description": "Explore planet families, orbital behaviour and the nebular formation model.",
+    "principle": "For bodies orbiting the same central mass: T² ∝ a³",
+    "concept": "solar",
+    "aliases": [
+      "solar",
+      "solar system explorer"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "geophysics-tectonics",
+    "route": "/geophysics/tectonics",
+    "subject": "Geophysics",
+    "title": "Plate tectonics",
+    "description": "Explore plates, boundaries, magnetic stripes, triple junctions and Earth’s shape.",
+    "principle": "Plate motion links surface patterns and geological processes",
+    "concept": "tectonics",
+    "aliases": [
+      "tectonics",
+      "plate tectonics"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "minitab-damped-oscillator",
+    "route": "/minitab/damped-oscillator",
+    "subject": "Mathematics",
+    "title": "Damped oscillator",
+    "description": "Explore how damping changes oscillations and the approach to equilibrium.",
+    "principle": "A damping force removes mechanical energy",
+    "concept": "oscillation",
+    "aliases": [
+      "damped oscillator",
+      "damped oscillator"
+    ],
+    "parameters": [
+      {
+        "key": "gamma",
+        "label": "Damping γ",
+        "unit": "1/s",
+        "min": 0,
+        "max": 6,
+        "default": 0.8
+      },
+      {
+        "key": "omega0",
+        "label": "Natural frequency ω₀",
+        "unit": "rad/s",
+        "min": 0.5,
+        "max": 6,
+        "default": 2
+      },
+      {
+        "key": "y0",
+        "label": "Initial displacement y(0)",
+        "unit": "",
+        "min": -2,
+        "max": 2,
+        "default": 1
+      },
+      {
+        "key": "yp0",
+        "label": "Initial velocity y'(0)",
+        "unit": "/s",
+        "min": -4,
+        "max": 4,
+        "default": 0
+      }
+    ],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "minitab-div-stokes",
+    "route": "/minitab/div-stokes",
+    "subject": "Mathematics",
+    "title": "Divergence and Stokes theorems",
+    "description": "Compare local derivative descriptions with flux and circulation integrals.",
+    "principle": "Volume divergence corresponds to closed-surface flux",
+    "concept": "calculus",
+    "aliases": [
+      "div stokes",
+      "divergence and stokes theorems"
+    ],
+    "parameters": [
+      {
+        "key": "disk.r",
+        "label": "disk.r",
+        "unit": "",
+        "min": 0.4,
+        "max": 2.2,
+        "default": 1.1
+      }
+    ],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "minitab-eigenvector-explorer",
+    "route": "/minitab/eigenvector-explorer",
+    "subject": "Mathematics",
+    "title": "Eigenvector explorer",
+    "description": "Explore directions preserved by a linear transformation.",
+    "principle": "Av = λv for a nonzero eigenvector v",
+    "concept": "matrix",
+    "aliases": [
+      "eigenvector explorer",
+      "eigenvector explorer"
+    ],
+    "parameters": [
+      {
+        "key": "t",
+        "label": "t",
+        "unit": "",
+        "min": 0,
+        "max": 1,
+        "default": 1
+      }
+    ],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "minitab-fourier-series",
+    "route": "/minitab/fourier-series",
+    "subject": "Mathematics",
+    "title": "Fourier series",
+    "description": "Build a periodic signal from harmonic components.",
+    "principle": "A periodic signal can be represented by harmonic sums under suitable conditions",
+    "concept": "fourier",
+    "aliases": [
+      "fourier series",
+      "fourier series"
+    ],
+    "parameters": [
+      {
+        "key": "n",
+        "label": "n",
+        "unit": "",
+        "min": 1,
+        "max": 60,
+        "default": 1,
+        "integer": true
+      }
+    ],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "minitab-fourier-transform",
+    "route": "/minitab/fourier-transform",
+    "subject": "Mathematics",
+    "title": "Fourier transform",
+    "description": "Compare a signal with its frequency-domain representation.",
+    "principle": "Frequency-domain structure describes a signal’s component frequencies",
+    "concept": "fourier",
+    "aliases": [
+      "fourier transform",
+      "fourier transform"
+    ],
+    "parameters": [
+      {
+        "key": "a",
+        "label": "a",
+        "unit": "",
+        "min": 0.2,
+        "max": 3,
+        "default": 1
+      }
+    ],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "minitab-gamma-function",
+    "route": "/minitab/gamma-function",
+    "subject": "Mathematics",
+    "title": "Gamma function",
+    "description": "Explore how the gamma function extends factorials beyond positive integers.",
+    "principle": "Γ(n) = (n−1)! for positive integers n",
+    "concept": "special",
+    "aliases": [
+      "gamma function",
+      "gamma function"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "minitab-gradient-explorer",
+    "route": "/minitab/gradient-explorer",
+    "subject": "Mathematics",
+    "title": "Gradient explorer",
+    "description": "Explore how a scalar field changes and how its gradient points uphill.",
+    "principle": "∇f points in the direction of greatest local increase",
+    "concept": "calculus",
+    "aliases": [
+      "gradient explorer",
+      "gradient explorer"
+    ],
+    "parameters": [],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "minitab-hermite-laguerre-delta",
+    "route": "/minitab/hermite-laguerre-delta",
+    "subject": "Mathematics",
+    "title": "Hermite, Laguerre and delta",
+    "description": "Explore special functions and finite-width representations of a delta distribution.",
+    "principle": "A delta distribution is defined through its action under integration",
+    "concept": "special",
+    "aliases": [
+      "hermite laguerre delta",
+      "hermite, laguerre and delta"
+    ],
+    "parameters": [
+      {
+        "key": "epsExp",
+        "label": "epsExp",
+        "unit": "",
+        "min": -2,
+        "max": 0.3,
+        "default": 0
+      }
+    ],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "minitab-legendre-bessel",
+    "route": "/minitab/legendre-bessel",
+    "subject": "Mathematics",
+    "title": "Legendre and Bessel functions",
+    "description": "Explore special-function solutions that arise in problems with symmetry.",
+    "principle": "Boundary conditions select physically relevant solutions",
+    "concept": "special",
+    "aliases": [
+      "legendre bessel",
+      "legendre and bessel functions"
+    ],
+    "parameters": [
+      {
+        "key": "besX",
+        "label": "besX",
+        "unit": "",
+        "min": 0.5,
+        "max": 14.5,
+        "default": 5
+      }
+    ],
+    "modes": [],
+    "protected": true
+  },
+  {
+    "id": "biology-skeletal-system",
+    "route": "/biology/skeletal-system",
+    "subject": "Biology",
+    "title": "Human skeletal system",
+    "description": "Explore the major bones and groups, their locations and functions. A typical adult has 206 bones: 80 axial and 126 appendicular. Group counts are not counts of SVG shapes. Identification and classification challenges support classroom discussion.",
+    "principle": "Axial (80) + appendicular (126) = 206 bones in a typical adult. Bones support, protect and act as levers.",
+    "concept": "skeleton",
+    "aliases": [
+      "skeletal system",
+      "human skeleton",
+      "skeleton",
+      "bones",
+      "femur",
+      "skull",
+      "axial skeleton",
+      "appendicular skeleton"
+    ],
+    "parameters": [
+      {
+        "key": "boneIndex",
+        "label": "Bone/group index in the activity list",
+        "unit": "",
+        "min": 0,
+        "max": 23,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [
+      {
+        "key": "view",
+        "default": "front",
+        "options": [
+          "front",
+          "back"
+        ]
+      },
+      {
+        "key": "division",
+        "default": "all",
+        "options": [
+          "all",
+          "axial",
+          "appendicular"
+        ]
+      },
+      {
+        "key": "labels",
+        "default": "on",
+        "options": [
+          "on",
+          "off"
+        ]
+      },
+      {
+        "key": "activity",
+        "default": "explore",
+        "options": [
+          "explore",
+          "identify",
+          "classify"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "biology-cells",
+    "route": "/biology/cells",
+    "subject": "Biology",
+    "title": "Cells and organelles",
+    "description": "Compare plant and animal cell structures and explain selected organelle functions.",
+    "principle": "Compare plant and animal cell structures and explain selected organelle functions.",
+    "concept": "bio-cells",
+    "aliases": [
+      "cells",
+      "cell organelles",
+      "plant cell",
+      "animal cell",
+      "cellular biology"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 7,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [
+      {
+        "key": "cell",
+        "default": "plant",
+        "options": [
+          "plant",
+          "animal"
+        ]
+      },
+      {
+        "key": "labels",
+        "default": "on",
+        "options": [
+          "on",
+          "off"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "biology-mitosis",
+    "route": "/biology/mitosis",
+    "subject": "Biology",
+    "title": "Mitosis and the cell cycle",
+    "description": "Track one replication and one division, preserving chromosome set number.",
+    "principle": "Track one replication and one division, preserving chromosome set number.",
+    "concept": "bio-mitosis",
+    "aliases": [
+      "mitosis",
+      "cell cycle"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 5,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "biology-meiosis",
+    "route": "/biology/meiosis",
+    "subject": "Biology",
+    "title": "Meiosis and genetic variation",
+    "description": "Track homologues then sister chromatids through two divisions and explore genetic variation.",
+    "principle": "Track homologues then sister chromatids through two divisions and explore genetic variation.",
+    "concept": "bio-meiosis",
+    "aliases": [
+      "meiosis",
+      "meiotic division"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 8,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [
+      {
+        "key": "crossing",
+        "default": "on",
+        "options": [
+          "on",
+          "off"
+        ]
+      },
+      {
+        "key": "orientation",
+        "default": "original",
+        "options": [
+          "original",
+          "alternate"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "biology-transpiration",
+    "route": "/biology/transpiration",
+    "subject": "Biology",
+    "title": "Transpiration in plants",
+    "description": "Explore humidity, air movement, temperature and stomatal opening with an illustrative relative water-loss index.",
+    "principle": "Explore humidity, air movement, temperature and stomatal opening with an illustrative relative water-loss index.",
+    "concept": "bio-transpiration",
+    "aliases": [
+      "transpiration",
+      "plant water loss"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 3,
+        "default": 0,
+        "integer": true
+      },
+      {
+        "key": "humidity",
+        "label": "Humidity",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "default": 50
+      },
+      {
+        "key": "wind",
+        "label": "Air movement",
+        "unit": "relative",
+        "min": 0,
+        "max": 5,
+        "default": 1
+      },
+      {
+        "key": "temperature",
+        "label": "Temperature",
+        "unit": "°C",
+        "min": 10,
+        "max": 40,
+        "default": 25
+      },
+      {
+        "key": "opening",
+        "label": "Stomatal opening",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "default": 100
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "biology-classification",
+    "route": "/biology/classification",
+    "subject": "Biology",
+    "title": "Classification and scientific names",
+    "description": "Search and compare 90 organisms across Domain and KPCOFGS, inspect source notes and practise scientific names.",
+    "principle": "Compare human and domestic cat ranks from Domain to Species and practise scientific names.",
+    "concept": "bio-classification",
+    "aliases": [
+      "classification",
+      "taxonomy",
+      "KPCOFGS",
+      "nomenclature",
+      "binomial naming"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 7,
+        "default": 0,
+        "integer": true
+      },
+      {
+        "key": "organismIndex",
+        "label": "First organism",
+        "unit": "index",
+        "min": 0,
+        "max": 89,
+        "default": 0,
+        "integer": true
+      },
+      {
+        "key": "comparisonIndex",
+        "label": "Comparison organism",
+        "unit": "index",
+        "min": 0,
+        "max": 89,
+        "default": 1,
+        "integer": true
+      }
+    ],
+    "modes": [
+      {
+        "key": "labels",
+        "default": "on",
+        "options": [
+          "on",
+          "off"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "biology-life-processes",
+    "route": "/biology/life-processes",
+    "subject": "Biology",
+    "title": "Characteristics of living things",
+    "description": "Examine evidence for life, compare life processes and distinguish common misconceptions.",
+    "principle": "Examine evidence for life, compare life processes and distinguish common misconceptions.",
+    "concept": "bio-life-processes",
+    "aliases": [
+      "life processes",
+      "characteristics of living things",
+      "MRNIGERDCA",
+      "MRS GREN"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 9,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [],
+    "protected": false
+  }
+]

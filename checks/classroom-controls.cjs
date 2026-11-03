@@ -7,7 +7,7 @@ function load(file){file=path.resolve(file);if(file.endsWith('.json'))return JSO
  vm.runInNewContext(code,{module,exports:module.exports,require:requireFile,console});return module.exports;
 }
 const catalog=JSON.parse(fs.readFileSync('src/lib/explorer/topics-data.json','utf8'));
-for(const topic of catalog){const s=fs.readFileSync('src/app'+topic.route+'/page.tsx','utf8');assert(s.includes('SimulationStage')||s.includes('GeophysicsFrame')||s.includes('SkeletalActivity'),'fullscreen missing at '+topic.route);}
+for(const topic of catalog){const s=fs.readFileSync('src/app'+topic.route+'/page.tsx','utf8');assert(s.includes('SimulationStage')||s.includes('GeophysicsFrame')||s.includes('SkeletalActivity')||s.includes('BiologyLesson'),'fullscreen missing at '+topic.route);}
 function nodes(tree){let out=[];function visit(n){if(!React.isValidElement(n))return;out.push(n);React.Children.forEach(n.props.children,visit);}visit(tree);return out;}
 initial=[false,''];const picker=load('src/components/explorer/TopicPicker.tsx');let chosen;
 let tree=picker.TopicPicker({value:'',label:'Topic',automatic:'Automatic',onChange:id=>chosen=id});let buttons=nodes(tree).filter(n=>n.type==='button'&&n.props.className==='af-topic-choice');assert.equal(buttons.length,catalog.length+1);for(const b of buttons){assert.equal(b.props.style.color,'#111827');assert.equal(b.props.style.backgroundColor,'#fff');}

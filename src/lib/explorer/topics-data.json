@@ -3241,5 +3241,270 @@
       }
     ],
     "protected": false
+  },
+  {
+    "id": "biology-cells",
+    "route": "/biology/cells",
+    "subject": "Biology",
+    "title": "Cells and organelles",
+    "description": "Compare plant and animal cell structures and explain selected organelle functions.",
+    "principle": "Compare plant and animal cell structures and explain selected organelle functions.",
+    "concept": "bio-cells",
+    "aliases": [
+      "cells",
+      "cell organelles",
+      "plant cell",
+      "animal cell",
+      "cellular biology"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 7,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [
+      {
+        "key": "cell",
+        "default": "plant",
+        "options": [
+          "plant",
+          "animal"
+        ]
+      },
+      {
+        "key": "labels",
+        "default": "on",
+        "options": [
+          "on",
+          "off"
+        ]
+      },
+      {
+        "key": "cellView",
+        "default": "illustration",
+        "options": [
+          "illustration",
+          "microscope"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "biology-mitosis",
+    "route": "/biology/mitosis",
+    "subject": "Biology",
+    "title": "Mitosis and the cell cycle",
+    "description": "Track one replication and one division, preserving chromosome set number.",
+    "principle": "Track one replication and one division, preserving chromosome set number.",
+    "concept": "bio-mitosis",
+    "aliases": [
+      "mitosis",
+      "cell cycle"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 5,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "biology-meiosis",
+    "route": "/biology/meiosis",
+    "subject": "Biology",
+    "title": "Meiosis and genetic variation",
+    "description": "Track homologues then sister chromatids through two divisions and explore genetic variation.",
+    "principle": "Track homologues then sister chromatids through two divisions and explore genetic variation.",
+    "concept": "bio-meiosis",
+    "aliases": [
+      "meiosis",
+      "meiotic division"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 8,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [
+      {
+        "key": "crossing",
+        "default": "on",
+        "options": [
+          "on",
+          "off"
+        ]
+      },
+      {
+        "key": "orientation",
+        "default": "original",
+        "options": [
+          "original",
+          "alternate"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "biology-transpiration",
+    "route": "/biology/transpiration",
+    "subject": "Biology",
+    "title": "Transpiration in plants",
+    "description": "Explore humidity, air movement, temperature and stomatal opening with an illustrative relative water-loss index.",
+    "principle": "Explore humidity, air movement, temperature and stomatal opening with an illustrative relative water-loss index.",
+    "concept": "bio-transpiration",
+    "aliases": [
+      "transpiration",
+      "plant water loss"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 3,
+        "default": 0,
+        "integer": true
+      },
+      {
+        "key": "humidity",
+        "label": "Humidity",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "default": 50
+      },
+      {
+        "key": "wind",
+        "label": "Air movement",
+        "unit": "relative",
+        "min": 0,
+        "max": 5,
+        "default": 1
+      },
+      {
+        "key": "temperature",
+        "label": "Temperature",
+        "unit": "°C",
+        "min": 10,
+        "max": 40,
+        "default": 25
+      },
+      {
+        "key": "opening",
+        "label": "Stomatal opening",
+        "unit": "%",
+        "min": 0,
+        "max": 100,
+        "default": 100
+      }
+    ],
+    "modes": [],
+    "protected": false
+  },
+  {
+    "id": "biology-classification",
+    "route": "/biology/classification",
+    "subject": "Biology",
+    "title": "Classification and scientific names",
+    "description": "Search and compare 90 organisms across Domain and KPCOFGS, inspect source notes and practise scientific names.",
+    "principle": "Compare human and domestic cat ranks from Domain to Species and practise scientific names.",
+    "concept": "bio-classification",
+    "aliases": [
+      "classification",
+      "taxonomy",
+      "KPCOFGS",
+      "nomenclature",
+      "binomial naming"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 7,
+        "default": 0,
+        "integer": true
+      },
+      {
+        "key": "organismIndex",
+        "label": "First organism",
+        "unit": "index",
+        "min": 0,
+        "max": 89,
+        "default": 0,
+        "integer": true
+      },
+      {
+        "key": "comparisonIndex",
+        "label": "Comparison organism",
+        "unit": "index",
+        "min": 0,
+        "max": 89,
+        "default": 1,
+        "integer": true
+      }
+    ],
+    "modes": [
+      {
+        "key": "labels",
+        "default": "on",
+        "options": [
+          "on",
+          "off"
+        ]
+      }
+    ],
+    "protected": false
+  },
+  {
+    "id": "biology-life-processes",
+    "route": "/biology/life-processes",
+    "subject": "Biology",
+    "title": "Characteristics of living things",
+    "description": "Examine evidence for life, compare life processes and distinguish common misconceptions.",
+    "principle": "Examine evidence for life, compare life processes and distinguish common misconceptions.",
+    "concept": "bio-life-processes",
+    "aliases": [
+      "life processes",
+      "characteristics of living things",
+      "MRNIGERDCA",
+      "MRS GREN"
+    ],
+    "parameters": [
+      {
+        "key": "step",
+        "label": "Stage or structure",
+        "unit": "index",
+        "min": 0,
+        "max": 9,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [],
+    "protected": false
   }
 ]

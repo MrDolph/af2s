@@ -1,0 +1,350 @@
+[
+  {
+    "file": "src/components/biology/biology-lessons.css",
+    "existed": true
+  },
+  {
+    "file": "src/components/biology/BiologyLesson.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/biology/ClassificationModel.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/biology/BiologyModel.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/biology/CellReference.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/biology/ReferenceImage.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/lib/explorer/topics-data.json",
+    "existed": true
+  },
+  {
+    "file": "src/lib/biology/reference-images.json",
+    "existed": false
+  },
+  {
+    "file": "src/lib/biology/lessons.ts",
+    "existed": true
+  },
+  {
+    "file": "checks/biology-images.cjs",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/escherichia-coli.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/pandinus-imperator.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/agaricus-bisporus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/felis-catus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/oryza-sativa.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/rhizopus-stolonifer.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/danaus-plexippus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/cocos-nucifera.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/triticum-aestivum.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/aspergillus-niger.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/halobacterium-salinarum.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/saccharum-officinarum.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/arachis-hypogaea.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/ovis-aries.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/rana-temporaria.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/solanum-tuberosum.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/struthio-camelus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/lumbricus-terrestris.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/taenia-solium.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/oryctolagus-cuniculus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/carica-papaya.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/elaeis-guineensis.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/panthera-leo.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/dryopteris-filix-mas.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/helianthus-annuus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/columba-livia.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/abelmoschus-esculentus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/pinus-sylvestris.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/mangifera-indica.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/mus-musculus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/python-sebae.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/hydra-vulgaris.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/staphylococcus-aureus.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/eidolon-helvum.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/gallus-gallus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/saccharomyces-cerevisiae.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/macrotermes-bellicosus.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/procambarus-clarkii.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/allium-cepa.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/zea-mays.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/oreochromis-niloticus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/musca-domestica.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/paramecium-caudatum.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/manihot-esculenta.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/anas-platyrhynchos.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/callinectes-sapidus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/obelia-geniculata.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/rhizobium-leguminosarum.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/crocodylus-niloticus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/bos-taurus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/glycine-max.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/ascaris-lumbricoides.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/bacillus-subtilis.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/polytrichum-commune.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/solanum-lycopersicum.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/theobroma-cacao.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/spongia-officinalis.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/capra-hircus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/sorghum-bicolor.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/rattus-norvegicus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/pan-troglodytes.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/homo-sapiens.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/macrobrachium-rosenbergii.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/volvox-carteri.png",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/girardia-tigrina.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/asterias-rubens.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/phaseolus-vulgaris.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/paracentrotus-lividus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/octopus-vulgaris.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/araneus-diadematus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/sclerophrys-regularis.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/penicillium-chrysogenum.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/amoeba-proteus.jpeg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/periplaneta-americana.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/clarias-gariepinus.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/vigna-unguiculata.jpg",
+    "existed": false
+  },
+  {
+    "file": "public/biology/reference/locusta-migratoria.jpg",
+    "existed": false
+  }
+]

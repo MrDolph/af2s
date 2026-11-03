@@ -1,0 +1,38 @@
+[
+  {
+    "file": "src/lib/biology/taxonomy.ts",
+    "existed": false
+  },
+  {
+    "file": "src/lib/biology/organisms.json",
+    "existed": false
+  },
+  {
+    "file": "src/lib/biology/lessons.ts",
+    "existed": true
+  },
+  {
+    "file": "src/lib/explorer/topics-data.json",
+    "existed": true
+  },
+  {
+    "file": "src/components/biology/BiologyModel.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/biology/ClassificationModel.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/biology/BiologyLesson.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/biology/biology-lessons.css",
+    "existed": true
+  },
+  {
+    "file": "checks/classification-organisms.cjs",
+    "existed": false
+  }
+]

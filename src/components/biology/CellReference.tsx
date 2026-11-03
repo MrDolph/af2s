@@ -1,0 +1,9 @@
+'use client';
+import images from '@/lib/biology/reference-images.json';
+import { lessons } from '@/lib/biology/lessons';
+import { ReferenceImage,type ReferenceMedia } from './ReferenceImage';
+export function CellReference({plant,view='illustration',selected,labels,interactive,onSelect}:{plant:boolean;view?:string;selected:number;labels:boolean;interactive:boolean;onSelect:(n:number)=>void}){
+ const microscopy=view==='microscope';const key=plant?(microscopy?'plant-micrograph':'plant-cell'):(microscopy?'animal-micrograph':'animal-cell');const media=images.cells[key] as ReferenceMedia;
+ const caption=plant?(microscopy?'Elodea leaf cells under a light microscope':'Detailed plant-cell reference illustration'):(microscopy?'Human cheek cells stained with methylene blue':'Detailed animal-cell reference illustration');
+ return <div className="bio-cell-reference"><ReferenceImage key={key} media={media} alt={caption} caption={caption}/><p className="my-3 text-sm leading-6">{microscopy?'This is an actual microscope image. Only structures resolved by this preparation are visible; it does not show every organelle in the illustration.':'This cutaway is a scientific illustration, not a photograph. Colours distinguish structures; shapes and proportions are generalised. Embedded image labels remain visible.'}</p><p className="my-2 text-sm font-semibold">Selected organelle: {lessons.cells.steps[selected].name}</p>{labels&&<div className="bio-organelle-guide" role="group" aria-label="Organelle guide">{lessons.cells.steps.slice(0,plant?8:5).map((s,i)=><button key={s.name} className="bio-button" disabled={!interactive} aria-pressed={i===selected} onClick={()=>onSelect(i)}>{s.name}</button>)}</div>}<p className="mt-2 text-xs leading-6 text-gray-600">Use the organelle menu or guide to read functions. The reference image is not an organelle-location test. Images show example cell types; cells vary with tissue and preparation.</p></div>;
+}

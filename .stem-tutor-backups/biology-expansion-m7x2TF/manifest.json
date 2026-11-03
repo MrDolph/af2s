@@ -1,0 +1,94 @@
+[
+  {
+    "file": "src/lib/subjects.ts",
+    "existed": true
+  },
+  {
+    "file": "src/lib/biology/lessons.ts",
+    "existed": false
+  },
+  {
+    "file": "src/lib/explorer/locales.ts",
+    "existed": true
+  },
+  {
+    "file": "src/lib/explorer/topics-data.json",
+    "existed": true
+  },
+  {
+    "file": "src/components/biology/BiologyModel.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/biology/BiologyLesson.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/biology/biology-lessons.css",
+    "existed": false
+  },
+  {
+    "file": "src/app/biology/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/biology/mitosis/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/biology/classification/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/biology/transpiration/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/biology/meiosis/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/biology/life-processes/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/biology/cells/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/embed/mitosis/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/embed/classification/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/embed/transpiration/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/embed/meiosis/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/embed/life-processes/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/embed/cells/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "checks/biology-expansion.cjs",
+    "existed": false
+  },
+  {
+    "file": "checks/classroom-controls.cjs",
+    "existed": true
+  },
+  {
+    "file": "checks/embed-layout.cjs",
+    "existed": true
+  }
+]

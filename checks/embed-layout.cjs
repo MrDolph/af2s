@@ -2,6 +2,7 @@ const fs=require('fs'),ts=require('typescript'),assert=require('assert');
 let count=0;
 for(const d of fs.readdirSync('src/app/embed',{withFileTypes:true}).filter(e=>e.isDirectory())){
  const file=`src/app/embed/${d.name}/page.tsx`,source=fs.readFileSync(file,'utf8'),ast=ts.createSourceFile(file,source,99,true,4);
+ if(source.includes('BiologyLesson')){assert(source.includes(' embed'));const shared=fs.readFileSync('src/components/biology/BiologyLesson.tsx','utf8');assert(shared.includes('af-embed-stage'));assert(shared.includes('data-stage-role="canvas"'));count++;continue;}
  if(d.name==='skeletal-system'){assert(source.includes('SkeletalActivity embed'));count++;continue;}
  assert(source.includes('af-embed-stage'),`missing common embed class: ${d.name}`);
  assert(source.includes('data-stage-role="canvas"'),`missing canvas slot: ${d.name}`);
@@ -18,5 +19,5 @@ for(const d of fs.readdirSync('src/app/embed',{withFileTypes:true}).filter(e=>e.
  assert(source.includes('useResponsiveCanvasSize')||source.includes('AtomicModelsCanvas')||source.includes('MosfetCanvas'),`no sizing strategy ${d.name}`);
  count++;
 }
-assert.equal(count,36);
+assert.equal(count,42);
 console.log(`PASS: ${count} embeds have shared stages, responsive canvases, separate playback and no auxiliary graphs in parameter headers.`);
