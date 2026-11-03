@@ -36,7 +36,7 @@ export function TopicPicker({ value, onChange, label, automatic }: Props) {
    </div>
    <div className="af-topic-picker-list">
     <button type="button" onClick={() => choose('')} className="af-topic-choice" style={colours}>{automatic}{!value && ' ✓'}</button>
-    {['Physics','Chemistry','Mathematics','Geophysics'].map(subject => {
+    {['Physics','Chemistry','Biology','Mathematics','Geophysics'].map(subject => {
      const group = filtered.filter(t => t.subject === subject); if (!group.length) return null;
      return <section key={subject} aria-label={subject}><h3 style={{color:'#3730a3',background:'#eef2ff',padding:'.6rem .75rem',fontSize:'.8rem'}}>{subject}</h3>
       {group.map(t => <button key={t.id} type="button" className="af-topic-choice" style={colours} onClick={() => choose(t.id)} aria-pressed={value===t.id}>{t.title}{value === t.id && ' ✓'}</button>)}

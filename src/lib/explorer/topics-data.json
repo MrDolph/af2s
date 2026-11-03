@@ -3174,5 +3174,72 @@
     ],
     "modes": [],
     "protected": true
+  },
+  {
+    "id": "biology-skeletal-system",
+    "route": "/biology/skeletal-system",
+    "subject": "Biology",
+    "title": "Human skeletal system",
+    "description": "Explore the major bones and groups, their locations and functions. A typical adult has 206 bones: 80 axial and 126 appendicular. Group counts are not counts of SVG shapes. Identification and classification challenges support classroom discussion.",
+    "principle": "Axial (80) + appendicular (126) = 206 bones in a typical adult. Bones support, protect and act as levers.",
+    "concept": "skeleton",
+    "aliases": [
+      "skeletal system",
+      "human skeleton",
+      "skeleton",
+      "bones",
+      "femur",
+      "skull",
+      "axial skeleton",
+      "appendicular skeleton"
+    ],
+    "parameters": [
+      {
+        "key": "boneIndex",
+        "label": "Bone/group index in the activity list",
+        "unit": "",
+        "min": 0,
+        "max": 23,
+        "default": 0,
+        "integer": true
+      }
+    ],
+    "modes": [
+      {
+        "key": "view",
+        "default": "front",
+        "options": [
+          "front",
+          "back"
+        ]
+      },
+      {
+        "key": "division",
+        "default": "all",
+        "options": [
+          "all",
+          "axial",
+          "appendicular"
+        ]
+      },
+      {
+        "key": "labels",
+        "default": "on",
+        "options": [
+          "on",
+          "off"
+        ]
+      },
+      {
+        "key": "activity",
+        "default": "explore",
+        "options": [
+          "explore",
+          "identify",
+          "classify"
+        ]
+      }
+    ],
+    "protected": false
   }
 ]

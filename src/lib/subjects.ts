@@ -39,6 +39,7 @@ export const SUBJECTS: Subject[] = [
     description: 'Trigonometry and the maths behind physics',
     status: 'live',
   },
+  { slug: 'biology', label: 'Biology', href: '/biology', icon: '🧬', description: 'Skeleton, bone identification and classroom activities', status: 'live' },
   // Examples — uncomment one (and create its hub page) when you're ready:
   // { slug: 'biology',   label: 'Biology',   href: '/biology',   icon: '🧬', description: 'Cells, genetics and ecosystems',            status: 'soon' },
   // { slug: 'it',        label: 'IT',        href: '/it',        icon: '💻', description: 'Computing, networks and algorithms',        status: 'soon' },

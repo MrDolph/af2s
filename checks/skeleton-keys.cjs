@@ -1,0 +1,6 @@
+const fs=require('fs'),vm=require('vm'),path=require('path'),ts=require('typescript'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),assert=require('assert');
+function load(file){const module={exports:{}};const code=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;vm.runInNewContext(code,{module,exports:module.exports,require:id=>id.startsWith('@/')?load('src/'+id.slice(2)+'.ts'):require(id),console});return module.exports;}
+const warnings=[],old=console.error;console.error=(...args)=>warnings.push(args.map(String).join(' '));
+try{const {SkeletonDiagram}=load('src/components/biology/SkeletonDiagram.tsx');for(const view of ['front','back'])for(const division of ['all','axial','appendicular']){const markup=renderToStaticMarkup(React.createElement(SkeletonDiagram,{view,division,selected:null,labels:true,interactive:true,onSelect:()=>{}}));assert(markup.includes('<svg'));assert(markup.includes('metacarpals')||markup.includes('Metacarpals'));}}finally{console.error=old;}
+assert(!warnings.some(w=>/unique.*key|same key/i.test(w)),warnings.join('\n'));
+console.log('PASS: front/back skeleton renders in all three division modes without missing or duplicate React keys.');

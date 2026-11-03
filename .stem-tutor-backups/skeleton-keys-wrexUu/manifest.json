@@ -1,0 +1,10 @@
+[
+  {
+    "file": "src/components/biology/SkeletonDiagram.tsx",
+    "existed": true
+  },
+  {
+    "file": "checks/skeleton-keys.cjs",
+    "existed": false
+  }
+]

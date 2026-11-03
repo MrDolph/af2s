@@ -1,0 +1,66 @@
+[
+  {
+    "file": "src/lib/subjects.ts",
+    "existed": true
+  },
+  {
+    "file": "src/lib/explorer/topics-data.json",
+    "existed": true
+  },
+  {
+    "file": "src/lib/explorer/locales.ts",
+    "existed": true
+  },
+  {
+    "file": "src/components/explorer/TopicPicker.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/explore/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "checks/classroom-controls.cjs",
+    "existed": true
+  },
+  {
+    "file": "checks/embed-layout.cjs",
+    "existed": true
+  },
+  {
+    "file": "src/lib/biology/languages.ts",
+    "existed": false
+  },
+  {
+    "file": "src/lib/biology/skeleton.ts",
+    "existed": false
+  },
+  {
+    "file": "src/components/biology/biology.css",
+    "existed": false
+  },
+  {
+    "file": "src/components/biology/SkeletonDiagram.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/biology/SkeletalActivity.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/biology/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/biology/skeletal-system/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/embed/skeletal-system/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "checks/biology-skeleton.cjs",
+    "existed": false
+  }
+]
