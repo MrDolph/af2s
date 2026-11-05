@@ -72,3 +72,24 @@
  display:flex; flex-direction:column; align-items:flex-start; gap:.3rem; margin:0;
 }
 .af-minitab-stage[data-expanded="true"] .af-minitab-live-readout .af-minitab-stat span:last-child { font-size:15px; white-space:nowrap; }
+
+.af-minitab-stage[data-expanded="true"] .af-stage-parameters .af-gradient-readout {
+ grid-template-columns:repeat(7,minmax(140px,1fr));
+}
+.af-minitab-stage[data-expanded="true"] .af-gradient-working { max-width:36rem; flex:0 0 32rem; }
+.af-minitab-stage[data-expanded="true"] .af-gradient-working[open] { overflow:auto; max-height:130px; }
+.af-minitab-stage[data-expanded="true"] .af-gradient-inputs input { min-height:44px; }
+
+/* Put the full gradient readout first, with inputs underneath it. */
+.af-gradient-stage[data-expanded="true"] .af-stage-parameters > [data-stage-role="parameters"] {
+ width:100%; min-width:0; flex:1 1 100%; flex-wrap:wrap !important; align-items:flex-start;
+}
+.af-gradient-stage[data-expanded="true"] .af-stage-parameters .af-gradient-readout {
+ order:-1; flex:1 0 100%; width:100%; min-width:0;
+ grid-template-columns:repeat(7,minmax(100px,1fr));
+}
+.af-gradient-stage[data-expanded="true"] .af-gradient-readout .af-minitab-stat { min-width:0; padding:.4rem; }
+.af-gradient-stage[data-expanded="true"] .af-gradient-readout .af-minitab-stat span:last-child { font-size:13px; white-space:normal; }
+.af-gradient-stage[data-expanded="true"] .af-gradient-inputs { flex:1 1 480px; }
+.af-gradient-stage[data-expanded="true"] .af-gradient-angle-control { flex:1 1 240px; }
+.af-gradient-stage[data-expanded="true"] .af-gradient-working { flex:1 1 320px; }

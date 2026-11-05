@@ -4,6 +4,8 @@ import { useState, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { GradientExplorerCanvas } from '@/components/simulation/GradientExplorerCanvas';
 import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
+import { GradientReadout } from '@/components/simulation/GradientReadout';
+import { gradientCoordinate, gradientAngle } from '@/lib/physics/gradientReadout';
 import { FIELDS } from '@/lib/physics/gradientField';
 
 const TEACHER_NOTES = [
@@ -17,7 +19,7 @@ const TEACHER_NOTES = [
 const EXERCISES: { q: string; a: string }[] = [
   { q: 'For φ=x²+y², find ∇φ at (1,1) and its magnitude.', a: '∇φ=(2x,2y)=(2,2) at (1,1). |∇φ|=√(4+4)=√8≈2.83.' },
   { q: 'Using the gradient from above, find D_âφ in direction â=(1/√2,1/√2).', a: 'D_âφ=∇φ·â=2(1/√2)+2(1/√2)=4/√2=2√2≈2.83 — matches |∇φ| exactly, since â is aligned with ∇φ here.' },
-  { q: 'For φ=xy, find ∇φ at (2,3) and the direction of steepest ascent.', a: '∇φ=(y,x)=(3,2) at (2,3). Direction: (3,2)/|(3,2)|=(3,2)/√13≈(0.83,0.55).' },
+  { q: 'For φ=xy, find ∇φ at (2,3) and the direction of steepest ascent.', a: '∇φ=(y,x)=(3,2) at (2,3). Direction: (3,2)/|(3,2)|=(3,2)/√13≈(0.83,0.55). Equivalently θ=atan2(2,3)≈33.69°, anticlockwise from the positive x-axis.' },
   { q: 'At what points does ∇φ=0 for φ=x²−y²?', a: 'Only at the origin (0,0), where both 2x=0 and −2y=0 — the saddle point.' },
   { q: 'Explain why moving along a level curve always gives D_âφ=0.', a: 'A level curve is defined by φ=constant, so by definition φ does not change as you move along it — and D_âφ measures exactly that rate of change, so it must be zero in that direction.' },
 ];
@@ -35,9 +37,8 @@ export default function GradientExplorerPage() {
   const gmag = Math.hypot(gx, gy);
   const rad = (angleDeg * Math.PI) / 180;
   const dirDeriv = gx * Math.cos(rad) + gy * Math.sin(rad);
-  const phi = field.f(point.x, point.y);
 
-  let interpretation = 'D_âφ = ∇φ·â = |∇φ|cosθ — rotate the handle and watch this hold exactly.';
+  let interpretation = 'D_âφ = ∇φ·â = |∇φ|cosα. α is the angle between ∇φ and â; θ gives the direction of â from the positive x-axis.';
   const cosAngle = gmag > 1e-6 ? dirDeriv / gmag : 0;
   if (gmag < 0.05) {
     interpretation = '∇φ ≈ 0 here — a stationary point. Every direction gives D_âφ ≈ 0.';
@@ -70,12 +71,12 @@ export default function GradientExplorerPage() {
             ))}
           </div>
 
-          <SimulationStage className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
+          <SimulationStage className="af-gradient-stage grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
             <div data-stage-role="canvas" className="space-y-3 min-w-0">
               <div ref={canvasBoxRef} className="af-minitab-canvas-frame rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
                 <GradientExplorerCanvas
                   fieldIndex={fieldIndex} point={point} angleDeg={angleDeg}
-                  onPointChange={setPoint} onAngleChange={setAngleDeg}
+                  onPointChange={p=>setPoint({x:gradientCoordinate(p.x),y:gradientCoordinate(p.y)})} onAngleChange={a=>setAngleDeg(gradientAngle(a))}
                   width={canvasSize.width} height={canvasSize.height}
                 />
               </div>
@@ -86,22 +87,7 @@ export default function GradientExplorerPage() {
 
             <div data-stage-role="parameters" className="space-y-3">
               <label className="block text-sm text-gray-700">Scalar field<select aria-label="Scalar field" value={fieldIndex} onChange={e=>setFieldIndex(Number(e.target.value))} className="mt-1 w-full rounded-lg border border-gray-300 bg-white p-2">{FIELDS.map((f,i)=><option key={f.name} value={i}>{f.name}</option>)}</select></label>
-              <div className="af-minitab-live-readout rounded-2xl border border-gray-100 bg-white p-4 space-y-2">
-                <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-2">Live readout</p>
-                {[
-                  { l: 'Point (x,y)', v: `(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`, c: 'text-gray-700' },
-                  { l: 'φ(x,y)', v: phi.toFixed(3), c: 'text-gray-700' },
-                  { l: '∇φ', v: `(${gx.toFixed(2)}, ${gy.toFixed(2)})`, c: 'text-emerald-600' },
-                  { l: '|∇φ|', v: gmag.toFixed(3), c: 'text-emerald-600' },
-                  { l: 'â direction', v: `${angleDeg.toFixed(0)}°`, c: 'text-amber-600' },
-                  { l: 'D_âφ = ∇φ·â', v: dirDeriv.toFixed(3), c: 'text-indigo-600' },
-                ].map(r => (
-                  <div key={r.l} className="af-minitab-stat flex justify-between items-center rounded-lg bg-gray-50 px-3 py-2">
-                    <span className="text-xs text-gray-500">{r.l}</span>
-                    <span className={`text-xs font-semibold tabular-nums ${r.c}`}>{r.v}</span>
-                  </div>
-                ))}
-              </div>
+              <GradientReadout fieldIndex={fieldIndex} point={point} angleDeg={angleDeg} onPointChange={setPoint} onAngleChange={setAngleDeg}/>
               <p className="text-[11px] text-gray-400 px-1">Drag the blue point to move; drag the gold arrowhead to change direction â.</p>
             </div>
 

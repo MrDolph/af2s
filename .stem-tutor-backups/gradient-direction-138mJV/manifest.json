@@ -1,0 +1,22 @@
+[
+  {
+    "file": "src/lib/physics/gradientReadout.ts",
+    "existed": false
+  },
+  {
+    "file": "src/app/minitab/gradient-explorer/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/GradientReadout.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/simulation/minitab-classroom.css",
+    "existed": true
+  },
+  {
+    "file": "checks/gradient-readout.cjs",
+    "existed": false
+  }
+]
