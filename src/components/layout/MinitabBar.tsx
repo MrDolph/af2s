@@ -14,6 +14,7 @@ export function MinitabBar() {
   // and the admin area has its own separate access gate anyway.
   useEffect(() => {
     if (pathname === '/minitab/login' || pathname.startsWith('/minitab/admin')) return;
+    try { if(navigator.doNotTrack==='1'||(navigator as Navigator&{globalPrivacyControl?:boolean}).globalPrivacyControl||localStorage.getItem('afactor-analytics-opt-out-v1')==='1')return; }catch{return;}
     if (tracked.current === pathname) return;
     tracked.current = pathname;
     const slug = pathname.replace(/^\/minitab\/?/, '') || 'hub';

@@ -267,6 +267,7 @@ export default function AboutPage() {
               <Link href="/simulations" className="hover:text-indigo-600 transition">Simulations</Link>
               <Link href="/about" className="hover:text-indigo-600 transition">About</Link>
               <a href={PORTFOLIO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 transition">Portfolio ↗</a>
+              <Link href="/privacy/analytics" className="hover:text-indigo-600 transition">Usage privacy</Link>
               <Link href="/minitab/admin/login" className="text-gray-300 hover:text-gray-500 transition">Instructor Login</Link>
             </div>
           </div>

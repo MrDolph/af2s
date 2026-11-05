@@ -1,4 +1,5 @@
 import '@/components/accessibility/accessibility.css';
+import { SiteAnalyticsTracker } from '@/components/analytics/SiteAnalyticsTracker';
 
 import { AccessibilityProvider } from '@/components/accessibility/AccessibilityProvider';
 import '@/components/explorer/explorer-mobile.css';
@@ -23,7 +24,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-      <body className="min-h-screen bg-gray-50" suppressHydrationWarning><AccessibilityProvider>{children}</AccessibilityProvider></body>
+      <body className="min-h-screen bg-gray-50" suppressHydrationWarning><AccessibilityProvider>{children}<SiteAnalyticsTracker/></AccessibilityProvider></body>
     </html>
   );
 }

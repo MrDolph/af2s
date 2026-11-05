@@ -1,0 +1,82 @@
+[
+  {
+    "file": "src/app/layout.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/layout/MinitabBar.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/analytics/SiteAnalyticsTracker.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/lib/analytics/redis.ts",
+    "existed": true
+  },
+  {
+    "file": "src/lib/analytics/site-auth.ts",
+    "existed": false
+  },
+  {
+    "file": "src/lib/analytics/site-pages.json",
+    "existed": false
+  },
+  {
+    "file": "src/lib/analytics/site-model.ts",
+    "existed": false
+  },
+  {
+    "file": "src/lib/analytics/site-store.ts",
+    "existed": false
+  },
+  {
+    "file": "src/app/about/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/api/minitab-analytics/route.ts",
+    "existed": true
+  },
+  {
+    "file": "src/app/api/site-analytics/route.ts",
+    "existed": false
+  },
+  {
+    "file": "src/app/api/minitab-auth/route.ts",
+    "existed": true
+  },
+  {
+    "file": "src/app/api/minitab-track/route.ts",
+    "existed": true
+  },
+  {
+    "file": "src/app/api/site-track/route.ts",
+    "existed": false
+  },
+  {
+    "file": "src/app/minitab/admin/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/admin/site-analytics/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/privacy/analytics/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "checks/site-analytics.cjs",
+    "existed": false
+  },
+  {
+    "file": "docs/site-analytics.md",
+    "existed": false
+  },
+  {
+    "file": ".env.example",
+    "existed": true
+  }
+]

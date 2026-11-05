@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hashPasscode, MINITAB_COOKIE, MINITAB_NAME_COOKIE } from '@/lib/utils/minitabAuth';
+import { optedOut } from '@/lib/analytics/site-auth';
 import { recordLogin, sanitizeName } from '@/lib/analytics/redis';
 
 export async function POST(req: NextRequest) {
@@ -41,8 +42,8 @@ export async function POST(req: NextRequest) {
       maxAge: 60 * 60 * 24 * 30,
     });
 
-    // Best-effort, never blocks the login response if analytics isn't configured or fails.
-    recordLogin(name);
+    // Best-effort with a bounded storage timeout; failures do not reject login.
+    if(!optedOut(req))await recordLogin(name);
 
     return res;
   } catch (error) {

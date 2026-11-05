@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -85,7 +86,7 @@ export default function MinitabAnalyticsPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 py-6 space-y-4">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 py-6 space-y-4"><Link href="/minitab/admin/site-analytics" className="block rounded-2xl border border-indigo-200 bg-indigo-50 p-5 text-indigo-900"><strong>Site-wide usage analytics →</strong><p className="mt-2 text-sm">Popular pages, visitor trends, activity and browser-level page histories across all subjects.</p></Link>
           {loading && <p className="text-sm text-gray-400">Loading…</p>}
 
           {!loading && data && !data.configured && (
