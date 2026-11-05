@@ -21,7 +21,7 @@ export function DampedOscillatorGraph({ gamma, omega0, y0, yp0, currentT = 0 }: 
   const liveY = dampedY(markerT, { gamma, omega0, y0, yp0 });
 
   return (
-    <ResponsiveContainer width="100%" height={220}>
+    <div className="af-minitab-plot" style={{height:'var(--af-minitab-plot-height, 220px)'}}><ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 8, right: 16, left: 10, bottom: 28 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis dataKey="t" type="number" domain={[0, TMAX]} tick={{ fontSize: 10 }}>
@@ -42,6 +42,6 @@ export function DampedOscillatorGraph({ gamma, omega0, y0, yp0, currentT = 0 }: 
           </>
         )}
       </LineChart>
-    </ResponsiveContainer>
+    </ResponsiveContainer></div>
   );
 }

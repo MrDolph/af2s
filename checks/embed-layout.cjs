@@ -19,5 +19,5 @@ for(const d of fs.readdirSync('src/app/embed',{withFileTypes:true}).filter(e=>e.
  assert(source.includes('useResponsiveCanvasSize')||source.includes('AtomicModelsCanvas')||source.includes('MosfetCanvas'),`no sizing strategy ${d.name}`);
  count++;
 }
-assert.equal(count,42);
+assert.equal(count,43);
 console.log(`PASS: ${count} embeds have shared stages, responsive canvases, separate playback and no auxiliary graphs in parameter headers.`);

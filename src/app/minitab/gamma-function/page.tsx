@@ -1,5 +1,5 @@
 'use client';
-import { SimulationStage } from '@/components/simulation/SimulationStage';
+import { MinitabStage as SimulationStage } from '@/components/simulation/MinitabStage';
 import { useState } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { GammaGraph } from '@/components/simulation/GammaGraph';

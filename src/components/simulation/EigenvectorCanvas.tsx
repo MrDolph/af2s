@@ -1,4 +1,5 @@
 'use client';
+import { prepareMinitabCanvas, minitabPointer } from '@/lib/physics/minitabViewport';
 import { useRef, useEffect, useCallback } from 'react';
 import { matAt, eigen, type Matrix2x2 } from '@/lib/physics/eigen';
 
@@ -21,7 +22,7 @@ export function EigenvectorCanvas({ matrix, t, width = 460, height = 460 }: Prop
   const draw = useCallback(() => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
-    const W = canvas.width, H = canvas.height;
+    const {W,H} = prepareMinitabCanvas(canvas,ctx,460,460);
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, H);

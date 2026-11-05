@@ -9,7 +9,7 @@ export function FourierSeriesGraph({ target, n }: Props) {
   const data = useMemo(() => generateSeriesData(target, n), [target, n]);
 
   return (
-    <ResponsiveContainer width="100%" height={320}>
+    <div className="af-minitab-plot" style={{height:'var(--af-minitab-plot-height, 320px)'}}><ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 8, right: 16, left: 10, bottom: 28 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis dataKey="x" type="number" tick={{ fontSize: 10 }}>
@@ -22,6 +22,6 @@ export function FourierSeriesGraph({ target, n }: Props) {
         <Line type="monotone" dataKey="target" name="target" stroke="#94a3b8" strokeWidth={2} strokeDasharray="5 3" dot={false} isAnimationActive={false} />
         <Line type="monotone" dataKey="approx" name={`N=${n} terms`} stroke="#059669" strokeWidth={2.2} dot={false} isAnimationActive={false} />
       </LineChart>
-    </ResponsiveContainer>
+    </ResponsiveContainer></div>
   );
 }

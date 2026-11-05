@@ -33,7 +33,7 @@ export function GammaGraph({ x, showNegative }: Props) {
   const xmin = showNegative ? -4.5 : 0;
 
   return (
-    <ResponsiveContainer width="100%" height={320}>
+    <div className="af-minitab-plot" style={{height:'var(--af-minitab-plot-height, 320px)'}}><ResponsiveContainer width="100%" height="100%">
       <LineChart data={merged} margin={{ top: 8, right: 16, left: 10, bottom: 28 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis dataKey="x" type="number" domain={[xmin, 6]} tick={{ fontSize: 10 }}>
@@ -55,6 +55,6 @@ export function GammaGraph({ x, showNegative }: Props) {
           <ReferenceDot x={x} y={gx} r={6} fill="#6366f1" stroke="#fff" strokeWidth={2} />
         )}
       </LineChart>
-    </ResponsiveContainer>
+    </ResponsiveContainer></div>
   );
 }

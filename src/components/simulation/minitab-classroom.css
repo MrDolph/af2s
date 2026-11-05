@@ -1,0 +1,74 @@
+/* These rules apply only to expanded Minitab activities. */
+.af-minitab-stage[data-expanded="true"] {
+ --af-minitab-plot-height: max(40px, calc(var(--af-stage-canvas-height, 70dvh) - 32px));
+}
+.af-minitab-stage[data-expanded="true"] .af-stage-main { overflow:hidden; }
+.af-minitab-stage[data-expanded="true"] [data-stage-role="canvas"] {
+ display:flex; align-items:center; justify-content:center;
+ width:100%; height:100%; min-height:0; overflow:hidden; padding:.5rem;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-canvas-frame {
+ display:flex; align-items:center; justify-content:center;
+ width:100%; height:100%; min-width:0; min-height:0; padding:.5rem;
+}
+.af-minitab-stage[data-expanded="true"] canvas {
+ width:100% !important; height:100% !important;
+ max-width:100%; max-height:100%; object-fit:contain; object-position:center;
+ margin:0;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-plot { width:100%; min-width:0; min-height:0; }
+.af-minitab-stage[data-expanded="true"] .af-minitab-plot .recharts-cartesian-axis-tick-value,
+.af-minitab-stage[data-expanded="true"] .af-minitab-plot .recharts-label { font-size:12px; }
+.af-minitab-stage[data-expanded="true"] .af-minitab-transform-plots {
+ display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:repeat(2,minmax(0,1fr));
+ width:100%; height:100%; min-height:0; gap:.75rem;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-transform-plots > div {
+ display:flex; flex-direction:column; min-height:0; margin:0;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-transform-plots .af-minitab-plot {
+ flex:1 1 0; height:100% !important;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-transform-plots p { flex:0 0 auto; font-size:12px; }
+.af-minitab-stage[data-expanded="true"] .af-minitab-damped-scene {
+ display:grid; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) minmax(0,1fr) auto; gap:.5rem;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-damped-scene > div { height:100%; min-height:0; margin:0; }
+.af-minitab-stage[data-expanded="true"] .af-minitab-damped-scene > .af-minitab-canvas-frame { grid-column:1; grid-row:1; }
+.af-minitab-stage[data-expanded="true"] .af-minitab-damped-scene > .af-minitab-damped-graph { grid-column:1; grid-row:2; }
+.af-minitab-stage[data-expanded="true"] .af-minitab-damped-scene > [data-stage-role="playback"] { grid-column:1 / -1; grid-row:3; height:auto; }
+.af-minitab-stage[data-expanded="true"] .af-minitab-damped-graph {
+ display:flex; flex-direction:column; padding:.5rem;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-damped-graph .af-minitab-plot { flex:1 1 0; height:100% !important; }
+@media(min-width:900px), (orientation:landscape) {
+ .af-minitab-stage[data-expanded="true"] .af-minitab-transform-plots {
+  grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:minmax(0,1fr);
+ }
+ .af-minitab-stage[data-expanded="true"] .af-minitab-damped-scene {
+  grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); grid-template-rows:minmax(0,1fr) auto;
+ }
+ .af-minitab-stage[data-expanded="true"] .af-minitab-damped-scene > .af-minitab-damped-graph { grid-column:2; grid-row:1; }
+ .af-minitab-stage[data-expanded="true"] .af-minitab-damped-scene > [data-stage-role="playback"] { grid-row:2; }
+}
+
+/* Keep the interactive controls proportional to the classroom viewport. */
+.af-minitab-stage[data-expanded="true"] { --af-minitab-slider-width:clamp(220px,28vw,520px); }
+.af-minitab-stage[data-expanded="true"] .af-stage-parameters [data-stage-role="parameters"] { align-items:center; }
+.af-minitab-stage[data-expanded="true"] .af-stage-parameters div:has(> input[type="range"]) {
+ flex:0 0 auto; width:max-content; min-width:var(--af-minitab-slider-width); max-width:none;
+}
+.af-minitab-stage[data-expanded="true"] .af-stage-parameters input[type="range"] {
+ flex:1 1 auto !important; width:var(--af-minitab-slider-width) !important;
+ min-width:200px; min-height:44px; margin-inline:.5rem; cursor:pointer;
+}
+.af-minitab-stage[data-expanded="true"] .af-stage-parameters :is(label,span) { font-size:13px; }
+.af-minitab-stage[data-expanded="true"] .af-stage-parameters .af-minitab-live-readout {
+ display:grid; grid-template-columns:repeat(6,minmax(120px,1fr)); gap:.5rem;
+ width:max-content; min-width:min(900px,80vw); padding:.5rem;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-live-readout > p { grid-column:1 / -1; margin:0; }
+.af-minitab-stage[data-expanded="true"] .af-minitab-live-readout .af-minitab-stat {
+ display:flex; flex-direction:column; align-items:flex-start; gap:.3rem; margin:0;
+}
+.af-minitab-stage[data-expanded="true"] .af-minitab-live-readout .af-minitab-stat span:last-child { font-size:15px; white-space:nowrap; }

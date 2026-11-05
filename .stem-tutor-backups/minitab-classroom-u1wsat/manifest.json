@@ -1,0 +1,94 @@
+[
+  {
+    "file": "src/components/simulation/minitab-classroom.css",
+    "existed": false
+  },
+  {
+    "file": "src/components/simulation/FourierSeriesGraph.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/GradientExplorerCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/DampedOscillatorCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/MinitabStage.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/simulation/GammaGraph.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/EigenvectorCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/DampedOscillatorGraph.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/DivStokesCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/FourierTransformGraph.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/LegendreBesselGraph.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/HermiteLaguerreDeltaGraph.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/fourier-series/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/eigenvector-explorer/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/gamma-function/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/damped-oscillator/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/div-stokes/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/legendre-bessel/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/gradient-explorer/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/fourier-transform/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/hermite-laguerre-delta/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/lib/physics/minitabViewport.ts",
+    "existed": false
+  },
+  {
+    "file": "checks/minitab-classroom.cjs",
+    "existed": false
+  }
+]

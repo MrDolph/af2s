@@ -1,5 +1,5 @@
 'use client';
-import { SimulationStage } from '@/components/simulation/SimulationStage';
+import { MinitabStage as SimulationStage } from '@/components/simulation/MinitabStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState } from 'react';
@@ -93,7 +93,7 @@ export default function HermiteLaguerreDeltaPage() {
                 <div className="space-y-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-gray-500 shrink-0">Narrow the pulse (ε)</span>
-                    <input type="range" min={-2} max={0.3} step={0.02} value={epsExp} onChange={e => setEpsExp(Number(e.target.value))} className="flex-1" style={{ accentColor: '#2563eb' }} />
+                    <input aria-label="Pulse width epsilon" type="range" min={-2} max={0.3} step={0.02} value={epsExp} onChange={e => setEpsExp(Number(e.target.value))} className="flex-1" style={{ accentColor: '#2563eb' }} />
                     <span className="text-xs font-mono text-gray-500 w-16 text-right">{eps.toFixed(3)}</span>
                   </div>
                   <select value={fname} onChange={e => setFname(e.target.value)} className="w-full rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900">

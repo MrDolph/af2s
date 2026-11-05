@@ -1,4 +1,5 @@
 'use client';
+import { prepareMinitabCanvas, minitabPointer } from '@/lib/physics/minitabViewport';
 import { useRef, useEffect, useCallback } from 'react';
 import { FIELDS, type VectorField2D } from '@/lib/physics/divStokes';
 
@@ -31,7 +32,7 @@ export function DivStokesCanvas({ fieldIndex, disk, onDiskChange, width = 480, h
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { fieldIndex: fi, disk: d } = sim.current;
     const field: VectorField2D = FIELDS[fi];
-    const W = canvas.width, H = canvas.height;
+    const {W,H} = prepareMinitabCanvas(canvas,ctx,480,480);
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, H);
@@ -78,10 +79,8 @@ export function DivStokesCanvas({ fieldIndex, disk, onDiskChange, width = 480, h
 
   const moveDisk = useCallback((clientX: number, clientY: number) => {
     const canvas = canvasRef.current; if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-    const px = (clientX - rect.left) * scaleX, py = (clientY - rect.top) * scaleY;
-    const [wx, wy] = fromCanvas(px, py, canvas.width, canvas.height);
+    const {x:px,y:py} = minitabPointer(canvas,clientX,clientY,480,480);
+    const [wx, wy] = fromCanvas(px, py, 480, 480);
     const { disk: d } = sim.current;
     onDiskChange({ ...d, cx: Math.max(-2.5, Math.min(2.5, wx)), cy: Math.max(-2.5, Math.min(2.5, wy)) });
   }, [fromCanvas, onDiskChange]);
@@ -92,6 +91,7 @@ export function DivStokesCanvas({ fieldIndex, disk, onDiskChange, width = 480, h
       onPointerDown={e => { (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId); draggingRef.current = true; moveDisk(e.clientX, e.clientY); }}
       onPointerMove={e => { if (draggingRef.current) moveDisk(e.clientX, e.clientY); }}
       onPointerUp={() => { draggingRef.current = false; }}
+      onPointerCancel={() => { draggingRef.current = false; }}
     />
   );
 }

@@ -1,4 +1,5 @@
 'use client';
+import { prepareMinitabCanvas, minitabPointer } from '@/lib/physics/minitabViewport';
 import { useRef, useEffect, useCallback } from 'react';
 import { FIELDS, computeContours, type ScalarField } from '@/lib/physics/gradientField';
 
@@ -36,7 +37,7 @@ export function GradientExplorerCanvas({
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { fieldIndex: fi, point: pt, angleDeg: ang } = sim.current;
     const field: ScalarField = FIELDS[fi];
-    const W = canvas.width, H = canvas.height;
+    const {W,H} = prepareMinitabCanvas(canvas,ctx,480,480);
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, H);
@@ -96,16 +97,14 @@ export function GradientExplorerCanvas({
 
   const handlePointer = useCallback((clientX: number, clientY: number, isDown: boolean) => {
     const canvas = canvasRef.current; if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
-    const px = (clientX - rect.left) * scaleX, py = (clientY - rect.top) * scaleY;
-    const [wx, wy] = fromCanvas(px, py, canvas.width, canvas.height);
+    const {x:px,y:py} = minitabPointer(canvas,clientX,clientY,480,480);
+    const [wx, wy] = fromCanvas(px, py, 480, 480);
 
     if (isDown) {
       const { point: pt, angleDeg: ang } = sim.current;
-      const [dpx, dpy] = toCanvas(pt.x, pt.y, canvas.width, canvas.height);
+      const [dpx, dpy] = toCanvas(pt.x, pt.y, 480, 480);
       const rad = (ang * Math.PI) / 180;
-      const [dhx, dhy] = toCanvas(pt.x + Math.cos(rad) * 1.4, pt.y + Math.sin(rad) * 1.4, canvas.width, canvas.height);
+      const [dhx, dhy] = toCanvas(pt.x + Math.cos(rad) * 1.4, pt.y + Math.sin(rad) * 1.4, 480, 480);
       const distPt = Math.hypot(px - dpx, py - dpy);
       const distDir = Math.hypot(px - dhx, py - dhy);
       dragRef.current = distDir < 20 && distDir < distPt ? 'dir' : 'pt';
@@ -126,6 +125,7 @@ export function GradientExplorerCanvas({
       onPointerDown={e => { (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId); handlePointer(e.clientX, e.clientY, true); }}
       onPointerMove={e => { if (dragRef.current) handlePointer(e.clientX, e.clientY, false); }}
       onPointerUp={() => { dragRef.current = null; }}
+      onPointerCancel={() => { dragRef.current = null; }}
     />
   );
 }

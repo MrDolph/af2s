@@ -1,5 +1,5 @@
 'use client';
-import { SimulationStage } from '@/components/simulation/SimulationStage';
+import { MinitabStage as SimulationStage } from '@/components/simulation/MinitabStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
@@ -143,9 +143,9 @@ export default function DampedOscillatorPage() {
           {/* Main grid */}
           <SimulationStage className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
 
-            <div data-stage-role="canvas" className="space-y-3 min-w-0">
+            <div data-stage-role="canvas" className="af-minitab-damped-scene space-y-3 min-w-0">
               {/* Canvas */}
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div ref={canvasBoxRef} className="af-minitab-canvas-frame rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <DampedOscillatorCanvas key={resetKey}
                   gamma={gamma} omega0={omega0} y0={y0} yp0={yp0}
                   isRunning={isRunning} isPaused={isPaused}
@@ -154,7 +154,7 @@ export default function DampedOscillatorPage() {
               </div>
 
               {/* Controls */}
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+              <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <SimulationControls
                   isRunning={isRunning} isPaused={isPaused}
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
@@ -169,7 +169,7 @@ export default function DampedOscillatorPage() {
               </div>
 
               {/* Graph */}
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="af-minitab-damped-graph rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">y(t) vs time</p>
                 <DampedOscillatorGraph gamma={gamma} omega0={omega0} y0={y0} yp0={yp0} currentT={currentT} />
               </div>
@@ -205,7 +205,7 @@ export default function DampedOscillatorPage() {
             </div>
 
             {/* Teacher notes + exercises */}
-            <div data-stage-role="parameters" className="space-y-3 lg:col-span-2 xl:col-span-1">
+            <div data-stage-role="extra" className="space-y-3 lg:col-span-2 xl:col-span-1">
               <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
                 <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-3">📋 Teacher notes</p>
                 <ul className="space-y-2">

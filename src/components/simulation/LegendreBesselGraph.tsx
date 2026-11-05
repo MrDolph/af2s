@@ -29,7 +29,7 @@ export function LegendreBesselGraph({ mode, shown }: Props) {
   }, [isLeg, maxOrder]);
 
   return (
-    <ResponsiveContainer width="100%" height={340}>
+    <div className="af-minitab-plot" style={{height:'var(--af-minitab-plot-height, 340px)'}}><ResponsiveContainer width="100%" height="100%">
       <LineChart data={merged} margin={{ top: 8, right: 16, left: 10, bottom: 28 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis dataKey="x" type="number" tick={{ fontSize: 10 }} domain={isLeg ? [-1, 1] : [0, 15]}>
@@ -46,6 +46,6 @@ export function LegendreBesselGraph({ mode, shown }: Props) {
               stroke={COLORS[n % COLORS.length]} strokeWidth={2} dot={false} isAnimationActive={false} />
           ))}
       </LineChart>
-    </ResponsiveContainer>
+    </ResponsiveContainer></div>
   );
 }

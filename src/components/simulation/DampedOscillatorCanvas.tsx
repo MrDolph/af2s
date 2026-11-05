@@ -1,4 +1,5 @@
 'use client';
+import { prepareMinitabCanvas } from '@/lib/physics/minitabViewport';
 import { useRef, useEffect, useCallback } from 'react';
 import { dampedY, type DampedOscillatorParams } from '@/lib/physics/dampedOscillator';
 
@@ -55,7 +56,7 @@ export function DampedOscillatorCanvas({
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const { gamma: g, omega0: w0, y0: Y0, yp0: Yp0, isRunning: r, isPaused: p, onTick: ot } = sim.current;
-    const W = canvas.width, H = canvas.height;
+    const {W,H} = prepareMinitabCanvas(canvas,ctx,380,300);
 
     if (r && !p && timestamp !== undefined) {
       if (lastFrameRef.current !== null) {
@@ -125,7 +126,7 @@ export function DampedOscillatorCanvas({
     }
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRunning, isPaused, draw, gamma, omega0, y0, yp0]);
+  }, [isRunning, isPaused, draw, gamma, omega0, y0, yp0, width, height]);
 
   return <canvas ref={canvasRef} width={width} height={height} className="rounded-xl" />;
 }

@@ -1,5 +1,5 @@
 'use client';
-import { SimulationStage } from '@/components/simulation/SimulationStage';
+import { MinitabStage as SimulationStage } from '@/components/simulation/MinitabStage';
 import { useState, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { GradientExplorerCanvas } from '@/components/simulation/GradientExplorerCanvas';
@@ -72,21 +72,21 @@ export default function GradientExplorerPage() {
 
           <SimulationStage className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_260px_300px] gap-4">
             <div data-stage-role="canvas" className="space-y-3 min-w-0">
-              <div ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
+              <div ref={canvasBoxRef} className="af-minitab-canvas-frame rounded-2xl border border-gray-200 bg-white p-3 shadow-sm flex justify-center">
                 <GradientExplorerCanvas
                   fieldIndex={fieldIndex} point={point} angleDeg={angleDeg}
                   onPointChange={setPoint} onAngleChange={setAngleDeg}
                   width={canvasSize.width} height={canvasSize.height}
                 />
               </div>
-              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+              <div data-stage-role="extra" className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
                 <p className="text-xs text-emerald-900 leading-relaxed">{interpretation}</p>
               </div>
             </div>
 
             <div data-stage-role="parameters" className="space-y-3">
               <label className="block text-sm text-gray-700">Scalar field<select aria-label="Scalar field" value={fieldIndex} onChange={e=>setFieldIndex(Number(e.target.value))} className="mt-1 w-full rounded-lg border border-gray-300 bg-white p-2">{FIELDS.map((f,i)=><option key={f.name} value={i}>{f.name}</option>)}</select></label>
-              <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2">
+              <div className="af-minitab-live-readout rounded-2xl border border-gray-100 bg-white p-4 space-y-2">
                 <p className="text-xs font-medium uppercase tracking-wide text-gray-400 mb-2">Live readout</p>
                 {[
                   { l: 'Point (x,y)', v: `(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`, c: 'text-gray-700' },
@@ -96,7 +96,7 @@ export default function GradientExplorerPage() {
                   { l: 'â direction', v: `${angleDeg.toFixed(0)}°`, c: 'text-amber-600' },
                   { l: 'D_âφ = ∇φ·â', v: dirDeriv.toFixed(3), c: 'text-indigo-600' },
                 ].map(r => (
-                  <div key={r.l} className="flex justify-between items-center rounded-lg bg-gray-50 px-3 py-2">
+                  <div key={r.l} className="af-minitab-stat flex justify-between items-center rounded-lg bg-gray-50 px-3 py-2">
                     <span className="text-xs text-gray-500">{r.l}</span>
                     <span className={`text-xs font-semibold tabular-nums ${r.c}`}>{r.v}</span>
                   </div>

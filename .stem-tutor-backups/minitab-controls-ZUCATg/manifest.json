@@ -1,0 +1,34 @@
+[
+  {
+    "file": "src/components/simulation/minitab-classroom.css",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/div-stokes/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/gradient-explorer/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/minitab/hermite-laguerre-delta/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/damped-oscillator/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/lib/physics/dampedEmbed.ts",
+    "existed": false
+  },
+  {
+    "file": "checks/minitab-classroom.cjs",
+    "existed": true
+  },
+  {
+    "file": "checks/embed-layout.cjs",
+    "existed": true
+  }
+]

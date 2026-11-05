@@ -1,5 +1,5 @@
 'use client';
-import { SimulationStage } from '@/components/simulation/SimulationStage';
+import { MinitabStage as SimulationStage } from '@/components/simulation/MinitabStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useRef, useCallback, useEffect } from 'react';

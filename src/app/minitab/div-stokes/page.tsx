@@ -1,5 +1,5 @@
 'use client';
-import { SimulationStage } from '@/components/simulation/SimulationStage';
+import { MinitabStage as SimulationStage } from '@/components/simulation/MinitabStage';
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 
 import { useState, useRef } from 'react';
@@ -64,7 +64,7 @@ export default function DivStokesPage() {
               </div>
               <div data-stage-role="parameters" className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <span className="text-xs text-gray-500 shrink-0">Disk radius r</span>
-                <input type="range" min={0.4} max={2.2} step={0.05} value={disk.r}
+                <input aria-label="Disk radius" type="range" min={0.4} max={2.2} step={0.05} value={disk.r}
                   onChange={e => setDisk(d => ({ ...d, r: Number(e.target.value) }))}
                   className="flex-1" style={{ accentColor: '#2563eb' }} />
                 <span className="text-xs font-mono text-gray-500 w-14 text-right">{disk.r.toFixed(2)}</span>

@@ -24,7 +24,7 @@ export function HermiteLaguerreGraph({ mode, shown }: CurveProps) {
   }, [isH, maxOrder]);
 
   return (
-    <ResponsiveContainer width="100%" height={340}>
+    <div className="af-minitab-plot" style={{height:'var(--af-minitab-plot-height, 340px)'}}><ResponsiveContainer width="100%" height="100%">
       <LineChart data={merged} margin={{ top: 8, right: 16, left: 10, bottom: 28 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis dataKey="x" type="number" tick={{ fontSize: 10 }} domain={isH ? [-2.6, 2.6] : [0, 10]}>
@@ -39,7 +39,7 @@ export function HermiteLaguerreGraph({ mode, shown }: CurveProps) {
             stroke={COLORS[n % COLORS.length]} strokeWidth={2} dot={false} isAnimationActive={false} />
         ))}
       </LineChart>
-    </ResponsiveContainer>
+    </ResponsiveContainer></div>
   );
 }
 
@@ -57,7 +57,7 @@ export function DiracDeltaGraph({ eps, fname }: DeltaProps) {
   }, [eps, fname]);
 
   return (
-    <ResponsiveContainer width="100%" height={320}>
+    <div className="af-minitab-plot" style={{height:'var(--af-minitab-plot-height, 320px)'}}><ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 8, right: 16, left: 10, bottom: 28 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
         <XAxis dataKey="x" type="number" domain={[-6, 6]} tick={{ fontSize: 10 }}>
@@ -70,6 +70,6 @@ export function DiracDeltaGraph({ eps, fname }: DeltaProps) {
         <Line type="monotone" dataKey="f" name="f(x)" stroke="#d97706" strokeWidth={2} strokeDasharray="4 3" dot={false} isAnimationActive={false} />
         <Line type="monotone" dataKey="delta" name="δ_ε(x)" stroke="#2563eb" strokeWidth={2.4} dot={false} isAnimationActive={false} />
       </LineChart>
-    </ResponsiveContainer>
+    </ResponsiveContainer></div>
   );
 }
