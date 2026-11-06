@@ -64,7 +64,7 @@ function AtomicModelsEmbedInner() {
     model, speed, zoom, screening:Math.min(screening,Math.max(0,protonCount-1)), showOrbits, showNucleus, showElectrons, showProbability,
     showEnergyLevels, showSpectrum, showLabels, showSpin, spinProjection, showFineStructure, showZeeman,
     magneticField, nQuantum, lQuantum, mQuantum, protonCount, neutronCount: 0,
-    electronCount: 1, alphaEnergy,
+    electronCount: model==='thomson'?protonCount:1, alphaEnergy,
   };
 
   const [isRunning, setIsRunning] = useState(false);

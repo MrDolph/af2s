@@ -87,7 +87,7 @@ export default function AtomicModelsPage() {
     model, speed, zoom, screening:Math.min(screening,Math.max(0,protonCount-1)), showOrbits, showNucleus, showElectrons, showProbability,
     showEnergyLevels, showSpectrum, showLabels, showSpin, spinProjection, showFineStructure,
     showZeeman, magneticField, nQuantum, lQuantum, mQuantum,
-    protonCount, neutronCount, electronCount, alphaEnergy,
+    protonCount, neutronCount, electronCount:model==='thomson'?protonCount:electronCount, alphaEnergy,
   };
 
   const [liveStats, setLiveStats] = useState({ energy: 0, radius: 0, velocity: 0, n: 1, wavelength: 0, shellConfig: '' });
@@ -217,7 +217,7 @@ export default function AtomicModelsPage() {
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
                 <EmbedButton path="/embed/atomic-models" title="Atomic Models"
-                  params={{ model, speed, zoom, S:screening, orbits: showOrbits ? 1 : 0, nucleus: showNucleus ? 1 : 0, electrons: showElectrons ? 1 : 0, prob: showProbability ? 1 : 0, levels: showEnergyLevels ? 1 : 0, spectrum: showSpectrum ? 1 : 0, labels: showLabels ? 1 : 0, spin: showSpin ? 1 : 0, ms:spinProjection, fs: showFineStructure ? 1 : 0, zeeman: showZeeman ? 1 : 0, B: magneticField, n: nQuantum, l: lQuantum, m: mQuantum, Z: protonCount, N: neutronCount, e: electronCount, alphaE: alphaEnergy }} />
+                  params={{ model, speed, zoom, S:screening, orbits: showOrbits ? 1 : 0, nucleus: showNucleus ? 1 : 0, electrons: showElectrons ? 1 : 0, prob: showProbability ? 1 : 0, levels: showEnergyLevels ? 1 : 0, spectrum: showSpectrum ? 1 : 0, labels: showLabels ? 1 : 0, spin: showSpin ? 1 : 0, ms:spinProjection, fs: showFineStructure ? 1 : 0, zeeman: showZeeman ? 1 : 0, B: magneticField, n: nQuantum, l: lQuantum, m: mQuantum, Z: protonCount, N: neutronCount, e: model==='thomson'?protonCount:electronCount, alphaE: alphaEnergy }} />
               </div>
 
               {/* Mobile controls toggle */}
@@ -312,7 +312,7 @@ export default function AtomicModelsPage() {
                   )}
                   {model === 'thomson' && (
                     <>
-                      <StatRow label="Electrons" value={electronCount.toString()} unit="" color="text-blue-500" />
+                      <StatRow label="Electrons" value={protonCount.toString()} unit="" color="text-blue-500" />
                       <StatRow label="Protons" value={protonCount.toString()} unit="" color="text-amber-600" />
                       <StatRow label="Net charge" value="0" unit="e" color="text-emerald-600" />
                     </>
