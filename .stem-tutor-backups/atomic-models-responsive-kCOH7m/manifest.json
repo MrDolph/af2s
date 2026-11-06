@@ -1,0 +1,14 @@
+[
+  {
+    "file": "src/components/simulation/AtomicModelsCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/atomic-models.css",
+    "existed": false
+  },
+  {
+    "file": "checks/atomic-models-layout.cjs",
+    "existed": false
+  }
+]

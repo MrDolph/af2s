@@ -1,0 +1,38 @@
+[
+  {
+    "file": "src/components/simulation/AtomicModelsCanvas.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/BohrRadiationLab.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/simulation/atomic-models.css",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/atomic-models/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/embed/atomic-models/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "checks/atomic-models-layout.cjs",
+    "existed": true
+  },
+  {
+    "file": "docs/atomic-radiation-lesson.md",
+    "existed": true
+  },
+  {
+    "file": "src/lib/physics/bohrWorkbench.ts",
+    "existed": false
+  },
+  {
+    "file": "src/components/simulation/BohrCalculations.tsx",
+    "existed": false
+  }
+]

@@ -1,7 +1,7 @@
 'use client';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
-import { Suspense, useState, useCallback } from 'react';
+import { Suspense, useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AtomicModelsCanvas } from '@/components/simulation/AtomicModelsCanvas';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
@@ -47,6 +47,7 @@ function AtomicModelsEmbedInner() {
   const [showEnergyLevels, setShowEnergyLevels] = useState(() => bool(sp, 'levels', true));
   const [showSpectrum, setShowSpectrum] = useState(() => bool(sp, 'spectrum', true));
   const [showLabels, setShowLabels] = useState(() => bool(sp, 'labels', true));
+  const [spinProjection,setSpinProjection] = useState<0.5|-0.5>(() => sp.get('ms')==='-0.5'?-0.5:0.5);
   const [showSpin, setShowSpin] = useState(() => bool(sp, 'spin', false));
   const [showFineStructure, setShowFineStructure] = useState(() => bool(sp, 'fs', false));
   const [showZeeman, setShowZeeman] = useState(() => bool(sp, 'zeeman', false));
@@ -57,9 +58,11 @@ function AtomicModelsEmbedInner() {
   const [protonCount, setProtonCount] = useState(() => num(sp, 'Z', 1, 1, 92));
   const [alphaEnergy, setAlphaEnergy] = useState(() => num(sp, 'alphaE', 5, 1, 10));
 
+  const [screening,setScreening]=useState(()=>num(sp,'S',0,0,91));
+  useEffect(()=>{setScreening(s=>Math.min(s,Math.max(0,protonCount-1)));},[protonCount]);
   const params: AtomicParams = {
-    model, speed, zoom, showOrbits, showNucleus, showElectrons, showProbability,
-    showEnergyLevels, showSpectrum, showLabels, showSpin, showFineStructure, showZeeman,
+    model, speed, zoom, screening:Math.min(screening,Math.max(0,protonCount-1)), showOrbits, showNucleus, showElectrons, showProbability,
+    showEnergyLevels, showSpectrum, showLabels, showSpin, spinProjection, showFineStructure, showZeeman,
     magneticField, nQuantum, lQuantum, mQuantum, protonCount, neutronCount: 0,
     electronCount: 1, alphaEnergy,
   };
@@ -83,7 +86,7 @@ function AtomicModelsEmbedInner() {
         })}
       </div>
 
-      <div data-stage-role="canvas"><AtomicModelsCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} /></div>
+      <div data-stage-role="canvas"><AtomicModelsCanvas key={resetKey} params={params} onZoomChange={showControls?setZoom:undefined} onParamsChange={showControls?patch=>{if(patch.protonCount!==undefined)setProtonCount(patch.protonCount);if(patch.showOrbits!==undefined)setShowOrbits(patch.showOrbits);if(patch.showElectrons!==undefined)setShowElectrons(patch.showElectrons);if(patch.showNucleus!==undefined)setShowNucleus(patch.showNucleus);if(patch.showEnergyLevels!==undefined)setShowEnergyLevels(patch.showEnergyLevels);if(patch.showLabels!==undefined)setShowLabels(patch.showLabels);if(patch.showSpin!==undefined)setShowSpin(patch.showSpin);if(patch.spinProjection!==undefined)setSpinProjection(patch.spinProjection);if(patch.showSpectrum!==undefined)setShowSpectrum(patch.showSpectrum);if(patch.showFineStructure!==undefined)setShowFineStructure(patch.showFineStructure);if(patch.showZeeman!==undefined)setShowZeeman(patch.showZeeman);if(patch.magneticField!==undefined)setMagneticField(patch.magneticField);if(patch.screening!==undefined)setScreening(patch.screening);if(patch.showProbability!==undefined)setShowProbability(patch.showProbability);if(patch.nQuantum!==undefined)setNQuantum(patch.nQuantum);if(patch.lQuantum!==undefined)setLQuantum(patch.lQuantum);if(patch.mQuantum!==undefined)setMQuantum(patch.mQuantum);}:undefined} isRunning={isRunning} isPaused={isPaused} interactive={showControls} onModelChange={showControls?setModel:undefined} onSpeedChange={showControls?setSpeed:undefined} controls={showControls?{run:()=>{setIsRunning(true);setIsPaused(false);},pause:()=>setIsPaused(v=>!v),reset:()=>{setIsRunning(false);setIsPaused(false);setResetKey(v=>v+1);}}:undefined} /></div>
       <div data-stage-role="playback"><SimulationControls isRunning={isRunning} isPaused={isPaused}
         onRun={() => { setIsRunning(true); setIsPaused(false); }}
         onPause={() => setIsPaused(p => !p)} onReset={reset} /></div>

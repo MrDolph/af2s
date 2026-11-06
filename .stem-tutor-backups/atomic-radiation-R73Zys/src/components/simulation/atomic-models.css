@@ -1,0 +1,35 @@
+.af-atomic-view { color-scheme:light; color:#0f172a; background:#fff; border:1px solid #cbd5e1; border-radius:16px; overflow:hidden; min-width:0; }
+.af-atomic-layout { display:grid; grid-template-columns:minmax(0,1fr); min-width:0; }
+.af-atomic-scene { position:relative; width:100%; height:clamp(300px,65vw,600px); min-width:0; overflow:hidden; background:#f8fafc; }
+.af-atomic-scene canvas { display:block; width:100%; height:100%; }
+.af-atomic-panel { padding:18px; background:#fff; border-top:1px solid #cbd5e1; min-width:0; }
+.af-atomic-view h3 { margin:0 0 10px; font-size:17px; font-weight:700; color:#0f172a; }
+.af-atomic-view h4 { margin:16px 0 8px; font-size:14px; font-weight:700; }
+.af-atomic-view p { font-size:14px; line-height:1.6; margin:6px 0; }
+.af-atomic-transition-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:12px; }
+.af-atomic-transition-controls label { width:100%; font-size:13px; font-weight:600; }
+.af-atomic-transition-controls :is(select,button) { min-height:44px; border-radius:9px; padding:8px 12px; font:inherit; font-size:14px; }
+.af-atomic-transition-controls select { color:#0f172a; background:white; border:1px solid #94a3b8; flex:1; }
+.af-atomic-transition-controls button { color:white; background:#4338ca; border:1px solid #4338ca; cursor:pointer; }
+.af-atomic-transition-controls button:disabled { background:#e2e8f0; color:#475569; border-color:#cbd5e1; cursor:default; }
+.af-atomic-transition-controls :focus-visible { outline:3px solid #2563eb; outline-offset:3px; }
+.af-atomic-transition { display:flex; flex-direction:column; gap:5px; padding:12px; margin-top:14px; border:1px solid #cbd5e1; border-radius:10px; background:#f8fafc; font-size:14px; overflow-wrap:anywhere; }
+.af-atomic-transition.is-emission { background:#f5f3ff; border-color:#a78bfa; color:#5b21b6; }
+.af-atomic-transition.is-absorption { background:#fffbeb; border-color:#fbbf24; color:#92400e; }
+.af-atomic-levels { list-style:none; padding:0; margin:0; display:grid; gap:5px; }
+.af-atomic-levels li { display:flex; gap:12px; align-items:center; padding:7px 8px; font-size:13px; border-radius:6px; font-variant-numeric:tabular-nums; }
+.af-atomic-levels li[data-active=true] { color:#1e40af; background:#eff6ff; font-weight:700; }
+.af-atomic-level-line { flex:1; height:2px; background:#94a3b8; }
+.af-atomic-levels li[data-active=true] .af-atomic-level-line { background:#2563eb; height:3px; }
+.af-atomic-notes { padding:16px 18px; background:#f1f5f9; border-top:1px solid #cbd5e1; }
+.af-atomic-view .af-atomic-caption { font-size:12px; color:#475569; line-height:1.6; }
+.af-atomic-legend { font-weight:600; color:#334155; }
+.af-atomic-spectrum > div { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.af-atomic-spectrum span { display:flex; flex-direction:column; padding:6px; background:#f8fafc; font-size:12px; }
+.af-atomic-radial { display:block; width:100%; max-width:520px; height:auto; fill:#334155; }
+@media(min-width:900px) { .af-atomic-view[data-model=bohr] .af-atomic-layout { grid-template-columns:minmax(0,1fr) 310px; } .af-atomic-view[data-model=bohr] .af-atomic-panel { border-top:0; border-left:1px solid #cbd5e1; } .af-atomic-view[data-model=bohr] .af-atomic-scene { height:100%; min-height:520px; } }
+/* Keep the diagram and its explanatory panels usable inside classroom view. */
+.af-simulation-stage[data-expanded=true] [data-stage-role=canvas]:has(.af-atomic-view) { overflow:auto; min-height:0; }
+.af-simulation-stage[data-expanded=true] .af-atomic-view { width:100%; min-height:100%; }
+@media(orientation:landscape) and (max-height:600px) { .af-atomic-view[data-model=bohr] .af-atomic-layout { grid-template-columns:minmax(0,1fr) 280px; } .af-atomic-scene { height:330px; } .af-atomic-view[data-model=bohr] .af-atomic-panel { max-height:400px; overflow:auto; } }
+.af-simulation-stage[data-expanded=true] .af-atomic-scene canvas { width:100% !important; height:100% !important; max-height:none; margin:0; }

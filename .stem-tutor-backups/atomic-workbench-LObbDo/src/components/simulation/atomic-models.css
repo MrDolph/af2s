@@ -1,0 +1,160 @@
+.af-atomic-view { color-scheme:light; color:#0f172a; background:#fff; border:1px solid #cbd5e1; border-radius:14px; overflow:hidden; min-width:0; display:flex; flex-direction:column; }
+.af-atomic-view :is(button,select) { font:inherit; font-size:13px; min-height:40px; padding:7px 10px; border:1px solid #cbd5e1; border-radius:8px; background:white; color:#0f172a; max-width:100%; }
+.af-atomic-view button { cursor:pointer; }
+.af-atomic-view button:disabled { opacity:.45; cursor:default; }
+.af-atomic-view :is(button,select):focus-visible { outline:3px solid #2563eb; outline-offset:2px; }
+.af-atomic-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:10px 14px; border-bottom:1px solid #cbd5e1; background:#f8fafc; flex:0 0 auto; }
+.af-atomic-toolbar>strong { font-size:14px; margin-right:auto; }
+.af-atomic-toolbar label { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; }
+.af-atomic-playback { display:flex; gap:6px; }
+.af-atomic-layout { display:flex; flex:1; min-height:0; min-width:0; }
+.af-atomic-scene { position:relative; width:100%; height:clamp(320px,48vw,620px); min-width:0; overflow:hidden; background:#f8fafc; }
+.af-atomic-scene canvas { display:block; width:100%; height:100%; }
+.af-atomic-notes { padding:12px 18px; background:#fff1f2; border-top:1px solid #fecdd3; flex:0 0 auto; }
+.af-atomic-view h3 { margin:0 0 6px; font-size:16px; font-weight:700; }
+.af-atomic-view p { font-size:14px; line-height:1.5; margin:5px 0; }
+.af-atomic-view .af-atomic-caption { font-size:12px; color:#475569; }
+.af-atomic-legend { font-weight:600; color:#334155; }
+.af-atomic-radial { display:block; width:100%; max-width:420px; height:100px; fill:#334155; }
+.af-bohr-lesson { display:flex; flex-direction:column; min-height:0; min-width:0; flex:1; background:#fff; }
+.af-bohr-controls { display:flex; align-items:center; flex-wrap:wrap; gap:9px 16px; padding:12px 14px; border-bottom:1px solid #e2e8f0; flex:0 0 auto; }
+.af-bohr-pair,.af-bohr-photon-choice { display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; }
+.af-bohr-actions { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.af-bohr-actions button:first-child { background:#4338ca; color:#fff; border-color:#4338ca; }
+.af-bohr-actions button:nth-child(2) { color:#9a3412; border-color:#fdba74; background:#fff7ed; }
+.af-bohr-actions button:nth-child(3) { color:#6d28d9; border-color:#c4b5fd; background:#f5f3ff; }
+.af-bohr-metrics { display:flex; flex-wrap:wrap; gap:5px 20px; padding:8px 14px; background:#f8fafc; font-size:12px; flex:0 0 auto; }
+.af-bohr-metrics strong { margin-left:5px; font-variant-numeric:tabular-nums; }
+.af-bohr-story { display:flex; list-style:none; padding:10px 14px; margin:0; gap:8px; border-bottom:1px solid #e2e8f0; flex:0 0 auto; }
+.af-bohr-story li { flex:1; display:flex; align-items:center; gap:5px; color:#64748b; font-size:12px; border-radius:7px; padding:5px; }
+.af-bohr-story li span { display:grid; place-items:center; width:23px; height:23px; flex-shrink:0; background:#e2e8f0; border-radius:50%; }
+.af-bohr-story li[data-active=true] { color:#312e81; background:#eef2ff; font-weight:700; }
+.af-bohr-story li[data-active=true] span { background:#4338ca; color:#fff; }
+.af-bohr-diagrams { display:grid; grid-template-columns:minmax(0,1fr) clamp(180px,25%,280px); min-height:340px; height:clamp(340px,40vw,540px); gap:12px; padding:10px 18px; flex:1 1 auto; }
+.af-bohr-diagrams[data-levels=false] { grid-template-columns:minmax(0,1fr); }
+.af-bohr-atom,.af-bohr-energy { margin:0; display:flex; flex-direction:column; min-width:0; min-height:0; }
+.af-bohr-diagrams figcaption { font-weight:700; font-size:14px; flex:0 0 auto; padding:4px 0; }
+.af-bohr-diagrams figcaption small { display:block; font-weight:400; font-size:11px; color:#64748b; }
+.af-bohr-atom>svg { display:block; width:100%; height:100%; min-height:0; flex:1 1 0; }
+.af-bohr-energy { padding-left:14px; border-left:1px solid #e2e8f0; }
+.af-bohr-energy-plot { position:relative; flex:1 1 0; min-height:0; }
+.af-bohr-energy-plot>svg { position:absolute; inset:0; display:block; }
+.af-bohr-energy-label { position:absolute; left:65%; font-size:12px; white-space:nowrap; line-height:1.25; transform:translateY(-50%); font-variant-numeric:tabular-nums; }
+.af-bohr-energy-label strong { display:block; }
+.af-bohr-zero { position:absolute; top:-1px; left:12%; font-size:10px; color:#64748b; background:white; }
+.af-bohr-energy>p { flex:0 0 auto; font-size:11px; color:#475569; }
+.af-bohr-narration { padding:12px 18px; border-top:1px solid #c7d2fe; background:#eef2ff; flex:0 0 auto; }
+.af-bohr-narration>strong { font-size:15px; }
+.af-bohr-narration p { font-size:14px; }
+.af-bohr-narration small { color:#475569; font-size:11px; }
+.af-bohr-narration[data-phase=excited] { background:#fff7ed; border-color:#fdba74; }
+.af-bohr-narration[data-phase=emitting] { background:#f5f3ff; border-color:#c4b5fd; }
+/* The common lab toolbar replaces duplicate transport buttons. */
+.af-simulation-stage:has(.af-atomic-view) [data-stage-role=playback] > :first-child { display:none; }
+@media(max-width:600px) {
+ .af-atomic-toolbar { gap:6px; padding:8px; }
+ .af-atomic-toolbar>strong { display:none; }
+ .af-atomic-toolbar label { flex:1; }
+ .af-atomic-toolbar select { min-width:0; }
+ .af-bohr-controls { padding:8px; gap:8px; }
+ .af-bohr-actions { width:100%; }
+ .af-bohr-actions button { flex:1 0 auto; }
+ .af-bohr-diagrams { grid-template-columns:minmax(0,1fr) 145px; gap:4px; padding:8px; height:300px; min-height:260px; }
+ .af-bohr-energy { padding-left:6px; }
+ .af-bohr-energy-label { left:55%; font-size:10px; }
+ .af-bohr-diagrams figcaption { font-size:12px; }
+ .af-bohr-story { gap:2px; padding:6px; }
+ .af-bohr-story li { flex-direction:column; font-size:10px; text-align:center; padding:3px 1px; }
+ .af-bohr-narration { padding:10px; }
+ .af-bohr-metrics { padding:7px 10px; gap:4px 12px; }
+}
+/* Classroom: one viewport, compact header controls, no document or inner scroll. */
+.af-simulation-stage[data-expanded=true]:has(.af-atomic-view) .af-stage-body { display:flex !important; overflow:hidden; gap:0; }
+.af-simulation-stage[data-expanded=true]:has(.af-atomic-view) .af-stage-main { flex:1 1 0; overflow:hidden; gap:0; }
+.af-simulation-stage[data-expanded=true]:has(.af-atomic-view) .af-stage-parameters { display:none !important; }
+.af-simulation-stage[data-expanded=true]:has(.af-atomic-view) > .af-stage-toolbar button:not(:last-child) { display:none; }
+.af-simulation-stage[data-expanded=true]:has(.af-atomic-view) [data-stage-role=playback] { display:none; }
+.af-simulation-stage[data-expanded=true] [data-stage-role=canvas]:has(.af-atomic-view) { display:flex; flex:1 1 0; min-height:0; overflow:hidden; padding:0; }
+.af-simulation-stage[data-expanded=true] .af-atomic-view { flex:1 1 0; width:100%; height:100%; min-height:0; }
+.af-simulation-stage[data-expanded=true] .af-atomic-scene { height:100%; min-height:0; flex:1; }
+.af-simulation-stage[data-expanded=true] .af-atomic-scene canvas { width:100% !important; height:100% !important; max-height:none; margin:0; }
+.af-simulation-stage[data-expanded=true] .af-bohr-diagrams { height:auto; min-height:0; flex:1 1 0; }
+.af-simulation-stage[data-expanded=true] .af-atomic-notes { padding:8px 14px; }
+.af-simulation-stage[data-expanded=true] .af-atomic-notes .af-atomic-caption { display:none; }
+.af-simulation-stage[data-expanded=true] .af-atomic-notes p { font-size:12px; margin:3px 0; }
+.af-simulation-stage[data-expanded=true] .af-atomic-notes:has(.af-atomic-radial) { display:none; }
+@media(max-height:800px) {
+ .af-simulation-stage[data-expanded=true] .af-bohr-controls { padding:5px 8px; gap:5px 10px; }
+ .af-simulation-stage[data-expanded=true] .af-atomic-toolbar { padding:4px 8px; gap:6px; }
+ .af-simulation-stage[data-expanded=true] .af-atomic-view :is(button,select) { min-height:32px; font-size:12px; padding:4px 7px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-story { display:none; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-metrics { padding:4px 10px; font-size:11px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-diagrams { padding:4px 10px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-narration { padding:5px 10px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-narration>strong { font-size:13px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-narration p { font-size:12px; margin:2px 0; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-narration small { display:none; }
+ .af-simulation-stage[data-expanded=true] .af-atomic-notes { padding:5px 10px; }
+ .af-simulation-stage[data-expanded=true] .af-atomic-notes>p:not(.af-atomic-legend) { display:none; }
+}
+.af-bohr-controls { display:grid; grid-template-columns:max-content max-content minmax(0,1fr); }
+.af-bohr-pair,.af-bohr-photon-choice { min-width:0; }
+@media(max-width:1100px) {
+ .af-bohr-controls { grid-template-columns:max-content max-content minmax(0,1fr); gap:7px; }
+ .af-bohr-actions { justify-content:flex-start; }
+}
+@media(max-width:600px) {
+ .af-atomic-toolbar { flex-wrap:nowrap; }
+ .af-atomic-toolbar label:first-of-type { flex:1; min-width:0; }
+ .af-atomic-toolbar label:first-of-type select { width:100%; min-width:0; }
+ .af-atomic-toolbar label:last-of-type { flex:0 0 auto; }
+ .af-bohr-controls { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+ .af-bohr-pair,.af-bohr-photon-choice { flex-direction:column; align-items:stretch; gap:3px; }
+ .af-bohr-actions { grid-column:1/-1; }
+ .af-bohr-atom svg text:not(.af-bohr-nuclear-sign) { display:none; }
+}
+.af-simulation-stage[data-expanded=true]:has(.af-atomic-view)>.af-stage-toolbar { flex-wrap:nowrap; }
+.af-simulation-stage[data-expanded=true]:has(.af-atomic-view) .af-rotate-hint { display:none; }
+@media(max-height:800px) {
+ .af-simulation-stage[data-expanded=true] .af-bohr-controls { grid-template-columns:max-content max-content minmax(0,1fr); }
+ .af-simulation-stage[data-expanded=true] .af-bohr-pair,.af-simulation-stage[data-expanded=true] .af-bohr-photon-choice { flex-direction:row; align-items:center; }
+}
+@media(max-height:800px) and (max-width:600px) {
+ .af-simulation-stage[data-expanded=true] .af-bohr-controls { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+ .af-simulation-stage[data-expanded=true] .af-bohr-pair,.af-simulation-stage[data-expanded=true] .af-bohr-photon-choice { flex-direction:column; align-items:stretch; }
+}
+.af-bohr-mobile-tabs { display:none; }
+@media(max-width:600px) and (orientation:portrait) {
+ .af-bohr-mobile-tabs { display:flex; gap:6px; padding:4px 10px; flex:0 0 auto; }
+ .af-bohr-mobile-tabs button { min-height:30px; padding:3px 12px; font-size:12px; }
+ .af-bohr-mobile-tabs button[aria-pressed=true] { background:#4338ca; color:white; border-color:#4338ca; }
+ .af-bohr-diagrams { grid-template-columns:minmax(0,1fr); }
+ .af-bohr-diagrams[data-mobile-panel=atom] .af-bohr-energy { display:none; }
+ .af-bohr-diagrams[data-mobile-panel=energy] .af-bohr-atom { display:none; }
+ .af-bohr-energy { border-left:0; }
+ .af-bohr-energy-label { left:65%; font-size:12px; }
+}
+@media(orientation:landscape) and (max-height:500px) {
+ .af-simulation-stage[data-expanded=true]:has(.af-atomic-view)>.af-stage-toolbar { min-height:30px; padding:0; }
+ .af-simulation-stage[data-expanded=true]:has(.af-atomic-view)>.af-stage-toolbar button { min-height:28px; font-size:11px; padding:3px 7px; }
+ .af-simulation-stage[data-expanded=true] .af-atomic-toolbar { padding:3px 7px; }
+ .af-simulation-stage[data-expanded=true] .af-atomic-toolbar>strong { display:none; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-controls { gap:6px; padding:4px 7px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-controls select { max-width:135px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-actions { flex-wrap:nowrap; gap:4px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-actions button { font-size:11px; padding:4px 6px; white-space:nowrap; min-height:30px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-narration { padding:4px 8px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-narration p { font-size:11px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-diagrams { grid-template-columns:minmax(0,1fr) 200px; }
+ .af-simulation-stage[data-expanded=true] .af-bohr-diagrams[data-levels=false] { grid-template-columns:minmax(0,1fr); }
+ .af-simulation-stage[data-expanded=true] .af-bohr-metrics { font-size:10px; padding:3px 8px; }
+}
+@media(max-width:600px) and (orientation:portrait) {
+ .af-bohr-actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); }
+ .af-bohr-actions button { padding-inline:4px; }
+}
+
+@media(max-width:600px) {
+ .af-atomic-view:not([data-model=bohr]) .af-atomic-toolbar { display:grid; grid-template-columns:minmax(0,1fr) auto; }
+ .af-atomic-view:not([data-model=bohr]) .af-atomic-playback { grid-column:1/-1; }
+}

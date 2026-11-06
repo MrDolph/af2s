@@ -1,4 +1,6 @@
 'use client';
+import {AtomicModelLearning} from '@/components/simulation/AtomicModelLearning';
+import {effectiveCharge,fineSeparation} from '@/lib/physics/atomicExtensions';
 import { SimulationStage } from '@/components/simulation/SimulationStage';
 
 import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
@@ -24,14 +26,6 @@ const CC: Record<string, string> = {
   JUPEB: 'bg-purple-100 text-purple-700',
   'A-Level': 'bg-cyan-100 text-cyan-700',
 };
-
-const TEACHER_NOTES = [
-  'The atomic model evolved over 120 years. Each model corrected fatal flaws in the previous.',
-  'Thomson (1897): Discovered the electron. Proposed the "plum pudding" model.',
-  'Rutherford (1911): Gold foil experiment proved atom is mostly empty space with a tiny nucleus.',
-  'Bohr (1913): Stationary states, quantized angular momentum L = nℏ, photon emission ΔE = hν.',
-  'Schrödinger (1926): Wavefunction Ψ gives probability amplitudes. |Ψ|² is probability density.',
-];
 
 function Slider({ label, unit, value, min, max, step, set, color, note }: {
   label: string; unit: string; value: number; min: number; max: number; step: number; set: (v: number) => void; color: string; note?: string;
@@ -74,6 +68,7 @@ export default function AtomicModelsPage() {
   const [showEnergyLevels, setShowEnergyLevels] = useState(true);
   const [showSpectrum, setShowSpectrum] = useState(true);
   const [showLabels, setShowLabels] = useState(true);
+  const [spinProjection,setSpinProjection] = useState<0.5|-0.5>(0.5);
   const [showSpin, setShowSpin] = useState(false);
   const [showFineStructure, setShowFineStructure] = useState(false);
   const [showZeeman, setShowZeeman] = useState(false);
@@ -86,9 +81,11 @@ export default function AtomicModelsPage() {
   const [electronCount, setElectronCount] = useState(1);
   const [alphaEnergy, setAlphaEnergy] = useState(5);
 
+  const [screening,setScreening]=useState(0);
+  useEffect(()=>{setScreening(s=>Math.min(s,Math.max(0,protonCount-1)));},[protonCount]);
   const params: AtomicParams = {
-    model, speed, zoom, showOrbits, showNucleus, showElectrons, showProbability,
-    showEnergyLevels, showSpectrum, showLabels, showSpin, showFineStructure,
+    model, speed, zoom, screening:Math.min(screening,Math.max(0,protonCount-1)), showOrbits, showNucleus, showElectrons, showProbability,
+    showEnergyLevels, showSpectrum, showLabels, showSpin, spinProjection, showFineStructure,
     showZeeman, magneticField, nQuantum, lQuantum, mQuantum,
     protonCount, neutronCount, electronCount, alphaEnergy,
   };
@@ -107,8 +104,9 @@ export default function AtomicModelsPage() {
     if (!preset) return;
     setModel(preset.model);
     const pp = preset.params;
+    setScreening(pp.screening??0);
     if (pp.speed !== undefined) setSpeed(pp.speed);
-    if (pp.zoom !== undefined) setZoom(pp.zoom);
+    setZoom(1);
     if (pp.showOrbits !== undefined) setShowOrbits(pp.showOrbits);
     if (pp.showNucleus !== undefined) setShowNucleus(pp.showNucleus);
     if (pp.showElectrons !== undefined) setShowElectrons(pp.showElectrons);
@@ -183,7 +181,7 @@ export default function AtomicModelsPage() {
           </div>
         </section>
 
-        <div className="mx-auto max-w-[100rem] px-4 sm:px-6 py-4 space-y-4">
+        <div data-atomic-model={model} className="af-atomic-page mx-auto max-w-[100rem] px-3 sm:px-4 py-2 space-y-2">
           <div className="flex flex-wrap items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-2.5">
             <span className="text-xs text-gray-400">Thomson → Rutherford → Bohr → Schrödinger</span>
             <span className="text-sm font-semibold font-mono text-gray-900">Eₙ = -13.6 Z²/n² eV</span>
@@ -192,26 +190,26 @@ export default function AtomicModelsPage() {
           <div className="flex gap-2 overflow-x-auto pb-1">
             {(['thomson', 'rutherford', 'bohr', 'quantum'] as AtomicModel[]).map(m => (
               <button key={m} onClick={() => { setModel(m); setIsRunning(false); setResetKey(k => k + 1); }}
-                className={`shrink-0 rounded-xl border px-4 py-2 text-left hover:shadow-sm transition min-w-[140px] ${model === m ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-200'}`}>
+                className={`shrink-0 rounded-xl border px-4 py-2 text-left hover:shadow-sm transition min-w-[110px] ${model === m ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-600 hover:border-indigo-200'}`}>
                 <p className="text-xs font-medium">{modelLabels[m]}</p>
               </button>
             ))}
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <details className="af-atomic-presets"><summary>Presets · choose a demonstration</summary><div className="flex gap-2 overflow-x-auto pb-1">
             {ATOMIC_PRESETS.map((preset, i) => (
               <button key={i} onClick={() => applyPreset(i)}
-                className="shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-left hover:border-indigo-300 hover:shadow-sm transition min-w-[200px]">
+                className="shrink-0 rounded-xl border border-gray-200 bg-white px-3 py-2 text-left hover:border-indigo-300 hover:shadow-sm transition min-w-[160px]">
                 <p className="text-xs font-medium text-indigo-700">{preset.name}</p>
                 <p className="text-[10px] text-gray-400 mt-0.5 leading-relaxed">{preset.description}</p>
               </button>
             ))}
-          </div>
+          </div></details>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px] xl:grid-cols-[minmax(0,1fr)_240px_280px] gap-4">
+          <div className="grid grid-cols-1 gap-2">
             <SimulationStage className="space-y-3 min-w-0">
               <div data-stage-role="canvas" className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
-                <AtomicModelsCanvas key={resetKey} params={params} isRunning={isRunning} isPaused={isPaused} onTick={handleTick} />
+                <AtomicModelsCanvas key={resetKey} params={params} onZoomChange={setZoom} onParamsChange={patch=>{if(patch.protonCount!==undefined)setProtonCount(patch.protonCount);if(patch.showOrbits!==undefined)setShowOrbits(patch.showOrbits);if(patch.showElectrons!==undefined)setShowElectrons(patch.showElectrons);if(patch.showNucleus!==undefined)setShowNucleus(patch.showNucleus);if(patch.showEnergyLevels!==undefined)setShowEnergyLevels(patch.showEnergyLevels);if(patch.showLabels!==undefined)setShowLabels(patch.showLabels);if(patch.showSpin!==undefined)setShowSpin(patch.showSpin);if(patch.spinProjection!==undefined)setSpinProjection(patch.spinProjection);if(patch.showSpectrum!==undefined)setShowSpectrum(patch.showSpectrum);if(patch.showFineStructure!==undefined)setShowFineStructure(patch.showFineStructure);if(patch.showZeeman!==undefined)setShowZeeman(patch.showZeeman);if(patch.magneticField!==undefined)setMagneticField(patch.magneticField);if(patch.screening!==undefined)setScreening(patch.screening);if(patch.showProbability!==undefined)setShowProbability(patch.showProbability);if(patch.nQuantum!==undefined)setNQuantum(patch.nQuantum);if(patch.lQuantum!==undefined)setLQuantum(patch.lQuantum);if(patch.mQuantum!==undefined)setMQuantum(patch.mQuantum);}} isRunning={isRunning} isPaused={isPaused} onModelChange={setModel} onSpeedChange={setSpeed} controls={{run:()=>{setIsRunning(true);setIsPaused(false);},pause:()=>setIsPaused(v=>!v),reset}} onTick={handleTick} />
               </div>
 
               <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
@@ -219,21 +217,21 @@ export default function AtomicModelsPage() {
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
                 <EmbedButton path="/embed/atomic-models" title="Atomic Models"
-                  params={{ model, speed, zoom, orbits: showOrbits ? 1 : 0, nucleus: showNucleus ? 1 : 0, electrons: showElectrons ? 1 : 0, prob: showProbability ? 1 : 0, levels: showEnergyLevels ? 1 : 0, spectrum: showSpectrum ? 1 : 0, labels: showLabels ? 1 : 0, spin: showSpin ? 1 : 0, fs: showFineStructure ? 1 : 0, zeeman: showZeeman ? 1 : 0, B: magneticField, n: nQuantum, l: lQuantum, m: mQuantum, Z: protonCount, N: neutronCount, e: electronCount, alphaE: alphaEnergy }} />
+                  params={{ model, speed, zoom, S:screening, orbits: showOrbits ? 1 : 0, nucleus: showNucleus ? 1 : 0, electrons: showElectrons ? 1 : 0, prob: showProbability ? 1 : 0, levels: showEnergyLevels ? 1 : 0, spectrum: showSpectrum ? 1 : 0, labels: showLabels ? 1 : 0, spin: showSpin ? 1 : 0, ms:spinProjection, fs: showFineStructure ? 1 : 0, zeeman: showZeeman ? 1 : 0, B: magneticField, n: nQuantum, l: lQuantum, m: mQuantum, Z: protonCount, N: neutronCount, e: electronCount, alphaE: alphaEnergy }} />
               </div>
 
               {/* Mobile controls toggle */}
-              <div data-stage-role="parameters"><button onClick={() => setMobileControlsOpen(o => !o)} className="lg:hidden w-full py-2.5 text-sm font-medium rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition">
-                {mobileControlsOpen ? 'Hide controls ▲' : 'Show controls ▼'}
+              <div className="af-atomic-below-parameters"><button onClick={() => setMobileControlsOpen(o => !o)} className="lg:hidden w-full py-2 text-sm font-medium rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition">
+                {mobileControlsOpen ? 'Hide extra parameters ▲' : 'More parameters ▼'}
               </button></div>
 
-              <div data-stage-role="parameters" className={`rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4 ${mobileControlsOpen ? '' : 'hidden lg:block'}`}>
+              <div data-stage-role="inline-parameters" className={`af-atomic-below-parameters rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4 ${mobileControlsOpen ? '' : 'hidden lg:block'}`}>
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <p className="text-[10px] font-medium text-indigo-600 uppercase tracking-wide">Display</p>
                     <Slider label="Animation speed" unit="×" value={speed} min={0} max={3} step={0.1} set={setSpeed} color="#3b82f6" note="Time evolution speed" />
-                    <Slider label="Zoom" unit="×" value={zoom} min={0.3} max={3} step={0.1} set={setZoom} color="#10b981" note="Canvas zoom level" />
+                    <Slider label="Zoom" unit="×" value={zoom} min={0.3} max={3} step={0.1} set={setZoom} color="#10b981" note="Magnification: drag the view to pan; Fit restores framing." />
                   </div>
                   <div className="space-y-3">
                     <p className="text-[10px] font-medium text-amber-600 uppercase tracking-wide">Nucleus</p>
@@ -255,7 +253,7 @@ export default function AtomicModelsPage() {
                       <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer"><input type="checkbox" checked={showOrbits} onChange={e => setShowOrbits(e.target.checked)} className="rounded" /> Show orbits</label>
                       <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer"><input type="checkbox" checked={showEnergyLevels} onChange={e => setShowEnergyLevels(e.target.checked)} className="rounded" /> Energy levels</label>
                       <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer"><input type="checkbox" checked={showSpectrum} onChange={e => setShowSpectrum(e.target.checked)} className="rounded" /> Spectrum bar</label>
-                      <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer"><input type="checkbox" checked={showSpin} onChange={e => setShowSpin(e.target.checked)} className="rounded" /> Show spin (↑)</label>
+                      <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer"><input type="checkbox" checked={showSpin} onChange={e => setShowSpin(e.target.checked)} className="rounded" /> Show spin (↑ / ↓)</label>
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer"><input type="checkbox" checked={showFineStructure} onChange={e => setShowFineStructure(e.target.checked)} className="rounded" /> Fine structure (j = l ± ½)</label>
@@ -287,9 +285,7 @@ export default function AtomicModelsPage() {
                   </div>
                 </div>
               </div>
-            </SimulationStage>
-
-            <div className="space-y-3">
+            <div data-stage-role="parameters" className="af-atomic-side-results space-y-2">
               <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">Calculated</p>
                 <div className="space-y-2">
@@ -300,7 +296,7 @@ export default function AtomicModelsPage() {
                       <StatRow label="Velocity vₙ" value={liveStats.velocity.toFixed(4)} unit="c·α" color="text-emerald-600" />
                       <StatRow label="Quantum n" value={liveStats.n.toString()} unit="" color="text-blue-500" />
                       {liveStats.wavelength > 0 && <StatRow label="λ (transition)" value={liveStats.wavelength.toFixed(1)} unit="nm" color="text-amber-600" />}
-                      {showFineStructure && <StatRow label="Fine split" value="~10⁻⁴" unit="eV" color="text-purple-600" />}
+                      {showFineStructure && <StatRow label="Fine split" value={(fineSeparation(Math.max(2,liveStats.n),effectiveCharge(protonCount,screening).Zeff)*1e6).toFixed(2)} unit="μeV" color="text-purple-600" />}
                       {showZeeman && magneticField > 0 && <StatRow label="Zeeman ΔE" value={(magneticField * 5.788e-5 * 1e6).toFixed(2)} unit="μeV" color="text-pink-500" />}
                     </>
                   )}
@@ -356,16 +352,13 @@ export default function AtomicModelsPage() {
               </div>
             </div>
 
-            <div className="space-y-3 lg:col-span-2 xl:col-span-1">
-              <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
-                <p className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-3">Teacher notes</p>
-                <ul className="space-y-2">
-                  {TEACHER_NOTES.map((n, i) => (
-                    <li key={i} className="text-xs text-amber-900 leading-relaxed flex gap-2"><span className="text-amber-400 shrink-0 mt-0.5">•</span>{n}</li>
-                  ))}
-                </ul>
+              <div data-stage-role="parameters" className="af-atomic-side-learning">
+                <AtomicModelLearning model={model} />
               </div>
-            </div>
+            </SimulationStage>
+
+
+
           </div>
         </div>
       </main>

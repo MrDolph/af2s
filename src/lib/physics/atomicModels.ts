@@ -22,6 +22,7 @@ export interface AtomicParams {
   showSpectrum: boolean;
   showLabels: boolean;
   showSpin: boolean;
+  spinProjection?: 0.5 | -0.5;
   showFineStructure: boolean;
   showZeeman: boolean;
   magneticField: number;
@@ -32,6 +33,7 @@ export interface AtomicParams {
   neutronCount: number;
   electronCount: number;
   alphaEnergy: number;
+  screening?: number; // User-chosen screening constant for the Bohr effective-charge approximation.
 }
 
 export interface ThomsonElectron {
@@ -254,15 +256,15 @@ export interface AtomicPreset {
 
 export const ATOMIC_PRESETS: AtomicPreset[] = [
   { name: 'Thomson — Plum Pudding', description: 'Positive sphere with embedded electrons.', model: 'thomson', params: { protonCount: 1, electronCount: 1, speed: 1, zoom: 1, showElectrons: true, showLabels: true } },
-  { name: 'Rutherford — Gold Foil', description: 'α-particles scatter off a dense nucleus.', model: 'rutherford', params: { protonCount: 79, zoom: 0.3, showNucleus: true, showLabels: true, alphaEnergy: 5 } },
-  { name: 'Bohr — Ground State', description: 'n=1 at the Bohr radius a₀ = 0.529 Å.', model: 'bohr', params: { protonCount: 1, zoom: 1.5, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showSpectrum: true, showLabels: true } },
-  { name: 'Bohr — Balmer Series', description: 'Visible lines from transitions to n=2.', model: 'bohr', params: { protonCount: 1, speed: 1.5, zoom: 1.2, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showSpectrum: true, showLabels: true } },
-  { name: 'Bohr — Fine Structure', description: 'Spin-orbit coupling splits j = l ± ½.', model: 'bohr', params: { protonCount: 1, zoom: 1.3, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showLabels: true, showFineStructure: true, showSpin: true } },
-  { name: 'Bohr — Zeeman Effect', description: 'Magnetic field splits degenerate levels.', model: 'bohr', params: { protonCount: 1, zoom: 1.3, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showLabels: true, showZeeman: true, magneticField: 3 } },
-  { name: 'Quantum — 1s Orbital', description: 'Spherically symmetric ground state.', model: 'quantum', params: { protonCount: 1, zoom: 2, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 1, lQuantum: 0, mQuantum: 0 } },
-  { name: 'Quantum — 2p Orbital', description: 'Dumbbell shape with one angular node.', model: 'quantum', params: { protonCount: 1, zoom: 1.5, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 2, lQuantum: 1, mQuantum: 0 } },
-  { name: 'Quantum — 3d Orbital', description: 'Cloverleaf with two angular nodes.', model: 'quantum', params: { protonCount: 1, zoom: 1.2, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 3, lQuantum: 2, mQuantum: 0 } },
-  { name: 'Quantum — 4f Orbital', description: 'Complex multi-lobed f-orbital.', model: 'quantum', params: { protonCount: 1, zoom: 1.0, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 4, lQuantum: 3, mQuantum: 0 } },
+  { name: 'Rutherford — Gold Foil', description: 'α-particles scatter off a dense nucleus.', model: 'rutherford', params: { protonCount: 79, zoom: 1, showNucleus: true, showLabels: true, alphaEnergy: 5 } },
+  { name: 'Bohr — Ground State', description: 'n=1 at the Bohr radius a₀ = 0.529 Å.', model: 'bohr', params: { protonCount: 1, zoom: 1, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showSpectrum: true, showLabels: true } },
+  { name: 'Bohr — Balmer Series', description: 'Visible lines from transitions to n=2.', model: 'bohr', params: { protonCount: 1, speed: 1.5, zoom: 1, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showSpectrum: true, showLabels: true } },
+  { name: 'Bohr — Fine Structure', description: 'Spin-orbit coupling splits j = l ± ½.', model: 'bohr', params: { protonCount: 1, zoom: 1, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showLabels: true, showFineStructure: true, showSpin: true } },
+  { name: 'Bohr — Zeeman Effect', description: 'Magnetic field splits degenerate levels.', model: 'bohr', params: { protonCount: 1, zoom: 1, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showLabels: true, showZeeman: true, magneticField: 3 } },
+  { name: 'Quantum — 1s Orbital', description: 'Spherically symmetric ground state.', model: 'quantum', params: { protonCount: 1, zoom: 1, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 1, lQuantum: 0, mQuantum: 0 } },
+  { name: 'Quantum — 2p Orbital', description: 'Dumbbell shape with one angular node.', model: 'quantum', params: { protonCount: 1, zoom: 1, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 2, lQuantum: 1, mQuantum: 0 } },
+  { name: 'Quantum — 3d Orbital', description: 'Cloverleaf with two angular nodes.', model: 'quantum', params: { protonCount: 1, zoom: 1, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 3, lQuantum: 2, mQuantum: 0 } },
+  { name: 'Quantum — 4f Orbital', description: 'Complex multi-lobed f-orbital.', model: 'quantum', params: { protonCount: 1, zoom: 1, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 4, lQuantum: 3, mQuantum: 0 } },
 ];
 
 export function validQuantumNumbers(n: number, l: number, m: number): boolean {

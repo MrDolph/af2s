@@ -27,11 +27,22 @@ body {
 }
 
 /* Hide scrollbar for topic filter row on mobile */
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /* Smooth tap targets on mobile */
-button, a { -webkit-tap-highlight-color: transparent; }
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
 
 /* Prevent canvas overflow on small screens */
-canvas { max-width: 100%; }
+canvas {
+  max-width: 100%;
+}
