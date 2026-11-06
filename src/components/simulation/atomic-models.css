@@ -409,3 +409,63 @@
 .af-atomic-page .af-simulation-stage:not([data-expanded="true"]) .af-atomic-below-parameters .grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .af-atomic-page .af-simulation-stage:not([data-expanded="true"]) .af-atomic-below-parameters{padding:10px}
 }
+
+/* Mobile classroom: reserve the viewport for diagrams, with compact scrollable controls. */
+@media(max-width:1023px){
+.af-simulation-stage[data-expanded="true"]:has(.af-atomic-view){padding:4px;gap:3px}
+.af-simulation-stage[data-expanded="true"]:has(.af-atomic-view)>.af-stage-toolbar{flex-wrap:nowrap;padding:0;gap:4px;font-size:10px}
+.af-simulation-stage[data-expanded="true"]:has(.af-atomic-view)>.af-stage-toolbar button{min-height:34px;padding:4px 7px;font-size:11px}
+.af-simulation-stage[data-expanded="true"]:has(.af-atomic-view) .af-stage-body{display:flex!important;flex-direction:column;min-height:0;gap:0}
+.af-simulation-stage[data-expanded="true"]:has(.af-atomic-view) .af-stage-main{flex:1;min-height:0;overflow:hidden;gap:0}
+.af-simulation-stage[data-expanded="true"]:has(.af-atomic-view) .af-stage-parameters{display:none!important}
+.af-simulation-stage[data-expanded="true"]:has(.af-atomic-view) [data-stage-role="playback"]{display:none}
+.af-simulation-stage[data-expanded="true"]:has(.af-atomic-view) [data-stage-role="canvas"]{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.af-simulation-stage[data-expanded="true"] .af-atomic-view{height:100%;flex:1;min-height:0}
+.af-simulation-stage[data-expanded="true"] .af-atomic-toolbar{flex-wrap:nowrap!important;overflow-x:auto;overflow-y:visible;padding:4px!important;gap:8px!important;min-height:44px;max-height:52px}
+.af-simulation-stage[data-expanded="true"] .af-atomic-toolbar>strong{display:none}
+.af-simulation-stage[data-expanded="true"] .af-atomic-toolbar>*{flex:0 0 auto!important}
+.af-simulation-stage[data-expanded="true"] .af-atomic-toolbar label{white-space:nowrap;font-size:11px}
+.af-simulation-stage[data-expanded="true"] .af-atomic-toolbar .af-atomic-zoom{flex:0 0 185px!important}
+.af-simulation-stage[data-expanded="true"] .af-atomic-toolbar :is(button,select){min-height:34px;font-size:12px;padding:4px 6px}
+.af-simulation-stage[data-expanded="true"] .af-atomic-display[open]{position:fixed;right:6px;top:86px;z-index:5;max-width:280px;background:white;border:1px solid #94a3b8;border-radius:8px;padding:8px;max-height:45dvh;overflow:auto}
+.af-simulation-stage[data-expanded="true"] .af-original-transport{flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:4px;min-height:42px}
+.af-simulation-stage[data-expanded="true"] .af-original-transport>*{flex-shrink:0;white-space:nowrap}
+.af-simulation-stage[data-expanded="true"] .af-original-transport strong{font-size:11px}
+.af-simulation-stage[data-expanded="true"] .af-original-physics{flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;font-size:10px;padding:3px 6px;min-height:22px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-workspace{min-height:0;flex:1;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;overflow:hidden}
+.af-simulation-stage[data-expanded="true"] .af-bohr-workspace>.af-bohr-diagrams{height:auto!important;min-height:0!important;grid-template-columns:minmax(0,1fr) 90px;padding:3px;gap:3px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-workspace>.af-bohr-diagrams[data-levels=false]{grid-template-columns:1fr}
+.af-simulation-stage[data-expanded="true"] .af-bohr-atom,.af-simulation-stage[data-expanded="true"] .af-bohr-energy{min-height:0;margin:0}
+.af-simulation-stage[data-expanded="true"] .af-bohr-atom figcaption{font-size:11px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-atom figcaption small{display:none}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculations{padding:4px;min-height:0}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculation-grid{grid-template-columns:repeat(4,minmax(0,1fr));flex:0 0 auto;gap:3px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculation{padding:3px;min-height:37px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculation strong{font-size:11px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculations .af-bohr-ledger{margin:3px 0;font-size:10px;line-height:1.2}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculations h3{font-size:11px;margin:0 0 3px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-narration{padding:3px 5px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-narration>strong{display:none}
+.af-simulation-stage[data-expanded="true"] .af-bohr-model-brief{flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;margin:0;padding:3px;gap:10px;font-size:10px}
+.af-simulation-stage[data-expanded="true"] .af-bohr-model-brief>*{flex-shrink:0}
+.af-simulation-stage[data-expanded="true"] .af-transition-spectra{padding:2px 4px;gap:1px 8px;grid-template-columns:1fr 1fr;font-size:10px}
+.af-simulation-stage[data-expanded="true"] .af-spectrum-row{padding:1px;gap:3px}
+.af-simulation-stage[data-expanded="true"] .af-spectrum-row>span{min-width:55px;font-size:9px}
+.af-simulation-stage[data-expanded="true"] .af-spectrum-band{height:10px}
+.af-simulation-stage[data-expanded="true"] .af-transition-spectra>small{font-size:9px;line-height:1.2}
+.af-simulation-stage[data-expanded="true"] .af-atomic-layout{flex:1;min-height:0}
+.af-simulation-stage[data-expanded="true"] .af-atomic-scene{height:100%;min-height:0;flex:1}
+.af-simulation-stage[data-expanded="true"] .af-atomic-scene canvas{width:100%!important;height:100%!important;max-height:none;margin:0}
+.af-simulation-stage[data-expanded="true"] .af-atomic-notes{padding:4px 6px}
+.af-simulation-stage[data-expanded="true"] .af-atomic-notes h3{font-size:11px;margin:0}
+.af-simulation-stage[data-expanded="true"] .af-atomic-notes p{font-size:10px;margin:1px 0}
+.af-simulation-stage[data-expanded="true"] .af-atomic-caption{display:none}
+}
+@media(max-width:1023px) and (orientation:landscape){
+.af-simulation-stage[data-expanded="true"] .af-bohr-workspace{grid-template-columns:minmax(0,1fr) 240px;grid-template-rows:minmax(0,1fr)}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculation-grid{grid-template-columns:repeat(2,minmax(0,1fr));flex:1 1 0}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculation{min-height:0}
+.af-simulation-stage[data-expanded="true"] .af-bohr-calculations .af-bohr-ledger{font-size:9px}
+}
+
+@media(max-width:1023px){.af-simulation-stage[data-expanded="true"] :is(.af-atomic-toolbar,.af-original-transport,.af-original-physics,.af-bohr-model-brief){scrollbar-width:none}.af-simulation-stage[data-expanded="true"] :is(.af-atomic-toolbar,.af-original-transport,.af-original-physics,.af-bohr-model-brief)::-webkit-scrollbar{display:none}}
