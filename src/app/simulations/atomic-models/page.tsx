@@ -83,8 +83,9 @@ export default function AtomicModelsPage() {
 
   const [screening,setScreening]=useState(0);
   useEffect(()=>{setScreening(s=>Math.min(s,Math.max(0,protonCount-1)));},[protonCount]);
+  const [seriesLower, setSeriesLower] = useState<number>();
   const params: AtomicParams = {
-    model, speed, zoom, screening:Math.min(screening,Math.max(0,protonCount-1)), showOrbits, showNucleus, showElectrons, showProbability,
+    model, speed, zoom, seriesLower, screening:Math.min(screening,Math.max(0,protonCount-1)), showOrbits, showNucleus, showElectrons, showProbability,
     showEnergyLevels, showSpectrum, showLabels, showSpin, spinProjection, showFineStructure,
     showZeeman, magneticField, nQuantum, lQuantum, mQuantum,
     protonCount, neutronCount, electronCount:model==='thomson'?protonCount:electronCount, alphaEnergy,
@@ -104,6 +105,7 @@ export default function AtomicModelsPage() {
     if (!preset) return;
     setModel(preset.model);
     const pp = preset.params;
+    setSeriesLower(pp.seriesLower);
     setScreening(pp.screening??0);
     if (pp.speed !== undefined) setSpeed(pp.speed);
     setZoom(1);
@@ -217,7 +219,7 @@ export default function AtomicModelsPage() {
                   onRun={() => { setIsRunning(true); setIsPaused(false); }}
                   onPause={() => setIsPaused(p => !p)} onReset={reset} />
                 <EmbedButton path="/embed/atomic-models" title="Atomic Models"
-                  params={{ model, speed, zoom, S:screening, orbits: showOrbits ? 1 : 0, nucleus: showNucleus ? 1 : 0, electrons: showElectrons ? 1 : 0, prob: showProbability ? 1 : 0, levels: showEnergyLevels ? 1 : 0, spectrum: showSpectrum ? 1 : 0, labels: showLabels ? 1 : 0, spin: showSpin ? 1 : 0, ms:spinProjection, fs: showFineStructure ? 1 : 0, zeeman: showZeeman ? 1 : 0, B: magneticField, n: nQuantum, l: lQuantum, m: mQuantum, Z: protonCount, N: neutronCount, e: model==='thomson'?protonCount:electronCount, alphaE: alphaEnergy }} />
+                  params={{ model, speed, zoom, series: seriesLower ?? 0, S:screening, orbits: showOrbits ? 1 : 0, nucleus: showNucleus ? 1 : 0, electrons: showElectrons ? 1 : 0, prob: showProbability ? 1 : 0, levels: showEnergyLevels ? 1 : 0, spectrum: showSpectrum ? 1 : 0, labels: showLabels ? 1 : 0, spin: showSpin ? 1 : 0, ms:spinProjection, fs: showFineStructure ? 1 : 0, zeeman: showZeeman ? 1 : 0, B: magneticField, n: nQuantum, l: lQuantum, m: mQuantum, Z: protonCount, N: neutronCount, e: model==='thomson'?protonCount:electronCount, alphaE: alphaEnergy }} />
               </div>
 
               {/* Mobile controls toggle */}

@@ -60,8 +60,10 @@ function AtomicModelsEmbedInner() {
 
   const [screening,setScreening]=useState(()=>num(sp,'S',0,0,91));
   useEffect(()=>{setScreening(s=>Math.min(s,Math.max(0,protonCount-1)));},[protonCount]);
+  const seriesValue = Number(sp.get('series'));
+  const seriesLower = Number.isInteger(seriesValue) && seriesValue >= 1 && seriesValue <= 6 ? seriesValue : undefined;
   const params: AtomicParams = {
-    model, speed, zoom, screening:Math.min(screening,Math.max(0,protonCount-1)), showOrbits, showNucleus, showElectrons, showProbability,
+    model, speed, zoom, seriesLower, screening:Math.min(screening,Math.max(0,protonCount-1)), showOrbits, showNucleus, showElectrons, showProbability,
     showEnergyLevels, showSpectrum, showLabels, showSpin, spinProjection, showFineStructure, showZeeman,
     magneticField, nQuantum, lQuantum, mQuantum, protonCount, neutronCount: 0,
     electronCount: model==='thomson'?protonCount:1, alphaEnergy,

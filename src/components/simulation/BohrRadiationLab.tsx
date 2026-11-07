@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {bohrEnergy,bohrRadius,bohrVelocity,transitionWavelength,wavelengthToRGB,type AtomicParams} from '@/lib/physics/atomicModels';
+import {bohrEnergy,bohrRadius,bohrVelocity,transitionWavelength,wavelengthToRGB,spectralSeriesName,type AtomicParams} from '@/lib/physics/atomicModels';
 import {advanceMotion,beginTransition,displayOrbit,effectiveCharge,fineSeparation,initialMotion,movingRadius,zeemanShifts} from '@/lib/physics/atomicExtensions';
 import {viewZoom} from '@/lib/physics/bohrWorkbench';
 import {BohrCalculations} from './BohrCalculations';
@@ -13,16 +13,21 @@ function photonWave(ctx:CanvasRenderingContext2D,x:number,y:number,angle:number,
  ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.strokeStyle=colour;ctx.fillStyle=colour;ctx.lineWidth=2.8;ctx.beginPath();for(let i=0;i<=48;i++){const px=-24+i,py=4*Math.sin(i/48*Math.PI*6);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();ctx.beginPath();ctx.moveTo(30,0);ctx.lineTo(21,-6);ctx.lineTo(21,6);ctx.closePath();ctx.fill();ctx.restore();
 }
 export function BohrRadiationLab({params:p,interactive=true,viewReset=0,isRunning=false,isPaused=false,controls,onTick}:Props){
- const canvas=useRef<HTMLCanvasElement>(null),wrap=useRef<HTMLDivElement>(null),motion=useRef(initialMotion()),pan=useRef({x:0,y:0}),drag=useRef<{x:number;y:number;pan:{x:number;y:number}}|null>(null);
+ const lower = p.seriesLower;
+ const startingLevel = lower ?? 1;
+ const startingTarget = lower ? lower + 1 : 3;
+ const startingSnapshot = {...initialSnapshot, n: startingLevel, from: startingLevel, to: startingTarget};
+ const nextUpper = useRef(startingTarget);
+ const canvas=useRef<HTMLCanvasElement>(null),wrap=useRef<HTMLDivElement>(null),motion=useRef({...initialMotion(),n:startingLevel}),pan=useRef({x:0,y:0}),drag=useRef<{x:number;y:number;pan:{x:number;y:number}}|null>(null);
  const photons=useRef<{x:number;y:number;angle:number;life:number;wavelength:number}[]>([]),pending=useRef(0),autoTime=useRef(0);
- const [target,setTarget]=useState(3),[auto,setAuto]=useState(true),[snap,setSnap]=useState<Snapshot>(initialSnapshot);
+ const [target,setTarget]=useState(startingTarget),[auto,setAuto]=useState(true),[snap,setSnap]=useState<Snapshot>(startingSnapshot);
  const props=useRef({p,isRunning,isPaused,onTick,auto});props.current={p,isRunning,isPaused,onTick,auto};
  const {sigma,Zeff}=effectiveCharge(p.protonCount||1,p.screening),Z=p.protonCount||1;
  useEffect(()=>{pan.current={x:0,y:0};},[viewReset]);
  useEffect(()=>{motion.current={...motion.current,transition:null};photons.current=[];autoTime.current=0;setSnap(s=>({...s,transitioning:false,wavelength:0}));},[Z,sigma]);
  useEffect(()=>{
   const element=canvas.current,box=wrap.current;if(!element||!box)return;
-  let frame=0,last:number|null=null,lastReport=0;let latest={...initialSnapshot};
+  let frame=0,last:number|null=null,lastReport=0;let latest={...startingSnapshot};
   function draw(now:number){
    const el=element!,container=box!,ctx=el.getContext('2d');if(!ctx)return;
    const {p,isRunning,isPaused,onTick,auto}=props.current,q=effectiveCharge(p.protonCount||1,p.screening).Zeff;
@@ -33,7 +38,13 @@ export function BohrRadiationLab({params:p,interactive=true,viewReset=0,isRunnin
    const R=Math.max(20,Math.min(w,h)*.43),cx=w/2,cy=h/2;
    if(pending.current){motion.current=beginTransition(motion.current,pending.current);pending.current=0;autoTime.current=0;}
    if(dt>0&&p.showElectrons){
-    if(!motion.current.transition&&auto){autoTime.current+=dt*p.speed;if(autoTime.current>2.8){autoTime.current=0;const current=motion.current.n;let to=Math.max(1,Math.min(7,current+(Math.random()<.5?-1:1)*(1+Math.floor(Math.random()*2))));if(to===current)to=current===1?3:1;motion.current=beginTransition(motion.current,to);}}
+    if(!motion.current.transition&&auto){autoTime.current+=dt*p.speed;if(autoTime.current>2.8){autoTime.current=0;const current=motion.current.n;let to=Math.max(1,Math.min(7,current+(Math.random()<.5?-1:1)*(1+Math.floor(Math.random()*2))));if (p.seriesLower) {
+      to = p.seriesLower;
+      if (current === p.seriesLower) {
+       to = nextUpper.current;
+       nextUpper.current = to === 7 ? p.seriesLower + 1 : to + 1;
+      }
+     } else if(to===current)to=current===1?3:1;motion.current=beginTransition(motion.current,to);}}
     const result=advanceMotion(motion.current,dt,p.speed);motion.current=result.state;
     if(result.completed){const t=result.completed,wl=transitionWavelength(t.from,t.to,q);latest={n:t.to,from:t.from,to:t.to,kind:t.to<t.from?'emission':'absorption',transitioning:false,wavelength:wl};
      if(t.to<t.from){const r=displayOrbit(t.to,R,q);photons.current.push({x:cx+Math.cos(t.angle)*r,y:cy+Math.sin(t.angle)*r,angle:t.angle+1.1+Math.random()*.7,life:1,wavelength:wl});}autoTime.current=0;
@@ -60,9 +71,11 @@ export function BohrRadiationLab({params:p,interactive=true,viewReset=0,isRunnin
   frame=requestAnimationFrame(draw);return()=>cancelAnimationFrame(frame);
  },[]);
  const pairLow=Math.min(snap.from,snap.to),pairHigh=Math.max(snap.from,snap.to),inspectN=Math.max(2,snap.n),fine=fineSeparation(inspectN,Zeff),zeeman=5.788e-5*p.magneticField;
+ const targets = [1,2,3,4,5,6,7].filter(n => !lower || (snap.n === lower ? n > lower : n === lower));
+ const selectedTarget = targets.includes(target) ? target : targets[0];
  return <section className="af-bohr-lesson af-bohr-original" aria-label="Original Bohr orbital simulation">
-  {interactive&&<header className="af-original-transport"><button type="button" onClick={isRunning?controls?.pause:controls?.run}>{!isRunning?'Run':isPaused?'Resume':'Pause'}</button><button type="button" onClick={controls?.reset}>Reset</button><label><input type="checkbox" checked={auto} onChange={e=>setAuto(e.target.checked)}/> Auto transitions</label><label>Target n<select aria-label="Transition target" value={target} onChange={e=>{const to=Number(e.target.value);setTarget(to);}}>{[1,2,3,4,5,6,7].map(n=><option key={n} value={n}>{n}</option>)}</select></label><button type="button" disabled={snap.transitioning||target===snap.n||!p.showElectrons} onClick={()=>{pending.current=target;if(!isRunning||isPaused)controls?.run();}}>Transition</button><strong>{snap.transitioning?`${snap.kind==='absorption'?'Absorbing':'Emitting'} · n=${snap.from} → ${snap.to}`:`Orbiting state n=${snap.n}`}</strong></header>}
-  <div className="af-original-physics"><span>Zeff = Z − σ = <strong>{Z} − {sigma.toFixed(2)} = {Zeff.toFixed(2)}</strong></span>{p.showZeeman&&<span>Zeeman μB·B = <strong>{(zeeman*1e6).toFixed(2)} μeV</strong></span>}{p.showFineStructure&&<span>Fine split n={inspectN}: <strong>{(fine*1e6).toFixed(2)} μeV</strong></span>}{p.showSpin&&<span>Spin: <strong>{p.spinProjection===-0.5?'↓ mₛ = −½':'↑ mₛ = +½'}</strong> · projection, not rotation</span>}<span>λ: <strong>{snap.wavelength?snap.wavelength.toFixed(2)+' nm':'—'}</strong></span></div>
+  {interactive&&<header className="af-original-transport"><button type="button" onClick={isRunning?controls?.pause:controls?.run}>{!isRunning?'Run':isPaused?'Resume':'Pause'}</button><button type="button" onClick={controls?.reset}>Reset</button><label><input type="checkbox" checked={auto} onChange={e=>setAuto(e.target.checked)}/> Auto transitions</label><label>Target n<select aria-label="Transition target" value={selectedTarget} onChange={e=>{const to=Number(e.target.value);setTarget(to);}}>{targets.map(n=><option key={n} value={n}>{n}</option>)}</select></label><button type="button" disabled={snap.transitioning||selectedTarget===snap.n||!p.showElectrons} onClick={()=>{pending.current=selectedTarget;if(!isRunning||isPaused)controls?.run();}}>Transition</button><strong>{snap.transitioning?`${snap.kind==='absorption'?'Absorbing':'Emitting'} · n=${snap.from} → ${snap.to}`:`Orbiting state n=${snap.n}`}</strong></header>}
+  <div className="af-original-physics">{lower&&<strong>{spectralSeriesName(lower)} series · lower n={lower}</strong>}<span>Zeff = Z − σ = <strong>{Z} − {sigma.toFixed(2)} = {Zeff.toFixed(2)}</strong></span>{p.showZeeman&&<span>Zeeman μB·B = <strong>{(zeeman*1e6).toFixed(2)} μeV</strong></span>}{p.showFineStructure&&<span>Fine split n={inspectN}: <strong>{(fine*1e6).toFixed(2)} μeV</strong></span>}{p.showSpin&&<span>Spin: <strong>{p.spinProjection===-0.5?'↓ mₛ = −½':'↑ mₛ = +½'}</strong> · projection, not rotation</span>}<span>λ: <strong>{snap.wavelength?snap.wavelength.toFixed(2)+' nm':'—'}</strong></span></div>
   <div className="af-bohr-workspace"><div className="af-bohr-diagrams" data-levels={p.showEnergyLevels}>
    <figure className="af-bohr-atom"><figcaption>Bohr orbits · n={snap.n}<small>Drag to pan · straight transition paths are schematic</small></figcaption><div className="af-original-canvas" ref={wrap}><canvas ref={canvas} role="img" aria-label={`Electron orbiting nucleus Z=${Z}; effective charge ${Zeff.toFixed(2)}; current state n=${snap.n}`} onPointerDown={e=>{drag.current={x:e.clientX,y:e.clientY,pan:{...pan.current}};e.currentTarget.setPointerCapture(e.pointerId);}} onPointerMove={e=>{const d=drag.current;if(d)pan.current={x:d.pan.x+e.clientX-d.x,y:d.pan.y+e.clientY-d.y};}} onPointerUp={()=>{drag.current=null;}} onPointerCancel={()=>{drag.current=null;}}/></div></figure>
    {p.showEnergyLevels&&<figure className="af-bohr-energy af-original-levels"><figcaption>Energy levels<small>Level spacing schematic · splitting enlarged</small></figcaption><div className="af-original-level-list">{[7,6,5,4,3,2,1].map(n=><div className="af-original-level" key={n} data-active={n===snap.n}><span>n={n}</span><svg viewBox="0 0 80 28" role="img" aria-label={`n=${n}: ${bohrEnergy(n,Zeff).toFixed(4)} eV${p.showZeeman&&n>1?'; Zeeman triplet enlarged':''}`}><line x1="2" x2="78" y1="14" y2="14" stroke="#94a3b8" strokeWidth={n===snap.n?2.5:1}/>{p.showFineStructure&&n>1&&[-1,1].map(sign=><line key={sign} x1="3" x2="34" y1={14+sign*3} y2={14+sign*3} stroke="#2563eb" strokeWidth="2"/>)}{p.showZeeman&&n>1&&[-1,0,1].map(m=><line key={m} x1="42" x2="78" y1={14-m*p.magneticField*1.5} y2={14-m*p.magneticField*1.5} stroke="#a21caf" strokeWidth="2"/>)}</svg><strong>{Math.abs(bohrEnergy(n,Zeff))<10000?bohrEnergy(n,Zeff).toFixed(3):bohrEnergy(n,Zeff).toExponential(2)}</strong></div>)}</div><p>eV · blue: fine · magenta: normal Zeeman. Separate schematic illustrations.</p></figure>}

@@ -14,6 +14,7 @@ export interface AtomicParams {
   model: AtomicModel;
   speed: number;
   zoom: number;
+  seriesLower?: number;
   showOrbits: boolean;
   showNucleus: boolean;
   showElectrons: boolean;
@@ -258,7 +259,17 @@ export const ATOMIC_PRESETS: AtomicPreset[] = [
   { name: 'Thomson — Plum Pudding', description: 'Positive sphere with embedded electrons.', model: 'thomson', params: { protonCount: 1, electronCount: 1, speed: 1, zoom: 1, showElectrons: true, showLabels: true } },
   { name: 'Rutherford — Gold Foil', description: 'α-particles scatter off a dense nucleus.', model: 'rutherford', params: { protonCount: 79, zoom: 1, showNucleus: true, showLabels: true, alphaEnergy: 5 } },
   { name: 'Bohr — Ground State', description: 'n=1 at the Bohr radius a₀ = 0.529 Å.', model: 'bohr', params: { protonCount: 1, zoom: 1, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showSpectrum: true, showLabels: true } },
-  { name: 'Bohr — Balmer Series', description: 'Visible lines from transitions to n=2.', model: 'bohr', params: { protonCount: 1, speed: 1.5, zoom: 1, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showSpectrum: true, showLabels: true } },
+  ...[1, 2, 3, 4, 5, 6].map((seriesLower): AtomicPreset => ({
+    name: `Bohr — ${spectralSeriesName(seriesLower)} Series`,
+    description: `Cycle between n=${seriesLower} and higher levels through n=7.`,
+    model: 'bohr',
+    params: {
+      seriesLower, protonCount: 1, screening: 0, speed: 1.5, zoom: 1,
+      showOrbits: true, showNucleus: true, showElectrons: true,
+      showEnergyLevels: true, showSpectrum: true, showLabels: true,
+      showFineStructure: false, showZeeman: false,
+    },
+  })),
   { name: 'Bohr — Fine Structure', description: 'Spin-orbit coupling splits j = l ± ½.', model: 'bohr', params: { protonCount: 1, zoom: 1, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showLabels: true, showFineStructure: true, showSpin: true } },
   { name: 'Bohr — Zeeman Effect', description: 'Magnetic field splits degenerate levels.', model: 'bohr', params: { protonCount: 1, zoom: 1, showOrbits: true, showNucleus: true, showElectrons: true, showEnergyLevels: true, showLabels: true, showZeeman: true, magneticField: 3 } },
   { name: 'Quantum — 1s Orbital', description: 'Spherically symmetric ground state.', model: 'quantum', params: { protonCount: 1, zoom: 1, showNucleus: true, showProbability: true, showLabels: true, nQuantum: 1, lQuantum: 0, mQuantum: 0 } },
