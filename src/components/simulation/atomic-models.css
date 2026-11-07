@@ -469,3 +469,12 @@
 }
 
 @media(max-width:1023px){.af-simulation-stage[data-expanded="true"] :is(.af-atomic-toolbar,.af-original-transport,.af-original-physics,.af-bohr-model-brief){scrollbar-width:none}.af-simulation-stage[data-expanded="true"] :is(.af-atomic-toolbar,.af-original-transport,.af-original-physics,.af-bohr-model-brief)::-webkit-scrollbar{display:none}}
+
+/* UV and IR markers identify regions beside the wavelength-scaled visible band. */
+.af-spectrum-band{display:grid;grid-template-columns:24px minmax(0,1fr) 24px;min-height:15px}
+.af-spectrum-visible,.af-spectrum-outside{position:relative;min-width:0}
+.af-spectrum-band .af-spectrum-outside{font-size:8px;line-height:13px;text-align:left;padding-left:2px;font-weight:700;color:#fff;background:#312e81}
+.af-spectrum-band .af-spectrum-outside[data-region=ir]{background:#78350f}
+.af-spectrum-absorption .af-spectrum-outside{background:#ddd6fe;color:#312e81}
+.af-spectrum-absorption .af-spectrum-outside[data-region=ir]{background:#fed7aa;color:#78350f}
+.af-spectrum-outside i{left:auto;right:2px;transform:none}
