@@ -1,0 +1,30 @@
+[
+  {
+    "file": "src/app/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/layout/SimulationsMenu.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/components/layout/AppHeader.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/stem/page.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/components/layout/SubjectNavigation.tsx",
+    "existed": false
+  },
+  {
+    "file": "src/app/simulations/bjt-transistor/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "src/app/simulations/pn-junction/page.tsx",
+    "existed": true
+  }
+]

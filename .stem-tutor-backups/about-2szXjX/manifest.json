@@ -1,0 +1,10 @@
+[
+  {
+    "file": "src/app/about/page.tsx",
+    "existed": true
+  },
+  {
+    "file": "public/iamdof-avatar.jpg",
+    "existed": false
+  }
+]

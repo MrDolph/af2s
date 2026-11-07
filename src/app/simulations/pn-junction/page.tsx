@@ -238,7 +238,7 @@ export default function PnJunctionPage() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-slate-500">PN Junction Simulation — Semiconductor Physics Engine</p>
           <div className="flex items-center gap-4 text-sm text-slate-500">
-            <Link href="/simulations" className="hover:text-slate-300 transition-colors">All Simulations</Link>
+            <Link href="/stem" className="hover:text-slate-300 transition-colors">All STEM simulations</Link>
             <Link href="/simulations/band-theory" className="hover:text-slate-300 transition-colors">← Band Theory</Link>
             <Link href="/simulations/bjt-transistor" className="hover:text-slate-300 transition-colors">BJT →</Link>
           </div>

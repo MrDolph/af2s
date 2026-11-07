@@ -60,7 +60,7 @@ export function SimulationsMenu() {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
-  const active = SUBJECTS.some(s => s.status === 'live' && isSubjectPath(pathname, s));
+  const active = pathname === '/stem' || SUBJECTS.some(s => s.status === 'live' && isSubjectPath(pathname, s));
 
   // Close on outside click or Escape while open.
   useEffect(() => {
@@ -104,7 +104,11 @@ export function SimulationsMenu() {
         <p className="px-3 pb-1 pt-1.5 text-[10px] font-medium uppercase tracking-wide text-gray-400">
           Choose a subject
         </p>
-        {SUBJECTS.map(s => (
+        <Link href="/stem" aria-current={pathname === '/stem' ? 'page' : undefined}
+            onClick={() => setOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50">
+            All STEM simulations
+          </Link>
+          {SUBJECTS.map(s => (
           <SubjectRow
             key={s.slug}
             subject={s}
@@ -122,7 +126,7 @@ export function SimulationsMobileMenu({ onNavigate }: { onNavigate?: () => void 
   const pathname = usePathname();
   const [open, setOpen] = useState(true); // the mobile menu is already opened on purpose, so show the subjects
   const panelId = useId();
-  const active = SUBJECTS.some(s => s.status === 'live' && isSubjectPath(pathname, s));
+  const active = pathname === '/stem' || SUBJECTS.some(s => s.status === 'live' && isSubjectPath(pathname, s));
 
   return (
     <div>
@@ -140,6 +144,10 @@ export function SimulationsMobileMenu({ onNavigate }: { onNavigate?: () => void 
       </button>
       {open && (
         <div id={panelId} className="ml-3 mt-1 space-y-0.5 border-l border-gray-100 pl-2">
+          <Link href="/stem" aria-current={pathname === '/stem' ? 'page' : undefined}
+            onClick={() => onNavigate?.()} className="block rounded-lg px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50">
+            All STEM simulations
+          </Link>
           {SUBJECTS.map(s => (
             <SubjectRow
               key={s.slug}

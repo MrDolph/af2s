@@ -70,7 +70,7 @@ export default function HomePage() {
               <span className="rounded-full bg-indigo-50 px-3 py-0.5 text-xs font-medium text-indigo-600">
                 Phase 1 · Projectile motion
               </span>
-              <Link href="/simulations" className="text-xs text-gray-400 hover:text-indigo-600 transition">
+              <Link href="/stem" className="text-xs text-gray-400 hover:text-indigo-600 transition">
                 All simulations →
               </Link>
               <Link href="/mathematics" className="text-xs text-gray-400 hover:text-indigo-600 transition">
@@ -163,9 +163,9 @@ export default function HomePage() {
           <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-gray-900 mb-0.5">More simulations</p>
-              <p className="text-xs text-gray-400">Gas laws, Newton&apos;s laws, waves, circuits, and more.</p>
+              <p className="text-xs text-gray-400">Explore physics, chemistry, biology, mathematics and geophysics.</p>
             </div>
-            <Link href="/simulations"
+            <Link href="/stem"
               className="shrink-0 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 transition">
               Browse all →
             </Link>

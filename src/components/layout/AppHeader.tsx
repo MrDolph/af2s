@@ -1,4 +1,5 @@
 'use client';
+import { SubjectNavigation } from '@/components/layout/SubjectNavigation';
 import { TopicContext } from '@/components/explorer/TopicContext';
 
 import { useState, useEffect, useId } from 'react';
@@ -103,6 +104,6 @@ export function AppHeader() {
           </div>
         )}
       </div>
-    </header><TopicContext /></>
+    </header><SubjectNavigation pathname={pathname} /><TopicContext /></>
   );
 }
