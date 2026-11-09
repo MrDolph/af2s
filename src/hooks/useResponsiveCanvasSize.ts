@@ -47,9 +47,9 @@ export function useResponsiveCanvasSize(
       const style = getComputedStyle(el);
       const available = el.clientWidth - parseFloat(style.paddingLeft || '0') - parseFloat(style.paddingRight || '0');
       if (!available) return;
-      // Direct mechanics canvases redraw to fill the classroom panel.
+      // Direct mechanics and optics canvases redraw to fill the classroom panel.
       const expanded = el.closest('[data-expanded="true"]');
-      const fillsScene = expanded?.classList.contains('af-mechanics-stage')
+      const fillsScene = expanded?.matches('.af-mechanics-stage, .af-optics-stage')
         && el.matches('[data-stage-role="canvas"]:has(> canvas:only-child)');
       const w = Math.floor(fillsScene ? available : Math.min(available, expanded ? 1600 : maxWidth));
       const effectiveAspect = available < MOBILE_BREAKPOINT ? Math.min(aspect, MOBILE_MAX_ASPECT) : aspect;

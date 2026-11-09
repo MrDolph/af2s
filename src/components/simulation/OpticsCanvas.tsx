@@ -39,7 +39,7 @@ function objectArrow(ctx: CanvasRenderingContext2D, x: number, yBase: number, yT
   ctx.beginPath(); ctx.moveTo(x, yTip);
   ctx.lineTo(x - 6, yTip - dir * 10); ctx.lineTo(x + 6, yTip - dir * 10);
   ctx.closePath(); ctx.fill();
-  ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+  ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(label, x, yTip - dir * 16);
   ctx.restore();
 }
@@ -66,18 +66,18 @@ export function OpticsCanvas({ mode, n1, n2, theta1, focal, objectDist, convergi
       // Normal
       ctx.setLineDash([5, 5]); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(cx, 20); ctx.lineTo(cx, H - 20); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = '#475569'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText(`n₁ = ${s.n1}`, 12, 22);
+      ctx.fillStyle = '#475569'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'left';
+      ctx.fillText(`n₁ = ${s.n1}`, 12, 22, W - 20);
       ctx.fillText(`n₂ = ${s.n2}`, 12, H - 12);
-      ctx.fillStyle = '#94a3b8'; ctx.font = '9px system-ui';
-      ctx.fillText('normal', cx + 6, 26);
+      ctx.fillStyle = '#334155'; ctx.font = '600 13px system-ui';
+      ctx.fillText('normal', cx + 6, 26, W - 20);
 
       const t1 = s.theta1 * Math.PI / 180;
       const rayLen = Math.min(cx, midY) - 30;
       // Incident ray (arrives at the boundary point)
       const ix = cx - Math.sin(t1) * rayLen, iy = midY - Math.cos(t1) * rayLen;
       arrow(ctx, ix, iy, cx, midY, '#6366f1', 2.5);
-      ctx.fillStyle = '#4338ca'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#4338ca'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
       ctx.fillText(`θ₁=${s.theta1}°`, cx - 44, midY - 22);
 
       const t2deg = snellTheta2(s.n1, s.n2, s.theta1);
@@ -85,7 +85,7 @@ export function OpticsCanvas({ mode, n1, n2, theta1, focal, objectDist, convergi
         // Total internal reflection: all light reflects at θ1
         const rx = cx + Math.sin(t1) * rayLen, ry = midY - Math.cos(t1) * rayLen;
         arrow(ctx, cx, midY, rx, ry, '#ef4444', 2.5);
-        ctx.fillStyle = '#ef4444'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+        ctx.fillStyle = '#ef4444'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
         const cc = criticalAngle(s.n1, s.n2);
         ctx.fillText(`TOTAL INTERNAL REFLECTION  (θ₁ > θc = ${cc?.toFixed(1)}°)`, cx, H - 30);
       } else {
@@ -93,7 +93,7 @@ export function OpticsCanvas({ mode, n1, n2, theta1, focal, objectDist, convergi
         // Refracted ray
         const fx = cx + Math.sin(t2) * rayLen, fy = midY + Math.cos(t2) * rayLen;
         arrow(ctx, cx, midY, fx, fy, '#10b981', 2.5);
-        ctx.fillStyle = '#059669'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+        ctx.fillStyle = '#059669'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
         ctx.fillText(`θ₂=${t2deg.toFixed(1)}°`, cx + 48, midY + 30);
         // Partial (weak) reflection
         const rx = cx + Math.sin(t1) * rayLen * 0.6, ry = midY - Math.cos(t1) * rayLen * 0.6;
@@ -135,7 +135,7 @@ export function OpticsCanvas({ mode, n1, n2, theta1, focal, objectDist, convergi
     // Focal points — a lens has two physical focal points, since light can
     // enter from either side.
     const fPx = s.focal * scale;
-    ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#f59e0b'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
     ([[-fPx, 'F'], [fPx, 'F'], [-2 * fPx, '2F'], [2 * fPx, '2F']] as [number, string][]).forEach(([dx, lab]) => {
       const x = cx + dx;
       if (x < 10 || x > W - 10) return;
@@ -177,15 +177,15 @@ export function OpticsCanvas({ mode, n1, n2, theta1, focal, objectDist, convergi
       drawTo(cx, axisY, ix, tipY, '#3b82f6', !img.real);
       ctx.restore();
     } else {
-      ctx.fillStyle = '#64748b'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('Object at F — rays emerge parallel, image at infinity', cx, 26);
+      ctx.fillStyle = '#334155'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('Object at F — rays emerge parallel, image at infinity', cx, 26, W - 20);
     }
 
     // Caption
-    ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#334155'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
     const nature = img.atInfinity ? 'at infinity'
       : `${img.real ? 'real' : 'virtual'}, ${img.inverted ? 'inverted' : 'upright'}, ${img.m > 1 ? 'magnified' : img.m < 1 ? 'diminished' : 'same size'}`;
-    ctx.fillText(`u=${u}cm  f=${f}cm  →  v=${img.atInfinity ? '∞' : Math.abs(img.v).toFixed(1) + 'cm'}  m=${img.atInfinity ? '∞' : img.m.toFixed(2)}  (${nature})`, 8, H - 8);
+    ctx.fillText(`u=${u}cm  f=${f}cm  →  v=${img.atInfinity ? '∞' : Math.abs(img.v).toFixed(1) + 'cm'}  m=${img.atInfinity ? '∞' : img.m.toFixed(2)}  (${nature})`, 8, H - 8, W - 20);
   }, []);
 
   useEffect(() => { draw(); });

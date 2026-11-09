@@ -2,6 +2,8 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { thinLensImage } from '@/lib/physics/optics';
 
+export type ReflectionSource = 'point' | 'ray-box' | 'hidden';
+
 export type ReflectionMode = 'plane' | 'curved' | 'rotation';
 
 interface Props {
@@ -10,11 +12,13 @@ interface Props {
   incidenceAngle: number; // degrees from the normal
   // curved (cm as display units)
   focal: number;          // |f| in cm
+  objectHeight?: number;  // cm
   objectDist: number;     // u in cm
   converging: boolean;    // true = concave (converging), false = convex (diverging)
-  // rotation — mirror angle used whenever the animation isn't actively
-  // sweeping (i.e. before Run, or after Pause/Reset)
-  rotationAngle: number;  // degrees, mirror tilt from its 0° reference position
+  parabolic?: boolean;
+  source?: ReflectionSource;
+  onRotationComplete?: () => void;
+  rotationAngle: number;  // target tilt from the 0° reference position
   isRunning: boolean; isPaused: boolean;
   onTick?: (mirrorDeg: number, reflectedDeg: number) => void;
   width?: number; height?: number;
@@ -43,7 +47,7 @@ function objectArrow(ctx: CanvasRenderingContext2D, x: number, yBase: number, yT
   ctx.beginPath(); ctx.moveTo(x, yTip);
   ctx.lineTo(x - 6, yTip - dir * 10); ctx.lineTo(x + 6, yTip - dir * 10);
   ctx.closePath(); ctx.fill();
-  ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+  ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(label, x, yTip - dir * 16);
   ctx.restore();
 }
@@ -63,6 +67,23 @@ function flag(ctx: CanvasRenderingContext2D, x: number, y: number, dir: 1 | -1, 
 }
 
 interface Vec { x: number; y: number; }
+function drawSource(ctx: CanvasRenderingContext2D, source: ReflectionSource, x: number, y: number, angle: number, halfHeight = 8) {
+  if (source === 'hidden') return;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.fillStyle = '#f59e0b';
+  if (source === 'point') {
+    ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+  } else {
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath(); ctx.roundRect(-22, -halfHeight, 22, halfHeight * 2, 3); ctx.fill();
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(-4, -halfHeight + 2, 4, halfHeight * 2 - 4);
+  }
+  ctx.restore();
+}
+
 function reflect(d: Vec, n: Vec): Vec {
   const dot = d.x * n.x + d.y * n.y;
   return { x: d.x - 2 * dot * n.x, y: d.y - 2 * dot * n.y };
@@ -72,19 +93,19 @@ function normalize(v: Vec): Vec {
   return { x: v.x / len, y: v.y / len };
 }
 
-const SWEEP_MAX_DEG = 35;
-const SWEEP_PERIOD = 4.5; // s — one full back-and-forth cycle
+const ROTATION_SECONDS = 3;
 
 export function ReflectionCanvas({
   mode, incidenceAngle, focal, objectDist, converging, rotationAngle,
+  objectHeight = 12, parabolic = false, source = 'point', onRotationComplete,
   isRunning, isPaused, onTick, width = 660, height = 320,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number>(0);
   const lastFrameRef = useRef<number | null>(null);
   const t = useRef(0);
-  const sim = useRef({ mode, incidenceAngle, focal, objectDist, converging, rotationAngle, isRunning, isPaused, onTick });
-  sim.current = { mode, incidenceAngle, focal, objectDist, converging, rotationAngle, isRunning, isPaused, onTick };
+  const sim = useRef({ mode, incidenceAngle, focal, objectDist, converging, rotationAngle, isRunning, isPaused, onTick, objectHeight, parabolic, source, onRotationComplete });
+  sim.current = { mode, incidenceAngle, focal, objectDist, converging, rotationAngle, isRunning, isPaused, onTick, objectHeight, parabolic, source, onRotationComplete };
 
   useEffect(() => { t.current = 0; lastFrameRef.current = null; }, [mode, incidenceAngle, focal, objectDist, converging, rotationAngle]);
 
@@ -97,18 +118,20 @@ export function ReflectionCanvas({
     const animate = s.mode === 'rotation' && s.isRunning && !s.isPaused;
     if (animate && timestamp !== undefined) {
       if (lastFrameRef.current !== null) {
-        t.current += Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
+        const next = Math.min(ROTATION_SECONDS, t.current + Math.min((timestamp - lastFrameRef.current) / 1000, 0.1));
+        if (t.current < ROTATION_SECONDS && next === ROTATION_SECONDS) s.onRotationComplete?.();
+        t.current = next;
       }
       lastFrameRef.current = timestamp;
     } else {
-      lastFrameRef.current = timestamp ?? null;
+      lastFrameRef.current = null;
     }
 
     ctx.clearRect(0, 0, W, H);
 
     if (s.mode === 'plane') {
       const cx = W * 0.52, midY = H / 2;
-      const mirrorTop = 20, mirrorBottom = H - 20;
+      const mirrorTop = H * 0.12, mirrorBottom = H * 0.88;
 
       ctx.strokeStyle = '#334155'; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.moveTo(cx, mirrorTop); ctx.lineTo(cx, mirrorBottom); ctx.stroke();
@@ -122,26 +145,13 @@ export function ReflectionCanvas({
       // (not the other way round) so the ray genuinely starts at the
       // object instead of two disconnected diagrams sharing a canvas.
       const P0: Vec = { x: cx, y: midY * 1.05 };
-      const eye: Vec = { x: cx - 200, y: H * 0.2 }; // same side as the object — you can't see a reflection from behind the mirror
-      const th = (s.incidenceAngle * Math.PI) / 180;
-      const rayLen = 130;
+      const incidence = Math.max(0, Math.min(90, s.incidenceAngle));
+      const th = incidence * Math.PI / 180;
+      const rayLen = Math.min(W * 0.34, H * 0.29);
       const objTip: Vec = { x: P0.x - Math.cos(th) * rayLen, y: P0.y - Math.sin(th) * rayLen };
-      const objHeight = 75;
+      const objHeight = H * 0.22;
       const objBase: Vec = { x: objTip.x, y: objTip.y + objHeight };
 
-      // Reflection points for the two "what the eye actually sees" rays,
-      // found via the mirror-image method: reflect the object point across
-      // the mirror, draw a straight line to the eye, and where that line
-      // crosses the mirror IS the true reflection point — this guarantees
-      // the law of reflection holds and that the backward extension lands
-      // exactly on the image, by construction rather than by coincidence.
-      const findReflectionPoint = (obj: Vec): Vec => {
-        const imgOfObj: Vec = { x: 2 * cx - obj.x, y: obj.y };
-        const tt = (cx - imgOfObj.x) / (eye.x - imgOfObj.x);
-        return { x: cx, y: imgOfObj.y + tt * (eye.y - imgOfObj.y) };
-      };
-      const P1 = findReflectionPoint(objTip);
-      const P2 = findReflectionPoint(objBase);
       const imgTip: Vec = { x: 2 * cx - objTip.x, y: objTip.y };
       const imgBase: Vec = { x: 2 * cx - objBase.x, y: objBase.y };
 
@@ -149,34 +159,41 @@ export function ReflectionCanvas({
       ctx.setLineDash([5, 5]); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(P0.x - 60, P0.y); ctx.lineTo(P0.x + 60, P0.y); ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#94a3b8'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
+      ctx.fillStyle = '#334155'; ctx.font = '600 13px system-ui'; ctx.textAlign = 'left';
       ctx.fillText('normal', P0.x + 62, P0.y + 3);
 
       // Ray A: object tip -> P0 -> reflects at an equal angle (labelled i, r)
       arrow(ctx, objTip.x, objTip.y, P0.x, P0.y, '#6366f1', 2.2);
-      const rA = { x: P0.x - Math.cos(th) * 70, y: P0.y + Math.sin(th) * 70 };
-      arrow(ctx, P0.x, P0.y, rA.x, rA.y, '#a5b4fc', 2.2);
-      ctx.fillStyle = '#4338ca'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText(`i=${s.incidenceAngle}°`, P0.x - 30, P0.y - 10);
-      ctx.fillStyle = '#818cf8';
-      ctx.fillText(`r=${s.incidenceAngle}°`, P0.x - 30, P0.y + 20);
+      const rA = { x: P0.x - Math.cos(th) * rayLen, y: P0.y + Math.sin(th) * rayLen };
+      arrow(ctx, P0.x, P0.y, rA.x, rA.y, '#4338ca', 2.2, 0.72);
+      const arcRadius = Math.min(rayLen * 0.55, 42);
+      ctx.strokeStyle = '#4338ca'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(P0.x, P0.y, arcRadius, Math.PI - th, Math.PI + th);
+      ctx.stroke();
+      ctx.fillStyle = '#312e81'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText(incidence === 90 ? '90° · Grazing incidence' : `Incidence ${incidence}° · Reflection ${incidence}°`, W / 2, 18, W - 16);
+      drawSource(ctx, s.source, objTip.x, objTip.y, th);
+      if (incidence === 90) {
+        ctx.fillText('The ray runs along the mirror surface.', W / 2, H - 10, W - 16);
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
 
-      // Ray B and C: the actual rays the eye receives, from the top and
-      // bottom of the object — solid to the mirror and on to the eye, then
-      // a dashed backward extension from the reflection point through the
-      // eye's direction, landing exactly on the image (top/bottom).
-      [
-        { obj: objTip, P: P1 },
-        { obj: objBase, P: P2 },
-      ].forEach(({ obj, P }) => {
-        arrow(ctx, obj.x, obj.y, P.x, P.y, '#10b981', 1.8);
-        arrow(ctx, P.x, P.y, eye.x, eye.y, '#10b981', 1.8, 0.85);
-        ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(16,185,129,0.55)'; ctx.lineWidth = 1.4;
-        const ang = Math.atan2(eye.y - P.y, eye.x - P.x);
-        const backX = P.x - Math.cos(ang) * 260, backY = P.y - Math.sin(ang) * 260;
-        ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(backX, backY); ctx.stroke();
-        ctx.restore();
-      });
+      // A second ray leaves the same object tip and hits lower on the
+      // mirror. Both backward extensions meet at that tip's virtual image.
+      const secondHit = { x: cx, y: H * 0.63 };
+      const outgoing = { x: objTip.x - cx, y: secondHit.y - objTip.y };
+      const reach = Math.min(1, (H - 36 - secondHit.y) / outgoing.y);
+      arrow(ctx, objTip.x, objTip.y, secondHit.x, secondHit.y, '#047857', 2);
+      arrow(ctx, secondHit.x, secondHit.y, secondHit.x + outgoing.x * reach,
+        secondHit.y + outgoing.y * reach, '#047857', 2);
+      ctx.save(); ctx.setLineDash([5, 4]); ctx.lineWidth = 1.7;
+      for (const [hit, color] of [[P0, '#4338ca'], [secondHit, '#047857']] as const) {
+        ctx.strokeStyle = color;
+        ctx.beginPath(); ctx.moveTo(hit.x, hit.y); ctx.lineTo(imgTip.x, imgTip.y); ctx.stroke();
+      }
+      ctx.restore();
 
       // Object and image arrows — drawn last so they sit cleanly on top of
       // the rays that terminate exactly at their tip/base.
@@ -187,99 +204,127 @@ export function ReflectionCanvas({
       ctx.restore();
       flag(ctx, imgTip.x, imgTip.y + 8, -1, '#8b5cf6');
 
-      ctx.fillStyle = '#a78bfa'; ctx.font = '16px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('👁', eye.x, eye.y + 5);
-
-      ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText('Solid: real light rays reaching the eye. Dashed: traced backward — they meet exactly at the image, laterally inverted.', 8, H - 10);
+      ctx.fillStyle = '#334155'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('Dashed extensions meet at the virtual image tip', W / 2, H - 25, W - 16);
+      ctx.fillText('Same height · Equal distances from the mirror', W / 2, H - 8, W - 16);
     } else if (s.mode === 'curved') {
       const axisY = H / 2, cx = W / 2;
       const f = s.converging ? s.focal : -s.focal;
       const u = s.objectDist;
       const img = thinLensImage(u, f);
-      const scale = Math.min(3.2, (W / 2 - 30) / Math.max(u, Math.abs(img.atInfinity ? u : img.v), 2 * s.focal));
-      const hObj = 44;
+      const maxDistance = Math.max(u, 2 * s.focal, img.atInfinity ? 0 : Math.abs(img.v));
+      const objectHeight = Math.max(2, Math.min(30, s.objectHeight));
+      const maxHeight = objectHeight * Math.max(1, img.atInfinity ? 1 : img.m);
+      const mirrorHalf = Math.min(H * 0.33, W * 0.26);
+      const scale = Math.min((W / 2 - 32) / maxDistance, (H / 2 - 28) / maxHeight, mirrorHalf * 0.82 / objectHeight);
+      const hObj = objectHeight * scale;
+      const parabolaFocus = Math.min(W * 0.26, Math.max(mirrorHalf, s.focal * W / 150));
+      const bow = s.parabolic ? -(mirrorHalf ** 2) / (4 * parabolaFocus) : mirrorHalf * (s.converging ? -0.32 : 0.32);
+      const surfaceX = (dy: number) => cx + bow * (dy / mirrorHalf) ** 2;
+      const curve = (offset: number, color: string, width: number) => {
+        ctx.strokeStyle = color; ctx.lineWidth = width;
+        ctx.beginPath(); ctx.moveTo(cx + bow + offset, axisY - mirrorHalf);
+        ctx.quadraticCurveTo(cx - bow + offset, axisY, cx + bow + offset, axisY + mirrorHalf);
+        ctx.stroke();
+      };
 
       ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0, axisY); ctx.lineTo(W, axisY); ctx.stroke();
-
-      const bow = s.converging ? -26 : 26;
-      ctx.save();
-      ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(cx + bow, axisY - 80);
-      ctx.quadraticCurveTo(cx - bow, axisY, cx + bow, axisY + 80);
-      ctx.stroke();
-      ctx.lineWidth = 1; ctx.strokeStyle = '#c7d2fe';
-      for (let yOff = -70; yOff <= 70; yOff += 14) {
-        const tParam = (yOff + 80) / 160;
-        const curveX = cx + bow * Math.pow(1 - 2 * tParam, 2);
-        ctx.beginPath();
-        ctx.moveTo(curveX + 3, axisY + yOff);
-        ctx.lineTo(curveX + 12, axisY + yOff - 8);
-        ctx.stroke();
+      curve(5, '#475569', 7);
+      ctx.strokeStyle = '#334155'; ctx.lineWidth = 2;
+      for (let dy = -mirrorHalf + 9; dy < mirrorHalf - 8; dy += 12) {
+        const x = surfaceX(dy);
+        ctx.beginPath(); ctx.moveTo(x + 5, axisY + dy); ctx.lineTo(x + 15, axisY + dy - 6); ctx.stroke();
       }
-      ctx.restore();
+      curve(0, '#818cf8', 3);
 
-      const fPx = s.focal * scale;
-      ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-      ([[-fPx, 'F'], [-2 * fPx, '2F']] as [number, string][]).forEach(([dx, lab]) => {
-        const x = cx + dx;
-        if (x < 10 || x > W - 10) return;
+      const markFocus = (x: number, label: string) => {
+        ctx.fillStyle = '#92400e'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
         ctx.beginPath(); ctx.arc(x, axisY, 3, 0, Math.PI * 2); ctx.fill();
-        ctx.fillText(lab, x, axisY + 16);
-      });
+        ctx.fillText(label, x, axisY + 19);
+      };
 
-      const objX = cx - u * scale;
-      objectArrow(ctx, objX, axisY, axisY - hObj, '#0f172a', 'O');
-
-      if (!img.atInfinity) {
-        const ix = img.real ? cx - img.v * scale : cx + Math.abs(img.v) * scale;
-        const tipY = img.inverted ? axisY + hObj * img.m : axisY - hObj * img.m;
-        if (ix > -40 && ix < W + 40) {
-          objectArrow(ctx, ix, axisY, tipY, img.real ? '#10b981' : '#8b5cf6', img.real ? 'I (real)' : 'I (virtual)');
+      if (s.parabolic) {
+        const focusX = cx - parabolaFocus;
+        if (s.source === 'ray-box') drawSource(ctx, s.source, 24, axisY, 0, mirrorHalf * 0.8 + 5);
+        for (const fraction of [-0.8, -0.4, 0.4, 0.8]) {
+          const dy = mirrorHalf * fraction;
+          const hitX = surfaceX(dy);
+          arrow(ctx, 24, axisY + dy, hitX, axisY + dy, '#4338ca');
+          arrow(ctx, hitX, axisY + dy, focusX, axisY, '#047857');
+          if (s.source === 'point') drawSource(ctx, s.source, 24, axisY + dy, 0);
         }
-        const tip: [number, number] = [objX, axisY - hObj];
-        const drawTo = (fromX: number, fromY: number, toX: number, toY: number, color: string, dashed = false) => {
-          ctx.save(); if (dashed) ctx.setLineDash([5, 4]);
-          ctx.strokeStyle = color; ctx.lineWidth = 1.6;
-          const ang = Math.atan2(toY - fromY, toX - fromX);
-          const ext = 60;
-          ctx.beginPath(); ctx.moveTo(fromX, fromY);
-          ctx.lineTo(toX + Math.cos(ang) * ext, toY + Math.sin(ang) * ext);
-          ctx.stroke(); ctx.restore();
-        };
-        arrow(ctx, tip[0], tip[1], cx, tip[1], '#ef4444', 1.6, 0.5);
-        drawTo(cx, tip[1], ix, tipY, '#ef4444', !img.real);
-        arrow(ctx, tip[0], tip[1], cx, axisY, '#3b82f6', 1.6, 0.5);
-        drawTo(cx, axisY, ix, tipY, '#3b82f6', !img.real);
-      } else {
-        ctx.fillStyle = '#64748b'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-        ctx.fillText('Object at F — rays emerge parallel, image at infinity', cx, 26);
+        markFocus(focusX, 'F');
+        ctx.fillStyle = '#334155'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText(`Parabolic mirror · Parallel rays meet at F (${s.focal} cm)`, cx, 22, W - 16);
+        rafRef.current = requestAnimationFrame(draw);
+        return;
       }
 
-      ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
+      const focusX = cx - f * scale;
+      markFocus(focusX, 'F');
+      if (Math.abs(f * scale) >= 28) markFocus(cx - 2 * f * scale, 'C');
+      const objX = cx - u * scale;
+      const objTipY = axisY - hObj;
+      const ix = img.atInfinity ? 0 : cx - img.v * scale;
+      const tipY = axisY + (img.inverted ? 1 : -1) * hObj * img.m;
+
+      // Use the paraxial image solution, with ray joins on the reflecting face.
+
+      for (const [hitY, color] of [[objTipY, '#b91c1c'], [axisY, '#1d4ed8']] as const) {
+        const hitX = surfaceX(hitY - axisY);
+        arrow(ctx, objX, objTipY, hitX, hitY, color, 1.6);
+        if (img.real && !img.atInfinity) {
+          arrow(ctx, hitX, hitY, ix, tipY, color, 1.6);
+        } else {
+          const slope = img.atInfinity ? -hObj / (u * scale) : (tipY - hitY) / (ix - hitX);
+          const reach = Math.min(hitX - 8, (slope < 0 ? H - 24 - hitY : hitY - 24) / Math.max(Math.abs(slope), 0.01));
+          arrow(ctx, hitX, hitY, hitX - reach, hitY - slope * reach, color, 1.6);
+          if (!img.atInfinity) {
+            ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = color;
+            ctx.beginPath(); ctx.moveTo(hitX, hitY); ctx.lineTo(ix, tipY); ctx.stroke(); ctx.restore();
+          }
+        }
+      }
+
+      objectArrow(ctx, objX, axisY, objTipY, '#0f172a', 'O');
+      drawSource(ctx, s.source, objX, objTipY, 0);
+      if (img.atInfinity) {
+        ctx.fillStyle = '#334155'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText('Object at F · Parallel reflected rays · Image at infinity', cx, 22, W - 16);
+      } else {
+        const color = img.real ? '#047857' : '#7c3aed';
+        objectArrow(ctx, ix, axisY, tipY, color, 'I');
+        if (Math.abs(tipY - axisY) < 12) {
+          const insetX = W - 30, insetY = 55;
+          objectArrow(ctx, insetX, insetY, insetY + (img.inverted ? 19 : -19), color, 'I');
+          ctx.fillStyle = color; ctx.textAlign = 'right'; ctx.font = '600 12px system-ui';
+          ctx.fillText('Image detail (enlarged)', insetX - 12, insetY, W / 2 - 48);
+        }
+        if (Math.abs(tipY - axisY) < 12 || hObj < 12) {
+          ctx.fillStyle = '#334155'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
+          ctx.fillText('Diagram zoomed out to fit the object and image', cx, 22, W - 16);
+        }
+      }
+
+      ctx.fillStyle = '#334155'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
       const nature = img.atInfinity ? 'at infinity'
         : `${img.real ? 'real' : 'virtual'}, ${img.inverted ? 'inverted' : 'upright'}, ${img.m > 1 ? 'magnified' : img.m < 1 ? 'diminished' : 'same size'}`;
-      ctx.fillText(`u=${u}cm  f=${f}cm  →  v=${img.atInfinity ? '∞' : Math.abs(img.v).toFixed(1) + 'cm'}  m=${img.atInfinity ? '∞' : img.m.toFixed(2)}  (${nature})`, 8, H - 8);
+      ctx.fillText(`u=${u}cm  f=${f}cm  →  v=${img.atInfinity ? '∞' : Math.abs(img.v).toFixed(1) + 'cm'}  hₒ=${objectHeight}cm  m=${img.atInfinity ? '∞' : img.m.toFixed(2)}  (${nature})`, 8, H - 8, W - 20);
     } else {
       // ── Rotation of a mirror: incident ray fixed, mirror rotates ──────────
       // Classic result: rotate the mirror by θ, the reflected ray rotates by
       // 2θ. Uses genuine vector reflection (not an assumed formula) and then
       // MEASURES the angle between the current and reference reflected rays,
       // so the 2θ relationship is demonstrated, not just asserted.
-      const P: Vec = { x: W * 0.6, y: H * 0.58 };     // fixed point of incidence
-      const S: Vec = { x: P.x - 230, y: P.y - 150 };  // fixed light source
+      const P: Vec = { x: W * 0.5, y: H * 0.52 };     // fixed point of incidence
+      const rayLength = Math.min(W * 0.39, H * 0.31);
+      const sourceOffset = rayLength / Math.SQRT2;
+      const S: Vec = { x: P.x - sourceOffset, y: P.y - sourceOffset };  // fixed light source
 
       const d = normalize({ x: P.x - S.x, y: P.y - S.y }); // fixed incident direction
 
-      // Freezes at the current sweep angle while paused (keyed on
-      // isRunning alone) rather than snapping back to the slider's
-      // default value — the same pause bug found and fixed in the
-      // shadows and eclipse simulations.
-      const angleDeg = s.isRunning
-        ? SWEEP_MAX_DEG * Math.sin((2 * Math.PI / SWEEP_PERIOD) * t.current)
-        : s.rotationAngle;
+      const angleDeg = s.rotationAngle * (t.current / ROTATION_SECONDS);
       const angleRad = (angleDeg * Math.PI) / 180;
 
       const mirrorDir: Vec = { x: Math.cos(angleRad), y: Math.sin(angleRad) };
@@ -288,21 +333,22 @@ export function ReflectionCanvas({
 
       const r = reflect(d, normal);
       const r0 = reflect(d, normal0);
-      const reflectedDeg = ((Math.atan2(r.y, r.x) - Math.atan2(r0.y, r0.x)) * 180) / Math.PI;
+      const reflectedTurn = Math.atan2(r0.x * r.y - r0.y * r.x, r0.x * r.x + r0.y * r.y);
+      const reflectedDeg = reflectedTurn * 180 / Math.PI;
       s.onTick?.(angleDeg, reflectedDeg);
 
       ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, H);
 
       // Faint reference (0°) mirror position and reflected ray
-      const refLen = 100;
-      ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(P.x - refLen, P.y); ctx.lineTo(P.x + refLen, P.y); ctx.stroke();
-      ctx.strokeStyle = '#fde68a';
-      ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x + r0.x * 190, P.y + r0.y * 190); ctx.stroke();
+      const mirrorHalf = Math.min(W * 0.38, H * 0.48);
+      ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(P.x - mirrorHalf, P.y); ctx.lineTo(P.x + mirrorHalf, P.y); ctx.stroke();
+      ctx.strokeStyle = '#a16207';
+      ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x + r0.x * rayLength, P.y + r0.y * rayLength); ctx.stroke();
       ctx.restore();
 
       // Current mirror (solid) with silvered-back hatching
-      const mLen = 100;
+      const mLen = mirrorHalf;
       ctx.strokeStyle = '#334155'; ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.moveTo(P.x - mirrorDir.x * mLen, P.y - mirrorDir.y * mLen);
@@ -317,30 +363,78 @@ export function ReflectionCanvas({
         ctx.stroke();
       }
 
-      // Normal (dashed)
+      // Show the initial normal throughout and add the current normal once the mirror turns.
       ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(P.x - normal.x * 60, P.y - normal.y * 60); ctx.lineTo(P.x + normal.x * 60, P.y + normal.y * 60); ctx.stroke();
+      const normalLength = Math.min(rayLength * 1.3, Math.max(rayLength, P.y - 49));
+      const normalTip = { x: P.x + normal.x * normalLength, y: P.y + normal.y * normalLength };
+      ctx.beginPath();
+      ctx.moveTo(P.x - normal.x * rayLength * 0.75, P.y - normal.y * rayLength * 0.75);
+      ctx.lineTo(normalTip.x, normalTip.y); ctx.stroke();
+      const turned = Math.abs(angleDeg) >= 0.05;
+      if (turned) {
+        ctx.strokeStyle = '#64748b'; ctx.setLineDash([2, 4]);
+        ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x, P.y - normalLength); ctx.stroke();
+      }
       ctx.restore();
 
       // Incident ray (fixed) and current reflected ray
       arrow(ctx, S.x, S.y, P.x, P.y, '#6366f1', 2.5);
-      arrow(ctx, P.x, P.y, P.x + r.x * 190, P.y + r.y * 190, '#10b981', 2.5);
+      arrow(ctx, P.x, P.y, P.x + r.x * rayLength, P.y + r.y * rayLength, '#10b981', 2.5);
+      drawSource(ctx, s.source, S.x, S.y, Math.atan2(d.y, d.x));
+      if (s.source !== 'hidden') {
+        ctx.fillStyle = '#92400e';
+        ctx.font = '600 14px system-ui'; ctx.textAlign = 'right';
+        ctx.fillText(s.source === 'ray-box' ? 'Fixed ray box' : 'Fixed source', S.x - 23, S.y, Math.max(1, S.x - 27));
+      }
+      const normalAngle = Math.atan2(normal.y, normal.x);
+      const incidentAngle = Math.atan2(-d.y, -d.x);
+      const reflectionAngle = Math.atan2(r.y, r.x);
+      const incidenceDeg = Math.acos(Math.max(-1, Math.min(1, -d.x * normal.x - d.y * normal.y))) * 180 / Math.PI;
+      const drawRayAngle = (end: number, color: string, label: string) => {
+        const turn = Math.atan2(Math.sin(end - normalAngle), Math.cos(end - normalAngle));
+        const radius = rayLength * 0.7;
+        ctx.strokeStyle = color; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(P.x, P.y, radius, normalAngle, normalAngle + turn, turn < 0); ctx.stroke();
+        const middle = normalAngle + turn / 2;
+        ctx.fillStyle = color; ctx.font = '600 13px system-ui'; ctx.textAlign = 'center';
+        ctx.fillText(label, P.x + Math.cos(middle) * (radius + 12), P.y + Math.sin(middle) * (radius + 12));
+      };
+      drawRayAngle(incidentAngle, '#4338ca', 'i');
+      drawRayAngle(reflectionAngle, '#047857', 'r');
+
 
       // Angle arcs: mirror rotation (small, at the mirror) vs reflected-ray
       // rotation (bigger, at the reflected ray) — drawn so the "twice as
       // wide" relationship is visible at a glance, not just in the numbers.
-      const arcR1 = 34;
+      const arcR1 = rayLength * 0.28;
       ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(P.x, P.y, arcR1, -Math.PI / 2, -Math.PI / 2 + angleRad, angleRad < 0); ctx.stroke();
-      const arcR2 = 60;
-      const a0 = Math.atan2(r0.y, r0.x), a1 = Math.atan2(r.y, r.x);
+      ctx.beginPath(); ctx.arc(P.x, P.y, arcR1, 0, angleRad, angleRad < 0); ctx.stroke();
+      const arcR2 = rayLength * 0.5;
+      const a0 = Math.atan2(r0.y, r0.x);
       ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(P.x, P.y, arcR2, a0, a1, a1 < a0); ctx.stroke();
+      ctx.beginPath(); ctx.arc(P.x, P.y, arcR2, a0, a0 + reflectedTurn, reflectedTurn < 0); ctx.stroke();
 
-      ctx.fillStyle = '#334155'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText(`Mirror rotated ${angleDeg.toFixed(1)}°  →  reflected ray rotated ${reflectedDeg.toFixed(1)}°  (≈ 2× the mirror's rotation)`, W / 2, 22);
-      ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText('Light source position is fixed — only the mirror turns', 8, H - 10);
+      ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(P.x, P.y, 4, 0, Math.PI * 2); ctx.fill();
+      const reflectedEnd = { x: P.x + r.x * rayLength, y: P.y + r.y * rayLength };
+      ctx.fillStyle = '#047857'; ctx.font = '700 14px system-ui'; ctx.textAlign = r.x >= 0 ? 'left' : 'right';
+      if (turned) ctx.fillText('R', reflectedEnd.x + (r.x >= 0 ? 5 : -5), reflectedEnd.y - 6,
+        Math.max(1, (r.x >= 0 ? W - reflectedEnd.x : reflectedEnd.x) - 10));
+
+      ctx.fillStyle = '#92400e'; ctx.textAlign = 'left';
+      ctx.fillText('R′', P.x + r0.x * rayLength + 5, P.y + r0.y * rayLength + 13);
+      ctx.fillStyle = '#475569'; ctx.textAlign = 'center';
+      ctx.fillText('N', P.x, Math.max(55, P.y - normalLength - 5));
+      if (turned) {
+        ctx.fillText('N′', normalTip.x + Math.sign(angleDeg) * 12, Math.max(55, normalTip.y + 12));
+      }
+
+      ctx.textAlign = 'center'; ctx.font = '700 16px system-ui'; ctx.fillStyle = '#0f172a';
+      ctx.fillText(`Mirror θ = ${angleDeg.toFixed(1)}°   ·   Ray turn 2θ = ${reflectedDeg.toFixed(1)}°`, W / 2, 20, W - 16);
+      ctx.font = '600 14px system-ui';
+      ctx.fillText(`From the current normal: incidence i = reflection r = ${incidenceDeg.toFixed(1)}°`, W / 2, 39, W - 16);
+      ctx.fillStyle = '#334155';
+      ctx.fillText('R′: original reflected ray · R: new reflected ray', W / 2, H - 27, W - 16);
+      ctx.fillText('N: initial normal · N′: rotated normal · r: reflection angle', W / 2, H - 9, W - 16);
     }
 
     rafRef.current = requestAnimationFrame(draw);

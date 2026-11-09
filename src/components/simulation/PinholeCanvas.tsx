@@ -53,7 +53,7 @@ export function PinholeCanvas({ objectHeightPx, objectDistPx, screenDistPx, pinh
 
     // Object
     arrowUp(ctx, objX, objBase, objTip, '#0f172a');
-    ctx.fillStyle = '#0f172a'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#0f172a'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
     ctx.fillText('O', objX, objTip - 10);
 
     // Rays from the top and bottom of the object, through the pinhole
@@ -98,19 +98,19 @@ export function PinholeCanvas({ objectHeightPx, objectDistPx, screenDistPx, pinh
     }
     ctx.restore();
     arrowUp(ctx, scrX + 14, imgBaseY, imgTipY, '#7c3aed');
-    ctx.fillStyle = '#7c3aed'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-    ctx.fillText('I (inverted, real)', scrX + 14, Math.max(imgTipY, imgBaseY) + 16);
+    ctx.fillStyle = '#7c3aed'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText('I · real image', Math.min(scrX + 14, W - 54), Math.min(H - 27, Math.max(imgTipY, imgBaseY) + 18));
 
-    ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#334155'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(
       s.pinholeRadiusPx < 1.5
-        ? 'A single ray per object point crosses at the pinhole — sharp, inverted, real image'
-        : 'A larger hole lets a BUNDLE of rays through each point — overlapping projections blur the image',
-      W / 2, H - 6,
+        ? 'Small pinhole → sharp, inverted image'
+        : 'Larger pinhole → overlapping rays blur the image',
+      W / 2, H - 8, W - 16,
     );
 
-    ctx.fillStyle = '#94a3b8'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
-    ctx.fillText('pinhole', pinX - 20, 10);
+    ctx.fillStyle = '#334155'; ctx.font = '600 13px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText('pinhole', pinX - 20, 16);
   }, []);
 
   useEffect(() => { draw(); });

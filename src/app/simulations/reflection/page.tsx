@@ -6,7 +6,7 @@ import { useTopicPreset } from '@/lib/explorer/use-topic-preset';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { SimulationControls } from '@/components/simulation/SimulationControls';
-import { ReflectionCanvas, ReflectionMode } from '@/components/simulation/ReflectionCanvas';
+import { ReflectionCanvas, ReflectionMode, type ReflectionSource } from '@/components/simulation/ReflectionCanvas';
 import { EmbedButton } from '@/components/ui/EmbedButton';
 import { thinLensImage } from '@/lib/physics/optics';
 import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
@@ -100,9 +100,13 @@ export default function ReflectionPage() {
 
   const [incidenceAngle, setIncidenceAngle] = useState(35);
   const [focal, setFocal] = useState(15);
+  const [objectHeight, setObjectHeight] = useState(12);
   const [objectDist, setObjectDist] = useState(40);
   const [converging, setConverging] = useState(true);
 
+  const [parabolic, setParabolic] = useState(false);
+  const [source, setSource] = useState<ReflectionSource>('point');
+  const [rotationDone, setRotationDone] = useState(false);
   const [rotationAngle, setRotationAngle] = useState(15);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -112,7 +116,7 @@ export default function ReflectionPage() {
   const f = converging ? focal : -focal;
   const img = thinLensImage(objectDist, f);
 
-  const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setResetKey(k => k + 1); }, []);
+  const reset = useCallback(() => { setIsRunning(false); setIsPaused(false); setRotationDone(false); setResetKey(k => k + 1); }, []);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
@@ -133,6 +137,7 @@ export default function ReflectionPage() {
   useTopicPreset("simulations-reflection", { "incidenceAngle": setIncidenceAngle,
     "focal": setFocal,
     "objectDist": setObjectDist,
+    "objectHeight": setObjectHeight,
     "rotationAngle": setRotationAngle }, { "mode": (value: string) => setMode(value as typeof mode) });
   return (
     <>
@@ -176,10 +181,12 @@ export default function ReflectionPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
-            <SimulationStage className="space-y-3 min-w-0">
+            <SimulationStage className="af-optics-stage space-y-3 min-w-0">
               <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <ReflectionCanvas key={resetKey} mode={mode} incidenceAngle={incidenceAngle}
-                  focal={focal} objectDist={objectDist} converging={converging}
+                  focal={focal} objectDist={objectDist} objectHeight={objectHeight} converging={converging}
+                  parabolic={parabolic} source={source}
+                  onRotationComplete={() => { setRotationDone(true); setIsRunning(false); }}
                   rotationAngle={rotationAngle} isRunning={isRunning} isPaused={isPaused}
                   onTick={handleRotationTick}
                   width={canvasSize.width} height={canvasSize.height} />
@@ -188,23 +195,32 @@ export default function ReflectionPage() {
               <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 {mode === 'rotation' ? (
                   <SimulationControls isRunning={isRunning} isPaused={isPaused}
-                    onRun={() => { setIsRunning(true); setIsPaused(false); }}
+                    onRun={() => { if (rotationDone) setResetKey(k => k + 1); setRotationDone(false); setIsRunning(true); setIsPaused(false); }}
                     onPause={() => setIsPaused(p => !p)} onReset={reset} />
                 ) : <span />}
                 <EmbedButton path="/embed/reflection"
                   title={`${MODE_META[mode].title} — A-Factor STEM Studio`}
                   params={
-                    mode === 'plane' ? { mode, angle: incidenceAngle }
-                    : mode === 'rotation' ? { mode, angle: rotationAngle }
-                    : { mode, focal, u: objectDist, conv: converging ? 1 : 0 }
+                    mode === 'plane' ? { mode, angle: incidenceAngle, source: source === 'hidden' ? 0 : source === 'point' ? 1 : source }
+                    : mode === 'rotation' ? { mode, angle: rotationAngle, source: source === 'hidden' ? 0 : source === 'point' ? 1 : source }
+                    : { mode, focal, u: objectDist, h: objectHeight, conv: converging ? 1 : 0, shape: parabolic ? 'parabolic' : 'spherical', source: source === 'hidden' ? 0 : source === 'point' ? 1 : source }
                   } />
               </div>
 
               <div data-stage-role="parameters" className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm space-y-4">
                 <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Parameters</p>
 
+                <label className="flex items-center gap-2 text-sm text-slate-700">
+                  Light source
+                  <select value={source} onChange={event => setSource(event.target.value as ReflectionSource)}
+                    className="rounded-md border border-slate-300 bg-white px-2 py-1">
+                    <option value="point">Point source</option>
+                    <option value="ray-box">Ray box</option>
+                    <option value="hidden">Hidden</option>
+                  </select>
+                </label>
                 {mode === 'plane' && (
-                  <Slider label="Angle of incidence" unit="°" value={incidenceAngle} min={5} max={80} step={1} set={setIncidenceAngle} color="#6366f1"
+                  <Slider label="Angle of incidence" unit="°" value={incidenceAngle} min={0} max={90} step={1} set={setIncidenceAngle} color="#6366f1"
                     note="Measured from the normal, not the mirror surface" />
                 )}
 
@@ -213,23 +229,28 @@ export default function ReflectionPage() {
                     <span className="text-xs text-gray-500">Type</span>
                     <div className="flex gap-2">
                       {([true, false] as const).map(c => (
-                        <button key={String(c)} onClick={() => setConverging(c)}
+                        <button key={String(c)} onClick={() => { setParabolic(false); setConverging(c); }}
                           className={`flex-1 rounded-lg border px-2 py-2 text-xs font-medium transition ${
-                            converging === c ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
+                            !parabolic && converging === c ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-500'
                           }`}>
                           {c ? 'Concave (converging)' : 'Convex (diverging)'}
                         </button>
                       ))}
+                  <button type="button" aria-pressed={parabolic} onClick={() => setParabolic(true)}
+                    className={`rounded-lg border px-2 py-2 text-xs font-medium ${parabolic ? 'border-indigo-300 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-600'}`}>
+                    Parabolic
+                  </button>
                     </div>
                   </div>
                   <Slider label="Focal length |f|" unit="cm" value={focal} min={5} max={40} step={1} set={setFocal} color="#f59e0b" />
-                  <Slider label="Object distance u" unit="cm" value={objectDist} min={5} max={90} step={1} set={setObjectDist} color="#6366f1"
-                    note="Slide the object through 2F, F and inside F — watch the image flip" />
+                  {!parabolic && <Slider label="Object height" unit="cm" value={objectHeight} min={2} max={30} step={1} set={setObjectHeight} color="#6366f1" />}
+                  {!parabolic && <Slider label="Object distance u" unit="cm" value={objectDist} min={5} max={90} step={1} set={setObjectDist} color="#6366f1"
+                    note="Slide the object through 2F, F and inside F — watch the image flip" />}
                 </>}
 
                 {mode === 'rotation' && (
                   <Slider label="Mirror rotation θ" unit="°" value={rotationAngle} min={-35} max={35} step={1} set={setRotationAngle} color="#6366f1"
-                    note="Press Run to sweep automatically, or set a fixed angle here while paused/reset" />
+                    note="Set the target angle, then press Run for one turn from 0°." />
                 )}
               </div>
             </SimulationStage>
@@ -244,13 +265,15 @@ export default function ReflectionPage() {
                     <StatRow label="Nature" value="virtual, upright" unit="" color="text-purple-600" />
                     <StatRow label="Orientation" value="laterally inverted" unit="" color="text-rose-500" />
                   </>}
-                  {mode === 'curved' && <>
+                  {mode === 'curved' && !parabolic && <>
                     <StatRow label="Image distance v" value={img.atInfinity ? '∞' : Math.abs(img.v).toFixed(1)} unit={img.atInfinity ? '' : 'cm'} color="text-indigo-600" />
+                    <StatRow label="Image height" value={img.atInfinity ? '—' : (objectHeight * img.m).toFixed(1)} unit={img.atInfinity ? '' : 'cm'} color="text-emerald-600" />
                     <StatRow label="Magnification m" value={img.atInfinity ? '∞' : img.m.toFixed(2)} unit="×" color="text-emerald-600" />
                     <StatRow label="Nature" value={img.atInfinity ? 'at infinity' : img.real ? 'real' : 'virtual'} unit="" color="text-amber-600" />
                     <StatRow label="Orientation" value={img.atInfinity ? '—' : img.inverted ? 'inverted' : 'upright'} unit="" color="text-rose-500" />
                     <StatRow label="Radius R = 2f" value={(2 * focal).toFixed(0)} unit="cm" color="text-purple-600" />
                   </>}
+                  {mode === 'curved' && parabolic && <StatRow label="Parallel rays focus at" value={focal.toFixed(0)} unit="cm" color="text-indigo-600" />}
                   {mode === 'rotation' && <>
                     <StatRow label="Mirror rotation θ" value={rotationAngle.toFixed(0)} unit="°" color="text-indigo-600" />
                     <StatRow label="Expected reflected-ray rotation" value={(2 * rotationAngle).toFixed(0)} unit="°" color="text-emerald-600" />

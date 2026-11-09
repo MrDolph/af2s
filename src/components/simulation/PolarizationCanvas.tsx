@@ -32,7 +32,7 @@ function drawPolarizer(ctx: CanvasRenderingContext2D, x: number, midY: number, h
   for (let y = midY - halfH + 6; y <= midY + halfH - 6; y += 10) {
     ctx.beginPath(); ctx.moveTo(x - dx, y - dy); ctx.lineTo(x + dx, y + dy); ctx.stroke();
   }
-  ctx.fillStyle = '#475569'; ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#475569'; ctx.font = '600 13px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(label, x, midY + halfH + 16);
   ctx.restore();
 }
@@ -91,10 +91,10 @@ export function PolarizationCanvas({ mode, polarizerAngle, analyzerAngle, isRunn
         vibrationTick(ctx, x, midY, s.polarizerAngle, 16 * wobble, '#10b981');
       }
 
-      ctx.fillStyle = '#334155'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('Unpolarized (all directions) → plane-polarized (one direction only)', W / 2, 24);
-      ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText(`Transmission axis at ${s.polarizerAngle}° from vertical`, 8, H - 10);
+      ctx.fillStyle = '#334155'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('Unpolarized → plane-polarized', W / 2, 24, W - 16);
+      ctx.fillStyle = '#334155'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
+      ctx.fillText(`Transmission axis at ${s.polarizerAngle}° from vertical`, 8, H - 10, W - 20);
       rafRef.current = requestAnimationFrame(draw);
       return;
     }
@@ -121,13 +121,13 @@ export function PolarizationCanvas({ mode, polarizerAngle, analyzerAngle, isRunn
       vibrationTick(ctx, x, midY, s.analyzerAngle, 15 * wobble * ampScale, `rgba(16,185,129,${0.3 + I * 0.7})`);
     }
 
-    ctx.fillStyle = '#334155'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#334155'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(
       s.analyzerAngle > 85 && s.analyzerAngle < 95 ? 'Crossed polarizers — no light gets through' : `Malus's law: I = I₀cos²θ = ${(I * 100).toFixed(0)}% of I₀`,
-      W / 2, 24,
+      W / 2, 24, W - 16,
     );
-    ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-    ctx.fillText(`θ = ${s.analyzerAngle}° between the two transmission axes`, 8, H - 10);
+    ctx.fillStyle = '#334155'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText(`θ = ${s.analyzerAngle}° between the two transmission axes`, 8, H - 10, W - 20);
 
     rafRef.current = requestAnimationFrame(draw);
   }, []);

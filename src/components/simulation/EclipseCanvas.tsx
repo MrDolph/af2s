@@ -88,7 +88,7 @@ export function EclipseCanvas({ eclipseType, orbitAngleDeg, isRunning, isPaused,
     // Sun
     ctx.fillStyle = '#fbbf24';
     ctx.beginPath(); ctx.arc(sunX, midY, sunR, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#fde68a'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#fde68a'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
     ctx.fillText('Sun', sunX, midY + sunR + 16);
 
     // The Moon's actual orbital path around Earth — a real, clearly
@@ -149,13 +149,13 @@ export function EclipseCanvas({ eclipseType, orbitAngleDeg, isRunning, isPaused,
     // Earth
     ctx.fillStyle = '#3b82f6';
     ctx.beginPath(); ctx.arc(earthX, midY, earthR, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#bfdbfe'; ctx.font = 'bold 10px system-ui';
+    ctx.fillStyle = '#bfdbfe'; ctx.font = '600 14px system-ui';
     ctx.fillText('Earth', earthX, midY - earthR - 8);
 
     // Moon
     ctx.fillStyle = '#cbd5e1';
     ctx.beginPath(); ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#e2e8f0'; ctx.font = '9px system-ui';
+    ctx.fillStyle = '#e2e8f0'; ctx.font = '600 13px system-ui';
     ctx.fillText('Moon', moonX, moonY - moonR - 6);
 
     let eclipseState: 'none' | 'partial' | 'total' = 'none';
@@ -220,7 +220,7 @@ export function EclipseCanvas({ eclipseType, orbitAngleDeg, isRunning, isPaused,
     ctx.fillStyle = 'rgba(15,23,42,0.9)';
     ctx.beginPath(); ctx.roundRect(insetX - insetR - 10, insetY - insetR - 18, insetR * 2 + 20, insetR * 2 + 30, 8); ctx.fill();
     ctx.strokeStyle = 'rgba(148,163,184,0.4)'; ctx.stroke();
-    ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#94a3b8'; ctx.font = '600 13px system-ui'; ctx.textAlign = 'center';
     ctx.fillText('View from Earth', insetX, insetY - insetR - 6);
     if (isSunSide) {
       ctx.fillStyle = '#fbbf24';
@@ -251,7 +251,7 @@ export function EclipseCanvas({ eclipseType, orbitAngleDeg, isRunning, isPaused,
     }
     ctx.restore();
 
-    ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+    ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
     ctx.fillStyle = eclipseState === 'total' ? '#f87171' : eclipseState === 'partial' ? '#fbbf24' : '#94a3b8';
     const bodyLabel = isSunSide ? 'Earth' : 'the Moon';
     const eclipseLabel = eclipseState === 'total'
@@ -261,9 +261,9 @@ export function EclipseCanvas({ eclipseType, orbitAngleDeg, isRunning, isPaused,
       : eclipseState === 'partial'
       ? `PARTIAL ECLIPSE — only part of ${bodyLabel} is in shadow`
       : 'No eclipse right now — the Moon is not at a node';
-    ctx.fillText(eclipseLabel, W / 2 - 40, 22);
-    ctx.fillStyle = '#64748b'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
-    ctx.fillText('Not to scale. Dashed ellipse = the Moon\u2019s real orbit around Earth; the dots are its two nodes.', 8, H - 8);
+    ctx.fillText(eclipseLabel, W / 2 - 40, 22, W - 20);
+    ctx.fillStyle = '#64748b'; ctx.font = '600 13px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText('Not to scale · Dashed: lunar orbit · Dots: nodes', 8, H - 8, W - 20);
 
     rafRef.current = requestAnimationFrame(draw);
   }, []);

@@ -136,36 +136,36 @@ export function ShadowsCanvas({ sourceType, sourceRadiusPx, objectRadiusPx, obje
     } else {
       ctx.beginPath(); ctx.ellipse(srcX, midY, 6, rs, 0, 0, Math.PI * 2); ctx.fill();
     }
-    ctx.fillStyle = '#fcd34d'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#fcd34d'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(s.sourceType === 'point' ? 'point source' : 'extended source', srcX, midY - rs - 12);
 
     // Opaque object
     ctx.fillStyle = '#475569';
     ctx.beginPath(); ctx.ellipse(objX, midY, 10, ro, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#94a3b8'; ctx.font = '10px system-ui';
+    ctx.fillStyle = '#94a3b8'; ctx.font = '600 14px system-ui';
     ctx.fillText('opaque object', objX, midY - ro - 10);
 
-    ctx.fillStyle = '#cbd5e1'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#cbd5e1'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
     ctx.fillText('screen', scrX - 40, screenTop - 6);
 
     // Labels
-    ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'left';
+    ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
     if (Math.abs(umbraBotY - umbraTopY) > 14) {
       ctx.fillStyle = '#e2e8f0';
-      ctx.fillText('umbra', scrX + 10, (umbraTopY + umbraBotY) / 2 + 3);
+      ctx.fillText('umbra', Math.min(scrX + 10, W - 82), (umbraTopY + umbraBotY) / 2 + 3);
     }
     if (s.sourceType === 'extended' && Math.abs(penTopY - umbraTopY) > 10) {
-      ctx.fillStyle = '#64748b';
-      ctx.fillText('penumbra', scrX + 10, (penTopY + umbraTopY) / 2 + 3);
-      ctx.fillText('penumbra', scrX + 10, (penBotY + umbraBotY) / 2 + 3);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText('penumbra', Math.min(scrX + 10, W - 82), (penTopY + umbraTopY) / 2 + 3);
+      ctx.fillText('penumbra', Math.min(scrX + 10, W - 82), (penBotY + umbraBotY) / 2 + 3);
     }
 
-    ctx.fillStyle = '#94a3b8'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#94a3b8'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(
       s.sourceType === 'point'
-        ? 'Point source → a single sharp-edged shadow (umbra only, no penumbra)'
-        : 'Extended source → umbra (no light at all) surrounded by penumbra (partly lit, some of the source is visible from there)',
-      W / 2, H - 6,
+        ? 'Point source → sharp umbra'
+        : 'Extended source → umbra + penumbra',
+      W / 2, H - 8, W - 16,
     );
 
     rafRef.current = requestAnimationFrame(draw);

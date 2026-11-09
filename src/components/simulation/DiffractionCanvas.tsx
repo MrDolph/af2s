@@ -105,13 +105,13 @@ export function DiffractionCanvas({ mode, wavelengthNm, slitWidthNm, slitSpacing
       });
       ctx.setLineDash([]);
 
-      ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#e2e8f0'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
       ctx.fillText(
         spread >= 0.99 ? 'Slit narrower than the wavelength — waves spread through almost a full half-circle' : `Diffraction half-angle ≈ ${(maxSpreadAngle * 180 / Math.PI).toFixed(0)}°`,
-        W / 2, 22,
+        W / 2, 22, W - 16,
       );
-      ctx.fillStyle = '#94a3b8'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText(`λ/a = ${(s.wavelengthNm / s.slitWidthNm).toFixed(2)} — bigger ratio (narrower slit, or longer wavelength) means more spreading`, 8, H - 10);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
+      ctx.fillText(`λ/a = ${(s.wavelengthNm / s.slitWidthNm).toFixed(2)} — bigger ratio (narrower slit, or longer wavelength) means more spreading`, 8, H - 10, W - 20);
       rafRef.current = requestAnimationFrame(draw);
       return;
     } else if (s.mode === 'grating') {
@@ -163,14 +163,14 @@ export function DiffractionCanvas({ mode, wavelengthNm, slitWidthNm, slitSpacing
         ctx.beginPath(); ctx.arc(screenX, targetY, n === 0 ? 5 : 4, 0, Math.PI * 2);
         ctx.fillStyle = n === 0 ? '#ffffff' : hue;
         ctx.fill();
-        ctx.fillStyle = '#cbd5e1'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
+        ctx.fillStyle = '#cbd5e1'; ctx.font = '600 13px system-ui'; ctx.textAlign = 'left';
         ctx.fillText(`n=${n}`, screenX + 10, targetY + 3);
       });
 
-      ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText(`d sinθ = nλ — up to order n = ±${maxOrder} visible at this spacing/wavelength`, W / 2, 22);
-      ctx.fillStyle = '#94a3b8'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText(`λ=${s.wavelengthNm}nm  d=${s.slitSpacingNm}nm`, 8, H - 10);
+      ctx.fillStyle = '#e2e8f0'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText(`d sinθ = nλ — up to order n = ±${maxOrder} visible at this spacing/wavelength`, W / 2, 22, W - 16);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
+      ctx.fillText(`λ=${s.wavelengthNm}nm  d=${s.slitSpacingNm}nm`, 8, H - 10, W - 20);
     } else {
       // ── Young's double-slit interference ────────────────────────────────
       const gapX = W * 0.32;
@@ -259,10 +259,10 @@ export function DiffractionCanvas({ mode, wavelengthNm, slitWidthNm, slitSpacing
         ctx.beginPath(); ctx.arc(screenX, y, n === 0 ? 4 : 3, 0, Math.PI * 2); ctx.fill();
       }
 
-      ctx.fillStyle = '#e2e8f0'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('Bright fringes where the path difference from the two slits is a whole number of wavelengths', W / 2, 22);
-      ctx.fillStyle = '#94a3b8'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-      ctx.fillText(`fringe spacing Δy = λD/d (near the centre) — ${visibleFringes} bright fringes visible on this screen`, 8, H - 10);
+      ctx.fillStyle = '#e2e8f0'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('Bright fringes: path difference = nλ', W / 2, 22, W - 16);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '600 14px system-ui'; ctx.textAlign = 'left';
+      ctx.fillText(`fringe spacing Δy = λD/d (near the centre) — ${visibleFringes} bright fringes visible on this screen`, 8, H - 10, W - 20);
     }
 
     rafRef.current = requestAnimationFrame(draw);
