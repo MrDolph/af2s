@@ -10,7 +10,7 @@ import { ElevatorCanvas } from '@/components/simulation/ElevatorCanvas';
 import { WeightlessnessCanvas } from '@/components/simulation/WeightlessnessCanvas';
 import { WalkingCanvas } from '@/components/simulation/WalkingCanvas';
 import { PropulsionCanvas } from '@/components/simulation/PropulsionCanvas';
-import { CollisionCanvas } from '@/components/simulation/CollisionCanvas';
+import { COLLISION_OBJECTS, CollisionCanvas, type CollisionObject } from '@/components/simulation/CollisionCanvas';
 import { useResponsiveCanvasSize } from '@/hooks/useResponsiveCanvasSize';
 import {
   apparentWeight, solveCollision, rocketAnalytics, rocketStateAt,
@@ -65,7 +65,7 @@ const TEACHER_NOTES: Record<Topic, string[]> = {
   ],
   collision: [
     "Momentum is always conserved in collisions (no external forces). Kinetic energy may or may not be conserved.",
-    "Elastic collision: KE conserved (e=1). Inelastic: KE lost (e<1). Perfectly inelastic: objects stick together (e=0).",
+    "Elastic collisions conserve kinetic energy. Inelastic collisions lose kinetic energy. Sticking is the perfectly inelastic case (e=0), which this demo uses.",
     "Impulse = change in momentum = FΔt. Increasing contact time (crumple zones, airbags) reduces peak force.",
     "The impulse-momentum theorem is why cars have airbags — same Δp, longer Δt, smaller F on passenger.",
     "WAEC exam: most collision questions just apply p_before = p_after. Check if KE is asked separately.",
@@ -149,25 +149,16 @@ export default function ConsequencesPage() {
   const [liveFall, setLiveFall] = useState({ t: 0, distance: 0 });
 
   // Collision
+  const [objectA, setObjectA] = useState<CollisionObject>('block');
+  const [objectB, setObjectB] = useState<CollisionObject>('block');
   const [collM1, setCollM1] = useState(3);
   const [collM2, setCollM2] = useState(2);
   const [collU1, setCollU1] = useState(6);
   const [collU2, setCollU2] = useState(0);
-  const [collType, setCollType] = useState<CollisionParams['type']>('perfectly-inelastic');
-  const [collE, setCollE] = useState(0.6);
-  const [collResult, setCollResult] = useState<ReturnType<typeof solveCollision> | null>(null);
-
-  // Stable object identity: without this, the instant the collision finishes
-  // (onComplete calling setCollResult/setIsComplete/setIsRunning) the page
-  // re-renders and recreates this object with a new reference. Since
-  // CollisionCanvas's phase-reset effect depends on [params], that new
-  // reference retriggers it at the exact moment impact transitions to
-  // "after" — resetting the whole sequence right when it should be showing
-  // the post-collision result. Same root cause as the earlier Newton's 2nd
-  // law "vibrating block" bug.
+  const [collType, setCollType] = useState<CollisionParams['type']>('elastic');
   const collParams: CollisionParams = useMemo(
-    () => ({ m1: collM1, m2: collM2, u1: collU1, u2: collU2, type: collType, e: collE }),
-    [collM1, collM2, collU1, collU2, collType, collE]
+    () => ({ m1: collM1, m2: collM2, u1: collU1, u2: collU2, type: collType }),
+    [collM1, collM2, collU1, collU2, collType]
   );
   const rocketA = rocketAnalytics(rocketMass, exhaustSpeed, massFlowRate);
   const rocketDryMass = rocketMass * (1 - fuelFraction);
@@ -183,7 +174,6 @@ export default function ConsequencesPage() {
   const reset = useCallback(() => {
     setIsRunning(false); setIsPaused(false);
     setIsComplete(false); setResetKey(k => k + 1);
-    setCollResult(null);
     setLiveRocket({ t: 0, v: 0, burnedOut: false });
     setLiveFall({ t: 0, distance: 0 });
   }, []);
@@ -191,7 +181,7 @@ export default function ConsequencesPage() {
   useEffect(() => {
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(reset, 100);
-  }, [topic, elevMass, elevState, elevAccel, frictionEnabled, rocketMass, exhaustSpeed, massFlowRate, fuelFraction, wlHeight, collM1, collM2, collU1, collU2, collType, collE, reset]);
+  }, [topic, elevMass, elevState, elevAccel, frictionEnabled, rocketMass, exhaustSpeed, massFlowRate, fuelFraction, wlHeight, collM1, collM2, collU1, collU2, collType, reset]);
 
   // Elevator is a tall, portrait-ish shaft; walking/collision are wide
   // and short — pick the matching base aspect before scaling up.
@@ -223,8 +213,7 @@ export default function ConsequencesPage() {
     "collM1": setCollM1,
     "collU1": setCollU1,
     "collM2": setCollM2,
-    "collU2": setCollU2,
-    "collE": setCollE }, {  });
+    "collU2": setCollU2 }, {  });
   return (
     <>
       <AppHeader />
@@ -254,13 +243,12 @@ export default function ConsequencesPage() {
           {/* Topic tabs — scrollable on mobile */}
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto">
             {(Object.keys(TOPIC_META) as Topic[]).map(t => (
-              <button key={t} onClick={() => { setTopic(t); setOpenEx(null); }}
+              <button key={t} onClick={() => { setTopic(t); setOpenEx(null); }} aria-pressed={topic === t}
                 className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition ${
                   topic === t ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                 }`}>
-                <span>{TOPIC_META[t].icon}</span>
-                <span className="hidden sm:inline">{TOPIC_META[t].title}</span>
-                <span className="sm:hidden">{TOPIC_META[t].icon}</span>
+                <span aria-hidden="true">{TOPIC_META[t].icon}</span>
+                <span>{TOPIC_META[t].title}</span>
               </button>
             ))}
           </div>
@@ -275,12 +263,13 @@ export default function ConsequencesPage() {
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
 
             {/* Canvas + controls + params */}
-            <SimulationStage className="space-y-3 min-w-0">
+            <SimulationStage className="af-mechanics-stage space-y-3 min-w-0">
               <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
 
                 {topic === 'elevator' && (
                   <ElevatorCanvas key={resetKey} mass={elevMass} elevState={elevState}
                     manualAccel={elevAccel} isRunning={isRunning} isPaused={isPaused}
+                    onComplete={() => { setIsComplete(true); setIsRunning(false); }}
                     width={canvasSize.width} height={canvasSize.height} />
                 )}
 
@@ -304,10 +293,9 @@ export default function ConsequencesPage() {
                 )}
 
                 {topic === 'collision' && (
-                  <CollisionCanvas key={resetKey} params={collParams}
+                  <CollisionCanvas key={JSON.stringify([resetKey, collParams])} params={collParams} objectA={objectA} objectB={objectB}
                     isRunning={isRunning} isPaused={isPaused}
-                    onComplete={r => { setCollResult(r); setIsComplete(true); setIsRunning(false); }}
-                    width={canvasSize.width} height={canvasSize.height} />
+                    onComplete={() => { setIsComplete(true); setIsRunning(false); }} />
                 )}
               </div>
 
@@ -365,11 +353,11 @@ export default function ConsequencesPage() {
               <div data-stage-role="playback" className="flex flex-wrap items-center justify-between gap-2">
                 <SimulationControls
                   isRunning={isRunning && !isComplete} isPaused={isPaused}
-                  onRun={() => { setIsRunning(true); setIsPaused(false); setIsComplete(false); }}
+                  onRun={() => { if (isComplete) setResetKey(k => k + 1); setIsRunning(true); setIsPaused(false); setIsComplete(false); }}
                   onPause={() => setIsPaused(p => !p)}
                   onReset={reset}
                 />
-                {isComplete && <span className="text-xs font-medium text-emerald-600">✓ Complete — Reset to go again</span>}
+                {isComplete && <span className="text-xs font-medium text-emerald-600">✓ Complete · Run to replay</span>}
                 {topic === 'propulsion' && liveRocket.burnedOut && (
                   <span className="text-xs font-medium text-amber-600">🔥 Engine cutoff — coasting</span>
                 )}
@@ -436,21 +424,27 @@ export default function ConsequencesPage() {
 
                 {topic === 'collision' && (
                   <>
-                    <div className="grid grid-cols-3 gap-1 bg-gray-100 p-1 rounded-xl">
-                      {(['elastic', 'inelastic', 'perfectly-inelastic'] as CollisionParams['type'][]).map(t => (
-                        <button key={t} onClick={() => setCollType(t)}
+                    <div className="grid grid-cols-2 gap-1 bg-gray-100 p-1 rounded-xl">
+                      {(['elastic', 'perfectly-inelastic'] as const).map(t => (
+                        <button key={t} onClick={() => setCollType(t)} aria-pressed={collType === t}
                           className={`py-2 rounded-lg text-[10px] font-medium transition ${
                             collType === t ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500'
-                          }`}>{t === 'perfectly-inelastic' ? 'Stick together' : t.charAt(0).toUpperCase() + t.slice(1)}</button>
+                          }`}>{t === 'elastic' ? 'Elastic' : 'Inelastic (sticks)'}</button>
                       ))}
                     </div>
-                    <Slider label="Mass 1 (blue)" unit="kg" value={collM1} min={0.5} max={10} step={0.5} set={setCollM1} color="#6366f1" />
-                    <Slider label="Velocity 1" unit="m/s" value={collU1} min={-10} max={20} step={0.5} set={setCollU1} color="#6366f1" />
-                    <Slider label="Mass 2 (green)" unit="kg" value={collM2} min={0.5} max={10} step={0.5} set={setCollM2} color="#10b981" />
-                    <Slider label="Velocity 2" unit="m/s" value={collU2} min={-10} max={10} step={0.5} set={setCollU2} color="#10b981" note="Negative = moving left" />
-                    {collType === 'inelastic' && (
-                      <Slider label="Coefficient of restitution (e)" unit="" value={collE} min={0.01} max={0.99} step={0.01} set={setCollE} color="#f59e0b" note="0 = stick together, 1 = elastic" />
-                    )}
+                    {([{ label: 'Object A', value: objectA, set: setObjectA }, { label: 'Object B', value: objectB, set: setObjectB }]).map(({ label, value, set }) => (
+                      <label key={label} className="grid gap-1 text-sm font-medium text-slate-700">
+                        {label}
+                        <select value={value} onChange={event => set(event.target.value as CollisionObject)}
+                          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900">
+                          {Object.entries(COLLISION_OBJECTS).map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+                        </select>
+                      </label>
+                    ))}
+                    <Slider label="Mass A (blue)" unit="kg" value={collM1} min={0.5} max={10} step={0.5} set={setCollM1} color="#6366f1" />
+                    <Slider label="Velocity A" unit="m/s" value={collU1} min={-10} max={20} step={0.5} set={setCollU1} color="#6366f1" />
+                    <Slider label="Mass B (green)" unit="kg" value={collM2} min={0.5} max={10} step={0.5} set={setCollM2} color="#10b981" />
+                    <Slider label="Velocity B" unit="m/s" value={collU2} min={-10} max={10} step={0.5} set={setCollU2} color="#10b981" note="Negative = moving left" />
                   </>
                 )}
               </div>
@@ -513,7 +507,8 @@ export default function ConsequencesPage() {
                     </div>
                   ))}
 
-                  {topic === 'collision' && [
+                  {topic === 'collision' && collU1 <= collU2 && <p className="text-sm text-slate-700">No impact occurs at these velocities.</p>}
+                  {topic === 'collision' && collU1 > collU2 && [
                     { l: 'v₁ after', v: `${collRes.v1.toFixed(2)} m/s`, c: 'text-indigo-600' },
                     { l: 'v₂ after', v: `${collRes.v2.toFixed(2)} m/s`, c: 'text-emerald-600' },
                     { l: 'p before', v: `${collRes.momentumBefore.toFixed(2)} kg·m/s`, c: 'text-gray-600' },

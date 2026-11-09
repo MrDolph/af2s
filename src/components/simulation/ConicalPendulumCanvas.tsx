@@ -73,7 +73,7 @@ export function ConicalPendulumCanvas({ length, theta_deg, mass, isRunning, isPa
     const projectedAngle = Math.atan2(bobY - pivotY, bobX - cx);
     ctx.arc(cx, pivotY, 28, Math.min(Math.PI / 2, projectedAngle), Math.max(Math.PI / 2, projectedAngle));
     ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.fillStyle = '#f59e0b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#92400e'; ctx.font = '600 12px system-ui'; ctx.textAlign = 'left';
     ctx.fillText(`θ=${th}° (true angle)`, cx + 6, pivotY + 38);
 
     // Bob
@@ -92,7 +92,7 @@ export function ConicalPendulumCanvas({ length, theta_deg, mass, isRunning, isPa
     ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(bobX, bobY);
     ctx.lineTo(bobX + Tx / Tmag * Tscale, bobY + Ty / Tmag * Tscale); ctx.stroke();
-    ctx.fillStyle = '#10b981'; ctx.font = '9px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#047857'; ctx.font = '600 12px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(`T=${T.toFixed(1)}N`, bobX + Tx / Tmag * Tscale * 0.6, bobY + Ty / Tmag * Tscale * 0.6 - 6);
     ctx.restore();
 
@@ -106,12 +106,12 @@ export function ConicalPendulumCanvas({ length, theta_deg, mass, isRunning, isPa
     ctx.beginPath(); ctx.moveTo(bobX, bobY + Wscale);
     ctx.lineTo(bobX - 4, bobY + Wscale - 7); ctx.lineTo(bobX + 4, bobY + Wscale - 7);
     ctx.closePath(); ctx.fill();
-    ctx.font = '9px system-ui'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#b91c1c'; ctx.font = '600 12px system-ui'; ctx.textAlign = 'left';
     ctx.fillText(`mg=${W_n.toFixed(1)}N`, bobX + 6, bobY + Wscale / 2);
     ctx.restore();
 
     // Info
-    ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#334155'; ctx.font = '600 12px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(`r=${r_circ.toFixed(2)}m  T_period=${(2*Math.PI/omega).toFixed(2)}s`, cx, H - 8);
 
     rafRef.current = requestAnimationFrame(draw);

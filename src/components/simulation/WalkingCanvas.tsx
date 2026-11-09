@@ -55,16 +55,16 @@ export function WalkingCanvas({ isRunning, isPaused, frictionEnabled, speed = 1,
     ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.stroke();
 
     // Surface label
-    ctx.fillStyle = '#94a3b8'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#334155'; ctx.font = '600 16px system-ui'; ctx.textAlign = 'center';
     if (!fr) {
-      ctx.fillText('ICE — frictionless (no grip, no walking)', W / 2, H - 10);
+      ctx.fillText('ICE — frictionless (no grip, no walking)', W / 2, H - 10, W - 16);
       // Ice texture
       for (let ix = 0; ix < W; ix += 30) {
         ctx.strokeStyle = 'rgba(147,197,253,0.5)'; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(ix, groundY); ctx.lineTo(ix + 15, groundY + 8); ctx.stroke();
       }
     } else {
-      ctx.fillText('Normal ground — friction provides forward push', W / 2, H - 10);
+      ctx.fillText('Normal ground — friction provides forward push', W / 2, H - 10, W - 16);
     }
 
     // Walking person (stick figure with leg animation)
@@ -107,9 +107,9 @@ export function WalkingCanvas({ isRunning, isPaused, frictionEnabled, speed = 1,
       ctx.beginPath(); ctx.moveTo(footX - 55, pushY);
       ctx.lineTo(footX - 45, pushY - 5); ctx.lineTo(footX - 45, pushY + 5);
       ctx.closePath(); ctx.fill();
-      ctx.font = '9px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('Foot on ground', footX - 28, pushY - 8);
-      ctx.fillText('(action ←)', footX - 28, pushY + 14);
+      ctx.font = '600 14px system-ui'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#991b1b';
+      ctx.fillText('Foot pushes ground ←', W / 2, H - 31, W - 16);
 
       // Ground pushes person forward (reaction) — green arrow rightward on person
       ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2;
@@ -118,15 +118,15 @@ export function WalkingCanvas({ isRunning, isPaused, frictionEnabled, speed = 1,
       ctx.beginPath(); ctx.moveTo(x + 35, py - 45);
       ctx.lineTo(x + 25, py - 50); ctx.lineTo(x + 25, py - 40);
       ctx.closePath(); ctx.fill();
-      ctx.fillText('Ground on person', x + 5, py - 52);
-      ctx.fillText('(reaction →)', x + 5, py - 35);
+      ctx.fillStyle = '#065f46';
+      ctx.fillText('Ground pushes person →', W / 2, 22, W - 16);
       ctx.restore();
     }
 
     if (!fr && r) {
       // Feet slipping
-      ctx.fillStyle = '#ef4444'; ctx.font = '11px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('No friction → no reaction force → cannot walk!', x, py - 110);
+      ctx.fillStyle = '#ef4444'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText('No friction → no forward push', W / 2, 22, W - 16);
     }
 
     rafRef.current = requestAnimationFrame(draw);

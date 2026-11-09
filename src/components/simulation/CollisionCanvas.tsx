@@ -1,190 +1,135 @@
 'use client';
-import { useRef, useEffect, useCallback } from 'react';
-import { CollisionParams, solveCollision } from '@/lib/physics/consequences';
 
-interface Props {
-  params: CollisionParams;
-  isRunning: boolean; isPaused: boolean;
-  onComplete?: (result: ReturnType<typeof solveCollision>) => void;
-  width?: number; height?: number;
+import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { type CollisionParams, solveCollision } from '@/lib/physics/consequences';
+
+const APPROACH = 1.6;
+const CONTACT = 1;
+const DEPARTURE = 1.5;
+const RELEASE = APPROACH + CONTACT;
+const END = RELEASE + DEPARTURE;
+const BLOCK = 72;
+
+function signed(value: number) {
+  return `${value > 0 ? '+' : ''}${Number(value.toFixed(2))}`;
 }
 
-const BW = 64;
-const X1_START = 80;
-const X2_START = 500;
-const IMPACT_FLASH_DURATION = 0.3; // s — bodies stay visually in contact for this long
-// px per (m/s) per second of wall-clock time — tuned to match the pacing of
-// the original frame-based animation (which moved u*0.8px every frame,
-// ~48px/s at 60fps) now that motion is driven by real elapsed time instead.
-const PX_PER_MPS = 48;
+export const COLLISION_OBJECTS = {
+  block: 'Block',
+  trolley: 'Trolley',
+  car: 'Toy car',
+  truck: 'Toy pickup truck',
+  lorry: 'Toy lorry',
+} as const;
 
-type Phase = 'before' | 'impact' | 'after';
+export type CollisionObject = keyof typeof COLLISION_OBJECTS;
 
-export function CollisionCanvas({ params, isRunning, isPaused, onComplete, width = 680, height = 220 }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const rafRef = useRef<number>(0);
-  const lastFrameRef = useRef<number | null>(null);
-  const t = useRef(0);           // wall-clock time since this run started/reset
-  const tImpact = useRef(0);     // the value of t at the moment of impact
-  const phase = useRef<Phase>('before');
-  const completedRef = useRef(false);
-  const result = useRef(solveCollision(params));
-  const simRef = useRef({ params, isRunning, isPaused, onComplete });
-  simRef.current = { params, isRunning, isPaused, onComplete };
+// Each silhouette spans the same contact width as the original block.
+const VEHICLE_BODIES = {
+  trolley: 'M0 76H72V99H0Z M0 76V63H5V76Z',
+  car: 'M0 81H9L21 66H47L60 81H72V99H0Z',
+  truck: 'M0 79H32V65H53L64 78H72V99H0Z',
+  lorry: 'M0 60H43V83H47V68H61L72 81V99H0Z',
+};
 
-  useEffect(() => {
-    phase.current = 'before';
-    t.current = 0;
-    tImpact.current = 0;
-    completedRef.current = false;
-    lastFrameRef.current = null;
-    result.current = solveCollision(params);
-  }, [params]);
-
-  const draw = useCallback((timestamp?: number) => {
-    const canvas = canvasRef.current; if (!canvas) return;
-    const ctx = canvas.getContext('2d'); if (!ctx) return;
-    const { params: p, isRunning: r, isPaused: pa, onComplete: oc } = simRef.current;
-    const W = 680, H = Math.max(260, canvas.height);
-    const groundY = H - 50;
-
-    // Real wall-clock dt, gated on running/paused exactly like every other
-    // canvas in the app — this also means the impact flash duration and the
-    // moment onComplete fires both correctly freeze while paused, instead of
-    // the old setTimeout (which kept counting down regardless of pause and
-    // was the root of the sequence "skipping ahead" unpredictably).
-    let dt = 0;
-    if (r && !pa && timestamp !== undefined) {
-      if (lastFrameRef.current !== null) {
-        dt = Math.min((timestamp - lastFrameRef.current) / 1000, 0.1);
-        t.current += dt;
-      }
-      lastFrameRef.current = timestamp;
-    } else {
-      lastFrameRef.current = timestamp ?? null;
-    }
-
-    // Position is always a pure function of elapsed time (not an
-    // accumulator), so there's no drift and pausing/resuming is exact.
-    let x1: number, x2: number;
-    if (phase.current === 'before') {
-      x1 = X1_START + p.u1 * PX_PER_MPS * t.current;
-      x2 = X2_START + p.u2 * PX_PER_MPS * t.current;
-      if (dt > 0 && x1 + BW >= x2) {
-        phase.current = 'impact';
-        tImpact.current = t.current;
-        result.current = solveCollision(p);
-        // Clamp to the exact contact point so the flash starts flush against
-        // both bodies rather than with a visible last-frame overlap.
-        x2 = x1 + BW;
-      }
-    } else if (phase.current === 'impact') {
-      x1 = X1_START + p.u1 * PX_PER_MPS * tImpact.current;
-      x2 = x1 + BW; // frozen in contact during the flash
-      if (t.current - tImpact.current >= IMPACT_FLASH_DURATION) {
-        phase.current = 'after';
-        if (!completedRef.current) { completedRef.current = true; oc?.(result.current); }
-      }
-    } else {
-      const tAfter = t.current - tImpact.current - IMPACT_FLASH_DURATION;
-      const xImpact = X1_START + p.u1 * PX_PER_MPS * tImpact.current + BW; // shared contact point
-      x1 = xImpact - BW + result.current.v1 * PX_PER_MPS * tAfter;
-      x2 = xImpact + result.current.v2 * PX_PER_MPS * tAfter;
-    }
-
-    ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, groundY);
-    ctx.fillStyle = '#e2e8f0'; ctx.fillRect(0, groundY, W, H - groundY);
-    ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(W, groundY);
-    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.stroke();
-
-    const by = groundY - 56;
-    const midY = by + 28;
-
-    const worldLeft = Math.min(0, x1 - 80, x2 - 80);
-    const worldRight = Math.max(W, x1 + BW + 80, x2 + BW + 80);
-    const cameraScale = W / (worldRight - worldLeft);
-    x1 = (x1 - worldLeft) * cameraScale;
-    x2 = (x2 - worldLeft) * cameraScale;
-    const blockWidth = BW * cameraScale;
-
-    // Impact flash
-    if (phase.current === 'impact') {
-      ctx.fillStyle = 'rgba(251,191,36,0.35)';
-      ctx.beginPath(); ctx.arc(x1 + blockWidth / 2, midY, 50, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'center';
-      ctx.fillText('IMPACT!', x1 + blockWidth / 2, midY - 55);
-    }
-
-    // Block 1
-    const bg1 = ctx.createLinearGradient(x1, by, x1, by + 56);
-    bg1.addColorStop(0, '#818cf8'); bg1.addColorStop(1, '#4f46e5');
-    ctx.fillStyle = bg1;
-    ctx.beginPath(); ctx.roundRect(x1, by, blockWidth, 56, 6); ctx.fill();
-    ctx.strokeStyle = '#3730a3'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.roundRect(x1, by, blockWidth, 56, 6); ctx.stroke();
-    ctx.fillStyle = 'white'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-    ctx.fillText(`${p.m1}kg`, x1 + blockWidth / 2, midY - 6);
-    ctx.font = '9px system-ui';
-    ctx.fillText(phase.current === 'before' ? `u=${p.u1} m/s` : `v=${result.current.v1.toFixed(1)} m/s`, x1 + blockWidth / 2, midY + 10);
-
-    // Block 2
-    const bg2 = ctx.createLinearGradient(x2, by, x2, by + 56);
-    bg2.addColorStop(0, '#34d399'); bg2.addColorStop(1, '#059669');
-    ctx.fillStyle = bg2;
-    ctx.beginPath(); ctx.roundRect(x2, by, blockWidth, 56, 6); ctx.fill();
-    ctx.strokeStyle = '#047857'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.roundRect(x2, by, blockWidth, 56, 6); ctx.stroke();
-    ctx.fillStyle = 'white'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-    ctx.fillText(`${p.m2}kg`, x2 + blockWidth / 2, midY - 6);
-    ctx.font = '9px system-ui';
-    ctx.fillText(phase.current === 'before' ? `u=${p.u2} m/s` : `v=${result.current.v2.toFixed(1)} m/s`, x2 + blockWidth / 2, midY + 10);
-
-    // Velocity arrows before impact
-    if (phase.current === 'before') {
-      [{ x: x1, v: p.u1, w: blockWidth }, { x: x2, v: p.u2, w: blockWidth }].forEach(b => {
-        if (Math.abs(b.v) < 0.01) return;
-        const dir = Math.sign(b.v);
-        const ax = dir > 0 ? b.x + b.w : b.x;
-        const arrowLen = Math.min(Math.abs(b.v) * 10, 60);
-        ctx.save();
-        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(ax, midY - 30); ctx.lineTo(ax + dir * arrowLen, midY - 30); ctx.stroke();
-        ctx.fillStyle = '#f59e0b';
-        ctx.beginPath(); ctx.moveTo(ax + dir * arrowLen, midY - 30);
-        ctx.lineTo(ax + dir * arrowLen - dir * 8, midY - 35);
-        ctx.lineTo(ax + dir * arrowLen - dir * 8, midY - 25);
-        ctx.closePath(); ctx.fill();
-        ctx.restore();
-      });
-
-      // Warn if the bodies are not actually on a collision course, so the
-      // "before" phase doesn't just run forever with no explanation.
-      if (p.u1 - p.u2 <= 0) {
-        ctx.fillStyle = '#dc2626'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
-        ctx.fillText('Not closing — body 1 is not catching up to body 2 (raise u₁ or lower u₂)', W / 2, 20);
-      }
-    }
-
-    // Type label
-    ctx.fillStyle = '#6366f1'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-    ctx.fillText(`${p.type} collision`, 10, 18);
-    if (phase.current === 'after') {
-      ctx.fillStyle = '#10b981';
-      ctx.fillText(`p: ${result.current.momentumBefore.toFixed(1)} → ${result.current.momentumAfter.toFixed(1)} kg·m/s  |  KE lost: ${result.current.keLost.toFixed(1)} J`, 10, H - 12);
-    }
-
-    rafRef.current = requestAnimationFrame(draw);
-  }, []);
+export function CollisionCanvas({ params, isRunning, isPaused, onComplete, objectA = 'block', objectB = 'block' }: {
+  params: CollisionParams;
+  objectA?: CollisionObject;
+  objectB?: CollisionObject;
+  isRunning: boolean;
+  isPaused: boolean;
+  onComplete: () => void;
+}) {
+  const [time, setTime] = useState(0);
+  const elapsed = useRef(0);
+  const complete = useEffectEvent(onComplete);
+  const closing = params.u1 > params.u2;
+  const sticks = params.type === 'perfectly-inelastic';
+  const result = solveCollision(params);
+  const end = closing ? END : APPROACH;
 
   useEffect(() => {
-    rafRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [draw]);
+    if (!isRunning || isPaused) return;
+    let frame: number;
+    let previous: number | undefined;
+    function advance(now: number) {
+      if (previous !== undefined) elapsed.current = Math.min(end, elapsed.current + Math.min(0.05, (now - previous) / 1000));
+      previous = now;
+      setTime(elapsed.current);
+      if (elapsed.current < end) frame = requestAnimationFrame(advance);
+      else complete();
+    }
+    frame = requestAnimationFrame(advance);
+    return () => cancelAnimationFrame(frame);
+  }, [end, isRunning, isPaused]);
+
+  const phase = !closing || time < APPROACH ? 0 : time < RELEASE ? 1 : 2;
+  const [u1, u2] = [params.u1, params.u2];
+  // Derive exact velocities for positioning so even a small rebound separates.
+  const e = sticks ? 0 : params.type === 'elastic' ? 1 : params.e ?? 0.5;
+  const centerVelocity = (params.m1 * u1 + params.m2 * u2) / (params.m1 + params.m2);
+  const separation = e * (u1 - u2);
+  const v1 = centerVelocity - separation * params.m2 / (params.m1 + params.m2);
+  const v2 = centerVelocity + separation * params.m1 / (params.m1 + params.m2);
+  const gap = closing ? (u1 - u2) * APPROACH : Math.max(4, Math.abs(u1 - u2));
+  const contact = u1 * APPROACH;
+  const final = closing ? [contact + v1 * DEPARTURE, contact + v2 * DEPARTURE] : [u1 * APPROACH, gap + u2 * APPROACH];
+  const left = Math.min(0, gap, contact, ...final);
+  const right = Math.max(0, gap, contact, ...final);
+  // Fit the entire demonstration once. The track and bodies never zoom during playback.
+  const scale = 310 / Math.max(1, right - left);
+  const offset = (480 - BLOCK * 2 - (right - left) * scale) / 2;
+  const approach = Math.min(time, APPROACH);
+  const depart = Math.max(0, time - RELEASE);
+  const x1 = offset + ((phase === 2 ? contact + v1 * depart : u1 * approach) - left) * scale;
+  const x2 = offset + BLOCK + ((phase === 2 ? contact + v2 * depart : gap + u2 * approach) - left) * scale;
+  const messages = [
+    closing ? 'The gap closes because A’s signed velocity is greater than B’s.' : 'The gap cannot close. Set A’s velocity greater than B’s to see an impact.',
+    'Contact is slowed for illustration. The arrows show the equal and opposite impulses that change the bodies’ momenta.',
+    sticks ? 'The bodies remain joined and move with a common velocity.' : 'The bodies separate. The arrows show their final directions of motion.',
+  ];
+  const arrows = phase === 1 ? [result.impulse, -result.impulse] : phase === 2 ? [v1, v2] : [u1, u2];
 
   return (
-    <canvas ref={canvasRef} width={width} height={height}
-      className="w-full rounded-xl border border-gray-200 bg-white" style={{ display: 'block' }} />
+    <section className="af-collision-demo flex min-w-0 flex-col gap-2 rounded-xl border border-slate-300 bg-white p-2 sm:p-3" aria-label="Collision demonstration">
+      <ol className="grid grid-cols-3 gap-1 text-center text-xs font-semibold sm:text-sm" aria-label="Collision stages">
+        {['Before impact', 'During impact', 'After impact'].map((label, index) => (
+          <li key={label} aria-current={index === phase ? 'step' : undefined}
+            className={`rounded-md border px-1 py-1 ${index === phase ? 'border-indigo-700 bg-indigo-700 text-white' : 'border-slate-200 bg-slate-50 text-slate-700'}`}>
+            {index + 1}. {label}
+          </li>
+        ))}
+      </ol>
+      <div className="af-collision-track flex min-h-0 flex-1 items-center justify-center rounded-lg bg-slate-50">
+        <svg viewBox="0 0 480 128" className="block max-h-full w-full" role="img" aria-label="Body A starts left of body B. Arrows indicate direction.">
+          <path d="M0 112H480" stroke="#64748b" strokeWidth="2" />
+          {phase === 1 && <path d={`M${x2} 38v77`} stroke="#d97706" strokeWidth="10" />}
+          {[x1, x2].map((x, i) => {
+            const object = i === 0 ? objectA : objectB;
+            const color = i === 0 ? '#4338ca' : '#047857';
+            const center = x + BLOCK / 2;
+            const direction = Math.sign(arrows[i]);
+            const tip = center + direction * 26;
+            return <g key={i}>
+              {object === 'block' ? <rect x={x} y="55" width={BLOCK} height="56" rx={phase === 1 || (phase === 2 && sticks) ? 0 : 7} fill={color} /> : (
+                <g transform={`translate(${x} 0)${(i === 0 ? u1 : u2) < 0 ? ` translate(${BLOCK} 0) scale(-1 1)` : ''}`}>
+                  <path d={VEHICLE_BODIES[object]} fill={color} />
+                  <circle cx="15" cy="103" r="8" fill="#1e293b" />
+                  <circle cx="57" cy="103" r="8" fill="#1e293b" />
+                </g>
+              )}
+              <text x={center} y="92" fill="white" fontSize={object === 'block' ? 25 : 15} fontWeight="700" textAnchor="middle">{i === 0 ? 'A' : 'B'}</text>
+              {direction !== 0 && <path d={`M${center - direction * 20} 31H${tip}m${-direction * 9} -7 ${direction * 9} 7 ${-direction * 9} 7`} fill="none" stroke={phase === 1 ? '#b45309' : color} strokeWidth="4" strokeLinejoin="round" />}
+              {direction === 0 && <circle cx={center} cy="31" r="4" fill={color} />}
+            </g>;
+          })}
+        </svg>
+      </div>
+      <div className="grid grid-cols-2 gap-1 text-sm font-semibold tabular-nums">
+        <div className="rounded-md bg-indigo-50 px-2 py-1 text-indigo-900">A · {COLLISION_OBJECTS[objectA]} · {params.m1} kg<br />{phase === 1 ? `J: ${signed(result.impulse)} N·s` : `${signed(arrows[0])} m/s`}</div>
+        <div className="rounded-md bg-emerald-50 px-2 py-1 text-emerald-900">B · {COLLISION_OBJECTS[objectB]} · {params.m2} kg<br />{phase === 1 ? `J: ${signed(-result.impulse)} N·s` : `${signed(arrows[1])} m/s`}</div>
+      </div>
+      <p className="text-xs leading-snug text-slate-700 sm:text-sm" aria-live="polite">{messages[phase]} {phase === 2 && `Total momentum: ${result.momentumBefore} → ${result.momentumAfter} kg·m/s. Kinetic energy: ${result.keBefore} → ${result.keAfter} J.`}</p>
+    </section>
   );
 }

@@ -239,7 +239,7 @@ export default function VectorsPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_320px_280px]">
-            <SimulationStage className="min-w-0 space-y-3">
+            <SimulationStage className="af-mechanics-stage min-w-0 space-y-3">
               <div data-stage-role="canvas" ref={boxRef} className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
                 <VectorCanvas dim={dim} width={size.width} height={canvasH} scene={scene} snap={snap} view={view} onView={setView} dragAxis={dragAxis} showPlanes={planes} showGrid={grid}
                   readOnly={practicing} onHandle={onHandle}

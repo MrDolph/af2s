@@ -11,6 +11,8 @@ interface Props {
   width?: number; height?: number;
 }
 
+const PIXELS_PER_METRE = 44;
+
 function forceArrow(ctx: CanvasRenderingContext2D, x: number, y: number, len: number, dir: 1 | -1, color: string, label: string) {
   if (len < 2) return;
   const ex = x + dir * len;
@@ -63,15 +65,10 @@ export function StaticDynamicCanvas({ scenario, f1, f2, mass, isRunning, isPause
       lastFrameRef.current = timestamp ?? null;
     }
     if (dt > 0) {
+      x.current += v.current * dt + 0.5 * a * dt * dt;
       v.current += a * dt;
-      x.current += v.current * dt;
-      // Wrap so a genuinely unbalanced / constant-velocity block never
-      // just runs off-screen forever.
-      const wrapRange = 140;
-      if (x.current > wrapRange) x.current = -wrapRange;
-      if (x.current < -wrapRange) x.current = wrapRange;
+      s.onTick?.(v.current, x.current);
     }
-    s.onTick?.(v.current, x.current);
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, W, groundY);
@@ -79,7 +76,17 @@ export function StaticDynamicCanvas({ scenario, f1, f2, mass, isRunning, isPause
     ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(W, groundY); ctx.stroke();
 
-    const cx = W / 2 + x.current;
+    // The track marks stay fixed while the block crosses them.
+    ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1;
+    for (let mark = W / 2 % PIXELS_PER_METRE; mark < W; mark += PIXELS_PER_METRE) {
+      ctx.beginPath(); ctx.moveTo(mark, groundY); ctx.lineTo(mark, groundY + 9); ctx.stroke();
+    }
+
+    // Wrap the drawing only. The displacement readout stays continuous.
+    const margin = Math.min(130, W / 4);
+    const span = Math.max(1, W - 2 * margin);
+    const offset = x.current * PIXELS_PER_METRE + span / 2;
+    const cx = margin + ((offset % span + span) % span);
     const bw = 64, bh = 48;
     const by = groundY - bh;
     const midY = by + bh / 2;
@@ -90,24 +97,28 @@ export function StaticDynamicCanvas({ scenario, f1, f2, mass, isRunning, isPause
     ctx.fillText(`${s.mass}kg`, cx, midY + 4);
 
     // Force arrows — right-pulling f1 (green), left-pulling f2 (red)
-    forceArrow(ctx, cx + bw / 2, midY, Math.min(s.f1 * 3, 130), 1, '#10b981', `F₁=${s.f1}N`);
-    forceArrow(ctx, cx - bw / 2, midY, Math.min(s.f2 * 3, 130), -1, '#ef4444', `F₂=${s.f2}N`);
+    forceArrow(ctx, cx + bw / 2, midY, Math.min(s.f1 * 3, margin - 36), 1, '#10b981', `F₁=${s.f1}N`);
+    forceArrow(ctx, cx - bw / 2, midY, Math.min(s.f2 * 3, margin - 36), -1, '#ef4444', `F₂=${s.f2}N`);
 
-    ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+    if (Math.abs(v.current) > 0.01) {
+      forceArrow(ctx, cx, by - 22, Math.min(54, 24 + Math.abs(v.current) * 8), v.current > 0 ? 1 : -1, '#4338ca', 'Velocity');
+    }
+
+    ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'center';
     if (bal.equilibrium) {
       ctx.fillStyle = '#059669';
       ctx.fillText(
         s.scenario === 'static'
-          ? 'ΣF = 0 — STATIC EQUILIBRIUM: at rest, and stays at rest'
-          : `ΣF = 0 — DYNAMIC EQUILIBRIUM: moving at a constant ${INITIAL_V.toFixed(1)} m/s`,
+          ? 'Static equilibrium · at rest'
+          : 'Dynamic equilibrium · constant velocity',
         W / 2, 24,
       );
     } else {
       ctx.fillStyle = '#f59e0b';
       ctx.fillText(`NOT in equilibrium — ΣF = ${bal.netForce.toFixed(1)}N, a = ${a.toFixed(2)} m/s²`, W / 2, 24);
     }
-    ctx.fillStyle = '#64748b'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-    ctx.fillText(`v = ${v.current.toFixed(2)} m/s`, 8, H - 10);
+    ctx.fillStyle = '#334155'; ctx.font = '600 12px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText(`v = ${v.current.toFixed(2)} m/s   ·   Δx = ${x.current.toFixed(2)} m`, 8, H - 10);
 
     rafRef.current = requestAnimationFrame(draw);
   }, []);

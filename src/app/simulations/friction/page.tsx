@@ -204,7 +204,7 @@ export default function FrictionPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
-            <SimulationStage className="space-y-3 min-w-0">
+            <SimulationStage className="af-mechanics-stage space-y-3 min-w-0">
               <div data-stage-role="canvas" ref={canvasBoxRef} className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <FrictionCanvas key={resetKey} mode={mode} mass={mass} applied={applied} angle={angle}
                   appliedIncline={appliedIncline} muS={muS} muK={muK} isRunning={isRunning} isPaused={isPaused} resetKey={resetKey}

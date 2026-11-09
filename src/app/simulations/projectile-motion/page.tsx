@@ -247,7 +247,7 @@ export default function ProjectileMotionPage() {
           </div>
 
           {/* ── MOBILE: stack everything; DESKTOP: 3-col ── */}
-          <SimulationStage className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
+          <SimulationStage className="af-mechanics-stage grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] xl:grid-cols-[minmax(0,1fr)_220px_260px] gap-4">
 
             {/* Col 1: canvas + controls */}
             <div data-stage-role="canvas" className="space-y-3 min-w-0">

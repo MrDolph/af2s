@@ -162,8 +162,8 @@ function drawScene(
     ctx.save();
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1;
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '11px system-ui, sans-serif';
+    ctx.fillStyle = '#475569';
+    ctx.font = '12px system-ui, sans-serif';
     const xStep = Math.ceil(analytics.maxRange / 6 / 5) * 5 || 1;
     ctx.textAlign = 'center';
     for (let x = 0; x <= analytics.maxRange * 1.1; x += xStep) {
@@ -212,7 +212,7 @@ function drawScene(
     ctx.moveTo(pCx, pCy); ctx.lineTo(pCx, h - GROUND_HEIGHT);
     ctx.strokeStyle = 'rgba(99,102,241,0.4)'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#6366f1'; ctx.font = 'bold 11px system-ui';
+    ctx.fillStyle = '#4338ca'; ctx.font = 'bold 13px system-ui';
     ctx.textAlign = 'center';
     ctx.fillText(`${analytics.maxHeight.toFixed(1)}m`, pCx, pCy - 10);
     ctx.restore();
@@ -224,7 +224,7 @@ function drawScene(
     ctx.save();
     ctx.beginPath(); ctx.arc(lCx, h - GROUND_HEIGHT, 5, 0, Math.PI * 2);
     ctx.fillStyle = '#10b981'; ctx.fill();
-    ctx.fillStyle = '#10b981'; ctx.font = 'bold 11px system-ui';
+    ctx.fillStyle = '#047857'; ctx.font = 'bold 13px system-ui';
     ctx.textAlign = 'center';
     ctx.fillText(`${analytics.maxRange.toFixed(1)}m`, lCx, h - GROUND_HEIGHT + 32);
     ctx.restore();

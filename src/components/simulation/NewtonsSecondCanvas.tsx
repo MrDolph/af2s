@@ -106,7 +106,7 @@ export function NewtonsSecondCanvas({ params, isRunning, isPaused, onTick, onCom
       ctx.beginPath(); ctx.moveTo(ax + fLen, midY);
       ctx.lineTo(ax + fLen - 10, midY - 6); ctx.lineTo(ax + fLen - 10, midY + 6);
       ctx.closePath(); ctx.fillStyle = '#10b981'; ctx.fill();
-      ctx.fillStyle = '#10b981'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#047857'; ctx.font = 'bold 12px system-ui'; ctx.textAlign = 'center';
       ctx.fillText(`F=${pm.appliedForce}N`, ax + fLen / 2, midY - 10);
       ctx.restore();
     }
@@ -121,14 +121,14 @@ export function NewtonsSecondCanvas({ params, isRunning, isPaused, onTick, onCom
       ctx.beginPath(); ctx.moveTo(ax - fLen, midY + 14);
       ctx.lineTo(ax - fLen + 9, midY + 8); ctx.lineTo(ax - fLen + 9, midY + 20);
       ctx.closePath(); ctx.fillStyle = '#ef4444'; ctx.fill();
-      ctx.fillStyle = '#ef4444'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#b91c1c'; ctx.font = 'bold 12px system-ui'; ctx.textAlign = 'center';
       ctx.fillText(`f=${(pm.friction * pm.mass * 9.81).toFixed(1)}N`, ax - fLen / 2, midY + 30);
       ctx.restore();
     }
 
     // Net force label
     const netF = state.netForce;
-    ctx.fillStyle = '#6366f1'; ctx.font = 'bold 11px monospace'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#3730a3'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'left';
     ctx.fillText(`F_net=${netF.toFixed(1)}N  a=${state.a.toFixed(2)}m/s²  v=${state.v.toFixed(2)}m/s`, 10, 22);
 
     rafRef.current = requestAnimationFrame(draw);

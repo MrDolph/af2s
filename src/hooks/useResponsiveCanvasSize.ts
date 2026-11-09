@@ -47,9 +47,15 @@ export function useResponsiveCanvasSize(
       const style = getComputedStyle(el);
       const available = el.clientWidth - parseFloat(style.paddingLeft || '0') - parseFloat(style.paddingRight || '0');
       if (!available) return;
-      const w = Math.round(Math.min(available, el.closest('[data-expanded="true"]') ? 1600 : maxWidth));
+      // Direct mechanics canvases redraw to fill the classroom panel.
+      const expanded = el.closest('[data-expanded="true"]');
+      const fillsScene = expanded?.classList.contains('af-mechanics-stage')
+        && el.matches('[data-stage-role="canvas"]:has(> canvas:only-child)');
+      const w = Math.floor(fillsScene ? available : Math.min(available, expanded ? 1600 : maxWidth));
       const effectiveAspect = available < MOBILE_BREAKPOINT ? Math.min(aspect, MOBILE_MAX_ASPECT) : aspect;
-      const h = Math.max(minHeight, Math.round(w / effectiveAspect));
+      const nominalHeight = Math.max(minHeight, Math.round(w / effectiveAspect));
+      const availableHeight = Math.floor(el.clientHeight - parseFloat(style.paddingTop || '0') - parseFloat(style.paddingBottom || '0'));
+      const h = fillsScene && availableHeight >= 120 ? availableHeight : nominalHeight;
       setSize(prev => (prev.width === w && prev.height === h ? prev : { width: w, height: h }));
     };
 

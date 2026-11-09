@@ -192,7 +192,7 @@ export default function SpacePage() {
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_300px_280px]">
             {/* Canvas + controls */}
-            <SimulationStage className="min-w-0 space-y-3">
+            <SimulationStage className="af-mechanics-stage min-w-0 space-y-3">
               <div data-stage-role="canvas" ref={boxRef} className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
                 <SpaceCanvas
                   dim={dim} activity={act} width={size.width} height={canvasH}

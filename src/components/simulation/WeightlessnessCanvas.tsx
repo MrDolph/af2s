@@ -53,14 +53,14 @@ function drawChamber(
   ctx.fillStyle = '#1e293b';
   ctx.beginPath(); ctx.roundRect(bx + boxW / 2 - 16, sy, 32, 8, 3); ctx.fill();
   ctx.fillStyle = weightless ? '#ef4444' : '#059669';
-  ctx.font = 'bold 9px system-ui'; ctx.textAlign = 'center';
+  ctx.font = 'bold 14px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(`${scaleReading.toFixed(0)}N`, bx + boxW / 2, sy + 20);
 
-  ctx.fillStyle = '#64748b'; ctx.font = 'bold 10px system-ui';
-  ctx.fillText(label, x + w / 2, y - 6);
+  ctx.fillStyle = '#64748b'; ctx.font = 'bold 16px system-ui';
+  ctx.fillText(label, x + w / 2, y - 6, w - 8);
   if (weightless && fallOffset > 2) {
-    ctx.fillStyle = '#ef4444'; ctx.font = 'bold 9px system-ui';
-    ctx.fillText('WEIGHTLESS', x + w / 2, by - 4);
+    ctx.fillStyle = '#ef4444'; ctx.font = 'bold 14px system-ui';
+    ctx.fillText('WEIGHTLESS', x + w / 2, by - 4, w - 8);
   }
 }
 
@@ -90,7 +90,7 @@ export function WeightlessnessCanvas({ mass, gValue, isRunning, isPaused, onTick
       lastFrameRef.current = timestamp ?? null;
     }
 
-    const chamberH = H - 30;
+    const chamberH = H - 65;
     const maxDropPx = chamberH - 80;
     const dropDistanceM = freeFallDistance(t.current, gv);
     // Visual pixel scale chosen so a representative drop (Earth g, ~2s) just
@@ -118,10 +118,10 @@ export function WeightlessnessCanvas({ mass, gValue, isRunning, isPaused, onTick
       landed.current ? 'Landed' : 'Free falling', falling && !landed.current);
 
     // Context readout
-    ctx.fillStyle = '#475569'; ctx.font = '10px system-ui'; ctx.textAlign = 'left';
-    ctx.fillText(`g at this altitude = ${gv.toFixed(2)} m/s²  (${(gv / 9.81 * 100).toFixed(0)}% of Earth surface)`, 10, H - 6);
-    ctx.textAlign = 'right';
-    ctx.fillText(`fallen ${dropDistanceM.toFixed(1)} m in ${t.current.toFixed(1)}s`, W - 10, H - 6);
+    ctx.fillStyle = '#475569'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'left';
+    ctx.fillText(`g at this altitude = ${gv.toFixed(2)} m/s²  (${(gv / 9.81 * 100).toFixed(0)}% of Earth surface)`, 10, H - 23, W - 20);
+    ctx.textAlign = 'left';
+    ctx.fillText(`fallen ${dropDistanceM.toFixed(1)} m in ${t.current.toFixed(1)}s`, 10, H - 5, W - 20);
 
     rafRef.current = requestAnimationFrame(draw);
   }, []);

@@ -114,7 +114,7 @@ export function PropulsionCanvas({
     ctx.lineTo(cx + bodyW / 2 + 22, cy);
     ctx.lineTo(cx + bodyW / 2, cy + bodyH / 2);
     ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#312e81'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#312e81'; ctx.font = 'bold 13px system-ui'; ctx.textAlign = 'center';
     ctx.fillText(`${state.mass.toFixed(0)}kg`, cx, cy + 4);
 
     // Fuel gauge
@@ -123,25 +123,24 @@ export function PropulsionCanvas({
     ctx.beginPath(); ctx.roundRect(gx, gy, gw, gh, 4); ctx.fill();
     ctx.fillStyle = state.fuelFraction > 0.2 ? '#34d399' : '#f87171';
     ctx.beginPath(); ctx.roundRect(gx, gy, gw * Math.max(0, state.fuelFraction), gh, 4); ctx.fill();
-    ctx.fillStyle = '#cbd5e1'; ctx.font = '9px system-ui'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#cbd5e1'; ctx.font = '600 15px system-ui'; ctx.textAlign = 'left';
     ctx.fillText(`Fuel ${(state.fuelFraction * 100).toFixed(0)}%`, gx, gy - 4);
 
     // HUD
     ctx.textAlign = 'right';
-    const uiScale = Math.max(0.75, Math.min(1, W / 660));
     const hud = [
       `T+${state.t.toFixed(1)}s`,
       `v = ${state.v.toFixed(1)} m/s`,
       `a = ${state.acceleration.toFixed(2)} m/s²`,
       `Thrust = ${state.thrust.toFixed(0)} N`,
     ];
-    const hudFont = Math.max(8, Math.round(10 * uiScale)), hudLineH = Math.max(12, Math.round(15 * uiScale));
+    const hudFont = Math.max(14, Math.min(20, Math.round(W / 45))), hudLineH = hudFont + 5;
     ctx.font = `bold ${hudFont}px monospace`; ctx.fillStyle = '#e0e7ff';
-    hud.forEach((line, i) => ctx.fillText(line, W - 12, 18 + i * hudLineH));
+    hud.forEach((line, i) => ctx.fillText(line, W - 12, hudFont + 5 + i * hudLineH));
 
     if (state.burnedOut) {
-      ctx.textAlign = 'center'; ctx.font = 'bold 11px system-ui'; ctx.fillStyle = '#fbbf24';
-      ctx.fillText('🔥 Engine cutoff — coasting at constant velocity (Newton\u2019s 1st Law)', W / 2, H - 10);
+      ctx.textAlign = 'center'; ctx.font = 'bold 16px system-ui'; ctx.fillStyle = '#fbbf24';
+      ctx.fillText('Engine cutoff · coasting at constant velocity', W / 2, H - 5, W - 16);
     }
 
     rafRef.current = requestAnimationFrame(draw);

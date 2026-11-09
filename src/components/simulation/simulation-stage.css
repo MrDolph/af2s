@@ -82,3 +82,23 @@
  .af-simulation-stage[data-expanded="true"] .af-stage-parameters > [data-stage-role="parameters"] { padding: .2rem; }
 }
 .af-simulation-stage[data-expanded="true"] .af-stage-parameters :is(.grid,.space-y-3,.space-y-4):has(input) { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: .75rem; }
+
+/* Keep mechanics scenes centered and their HTML labels legible at classroom scale. */
+.af-mechanics-stage[data-expanded="true"] :is(.af-stage-toolbar, [data-stage-role="playback"], .af-stage-parameters) .text-xs { font-size: .875rem; }
+.af-mechanics-stage[data-expanded="true"] .af-stage-parameters [class*="text-[10px]"] { font-size: .8125rem; }
+.af-mechanics-stage[data-expanded="true"] [data-stage-role="canvas"]:has(> canvas:only-child) {
+ display: grid;
+ place-items: center;
+}
+.af-mechanics-stage[data-expanded="true"] [data-stage-role="canvas"]:has(.af-collision-demo) {
+ display: flex;
+ flex-direction: column;
+}
+.af-mechanics-stage[data-expanded="true"] .af-collision-demo { flex: 1; }
+.af-mechanics-stage[data-expanded="true"] .af-collision-track { min-height: 64px; }
+.af-mechanics-stage[data-expanded="true"] [data-stage-role="canvas"] > canvas:only-child {
+ max-height: 100%;
+}
+.af-mechanics-stage[data-expanded="true"] [data-stage-role="canvas"]:has(> canvas:only-child) {
+ grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+}
